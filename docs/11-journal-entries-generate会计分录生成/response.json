@@ -1,0 +1,101 @@
+{
+  "contract": {
+    "id": 1,
+    "totalAmount": 3000.00,
+    "startDate": "2024-01-01",
+    "endDate": "2024-03-31",
+    "vendorName": "供应商A"
+  },
+  "journalEntries": [
+    {
+      "id": 1,
+      "bookingDate": "2024-01-31",
+      "accountName": "费用",
+      "debitAmount": 1000.00,
+      "creditAmount": 0.00,
+      "description": "合同摊销费用",
+      "memo": "摊销费用 - 2024-01",
+      "entryOrder": 1,
+      "entryType": "AMORTIZATION",
+      "createdAt": "2024-01-24T14:30:52.123456",
+      "updatedAt": "2024-01-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 2,
+      "bookingDate": "2024-01-31",
+      "accountName": "应付",
+      "debitAmount": 0.00,
+      "creditAmount": 1000.00,
+      "description": "合同摊销应付",
+      "memo": "摊销应付 - 2024-01",
+      "entryOrder": 2,
+      "entryType": "AMORTIZATION",
+      "createdAt": "2024-01-24T14:30:52.123456",
+      "updatedAt": "2024-01-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 3,
+      "bookingDate": "2024-02-29",
+      "accountName": "费用",
+      "debitAmount": 1000.00,
+      "creditAmount": 0.00,
+      "description": "合同摊销费用",
+      "memo": "摊销费用 - 2024-02",
+      "entryOrder": 3,
+      "entryType": "AMORTIZATION",
+      "createdAt": "2024-01-24T14:30:52.123456",
+      "updatedAt": "2024-01-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 4,
+      "bookingDate": "2024-02-29",
+      "accountName": "应付",
+      "debitAmount": 0.00,
+      "creditAmount": 1000.00,
+      "description": "合同摊销应付",
+      "memo": "摊销应付 - 2024-02",
+      "entryOrder": 4,
+      "entryType": "AMORTIZATION",
+      "createdAt": "2024-01-24T14:30:52.123456",
+      "updatedAt": "2024-01-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 5,
+      "bookingDate": "2024-03-31",
+      "accountName": "费用",
+      "debitAmount": 1000.00,
+      "creditAmount": 0.00,
+      "description": "合同摊销费用",
+      "memo": "摊销费用 - 2024-03",
+      "entryOrder": 5,
+      "entryType": "AMORTIZATION",
+      "createdAt": "2024-01-24T14:30:52.123456",
+      "updatedAt": "2024-01-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 6,
+      "bookingDate": "2024-03-31",
+      "accountName": "应付",
+      "debitAmount": 0.00,
+      "creditAmount": 1000.00,
+      "description": "合同摊销应付",
+      "memo": "摊销应付 - 2024-03",
+      "entryOrder": 6,
+      "entryType": "AMORTIZATION",
+      "createdAt": "2024-01-24T14:30:52.123456",
+      "updatedAt": "2024-01-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    }
+  ]
+}

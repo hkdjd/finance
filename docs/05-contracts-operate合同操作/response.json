@@ -1,0 +1,11 @@
+{
+  "contractId": 1,
+  "totalAmount": 6500.00,
+  "startDate": "2024-01-01",
+  "endDate": "2024-06-30",
+  "taxRate": 0.06,
+  "vendorName": "修正后的供应商名称",
+  "attachmentName": "contract_20240124_143052_a1b2c3d4.pdf",
+  "createdAt": "2024-01-24T14:35:20.456789+08:00",
+  "message": "合同信息更新成功"
+}

@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 应用服务
+  finance2-app:
+    build: .
+    container_name: finance2-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:finance2;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_H2_CONSOLE_ENABLED=true
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - finance2-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # PostgreSQL数据库服务（可选，用于生产环境）
+  finance2-db:
+    image: postgres:15-alpine
+    container_name: finance2-postgres
+    environment:
+      POSTGRES_DB: finance2
+      POSTGRES_USER: finance2_user
+      POSTGRES_PASSWORD: finance2_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - finance2-network
+    restart: unless-stopped
+    profiles:
+      - postgres
+
+networks:
+  finance2-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,0 +1,36 @@
+{
+  "contracts": [
+    {
+      "contractId": 3,
+      "totalAmount": 8000.00,
+      "startDate": "2024-03-01",
+      "endDate": "2024-08-31",
+      "vendorName": "供应商C",
+      "attachmentName": "contract_20240324_150230_x9y8z7w6.pdf",
+      "createdAt": "2024-03-24T15:02:30.123456+08:00",
+      "status": "ACTIVE"
+    },
+    {
+      "contractId": 2,
+      "totalAmount": 7500.00,
+      "startDate": "2024-02-01",
+      "endDate": "2024-07-31",
+      "vendorName": "供应商B",
+      "attachmentName": "contract_20240224_143052_b2c3d4e5.pdf",
+      "createdAt": "2024-02-24T14:30:52.789012+08:00",
+      "status": "ACTIVE"
+    },
+    {
+      "contractId": 1,
+      "totalAmount": 6000.00,
+      "startDate": "2024-01-01",
+      "endDate": "2024-06-30",
+      "vendorName": "供应商A",
+      "attachmentName": "contract_20240124_143052_a1b2c3d4.pdf",
+      "createdAt": "2024-01-24T14:30:52.123456+08:00",
+      "status": "ACTIVE"
+    }
+  ],
+  "totalCount": 3,
+  "message": "查询成功"
+}

@@ -1,0 +1,53 @@
+{
+  "contractId": 1,
+  "amortization": [
+    {
+      "id": 1,
+      "amortizationPeriod": "2025-01",
+      "accountingPeriod": "2025-01",
+      "amount": 1200.00,
+      "periodDate": "2025-01-01",
+      "paymentStatus": "PENDING",
+      "createdAt": "2024-12-24T14:30:52.123456",
+      "updatedAt": "2024-12-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 2,
+      "amortizationPeriod": "2025-02",
+      "accountingPeriod": "2025-02",
+      "amount": 1000.00,
+      "periodDate": "2025-02-01",
+      "paymentStatus": "PENDING",
+      "createdAt": "2024-12-24T14:30:52.123456",
+      "updatedAt": "2024-12-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 3,
+      "amortizationPeriod": "2025-03",
+      "accountingPeriod": "2025-03",
+      "amount": 1000.00,
+      "periodDate": "2025-03-01",
+      "paymentStatus": "COMPLETED",
+      "createdAt": "2024-12-24T14:30:52.123456",
+      "updatedAt": "2024-12-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    },
+    {
+      "id": 4,
+      "amortizationPeriod": "2025-04",
+      "accountingPeriod": "2025-04",
+      "amount": 800.00,
+      "periodDate": "2025-04-01",
+      "paymentStatus": "PENDING",
+      "createdAt": "2024-12-24T14:30:52.123456",
+      "updatedAt": "2024-12-24T14:30:52.123456",
+      "createdBy": "system",
+      "updatedBy": "system"
+    }
+  ]
+}
