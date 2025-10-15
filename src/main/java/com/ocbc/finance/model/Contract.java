@@ -36,4 +36,10 @@ public class Contract extends BaseAuditable {
 
     @Column(name = "attachment_name", length = 500)
     private String attachmentName; // 合同附件名称
+    
+    @Column(name = "file_path", length = 1000)
+    private String filePath; // 文件存储路径
+    
+    @Column(name = "original_file_name", length = 500)
+    private String originalFileName; // 原始文件名
 }

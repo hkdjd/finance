@@ -1,7 +1,9 @@
 package com.ocbc.finance.service;
 
+import com.ocbc.finance.dto.JournalEntryGenerateRequest;
 import com.ocbc.finance.dto.JournalEntryListResponse;
 import com.ocbc.finance.dto.OperationRequest;
+import com.ocbc.finance.enums.EntryType;
 import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.model.Contract;
 import com.ocbc.finance.model.JournalEntry;
@@ -106,6 +108,47 @@ public class JournalEntryService {
     public JournalEntryListResponse generateJournalEntriesWithResponse(Long contractId) {
         // 调用原有方法生成会计分录
         List<JournalEntry> journalEntries = generateJournalEntries(contractId);
+        
+        // 获取合同信息
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new IllegalArgumentException("未找到合同，ID=" + contractId));
+        
+        // 构造响应
+        JournalEntryListResponse.ContractInfo contractInfo = new JournalEntryListResponse.ContractInfo(contract);
+        List<JournalEntryListResponse.JournalEntryInfo> entryInfoList = journalEntries.stream()
+                .map(JournalEntryListResponse.JournalEntryInfo::new)
+                .collect(Collectors.toList());
+        
+        return new JournalEntryListResponse(contractInfo, entryInfoList);
+    }
+
+    /**
+     * 步骤3：根据合同ID和请求参数生成会计分录（返回包装格式）
+     * 支持指定分录类型和自定义描述
+     */
+    @Transactional
+    public JournalEntryListResponse generateJournalEntriesWithResponse(Long contractId, JournalEntryGenerateRequest request) {
+        // 验证请求参数
+        if (request.getEntryType() == null) {
+            throw new IllegalArgumentException("分录类型不能为空");
+        }
+        
+        // 根据分录类型生成会计分录
+        List<JournalEntry> journalEntries;
+        switch (request.getEntryType()) {
+            case AMORTIZATION:
+                journalEntries = generateJournalEntries(contractId);
+                // 如果有自定义描述，更新分录描述
+                if (request.getDescription() != null && !request.getDescription().trim().isEmpty()) {
+                    journalEntries.forEach(entry -> entry.setDescription(request.getDescription()));
+                }
+                break;
+            case PAYMENT:
+                // 付款分录通常在付款接口中生成，这里暂时抛出异常
+                throw new IllegalArgumentException("付款分录应通过付款接口生成，不支持直接调用");
+            default:
+                throw new IllegalArgumentException("不支持的分录类型: " + request.getEntryType());
+        }
         
         // 获取合同信息
         Contract contract = contractRepository.findById(contractId)

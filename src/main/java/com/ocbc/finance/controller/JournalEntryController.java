@@ -1,5 +1,6 @@
 package com.ocbc.finance.controller;
 
+import com.ocbc.finance.dto.JournalEntryGenerateRequest;
 import com.ocbc.finance.dto.JournalEntryListResponse;
 import com.ocbc.finance.dto.OperationRequest;
 import com.ocbc.finance.model.JournalEntry;
@@ -25,11 +26,13 @@ public class JournalEntryController {
     }
 
     /**
-     * 步骤3：根据合同ID生成会计分录
+     * 步骤3：根据合同ID和请求参数生成会计分录
      */
     @PostMapping("/generate/{contractId}")
-    public ResponseEntity<JournalEntryListResponse> generateJournalEntries(@PathVariable Long contractId) {
-        JournalEntryListResponse response = journalEntryService.generateJournalEntriesWithResponse(contractId);
+    public ResponseEntity<JournalEntryListResponse> generateJournalEntries(
+            @PathVariable Long contractId,
+            @Valid @RequestBody JournalEntryGenerateRequest request) {
+        JournalEntryListResponse response = journalEntryService.generateJournalEntriesWithResponse(contractId, request);
         return ResponseEntity.ok(response);
     }
 

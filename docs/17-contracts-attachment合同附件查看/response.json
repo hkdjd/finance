@@ -1,0 +1,14 @@
+{
+  "contractId": 1,
+  "attachment": {
+    "id": 1,
+    "fileName": "合同_供应商A_20240101.pdf",
+    "originalFileName": "contract_vendor_a.pdf",
+    "fileSize": 2048576,
+    "contentType": "application/pdf",
+    "uploadTime": "2024-01-01T10:30:00.123456",
+    "uploadBy": "admin",
+    "filePath": "/uploads/contracts/2024/01/contract_1_20240101.pdf",
+    "downloadUrl": "/contracts/1/attachment?download=true"
+  }
+}

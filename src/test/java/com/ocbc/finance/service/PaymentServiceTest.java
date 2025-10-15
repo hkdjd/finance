@@ -5,6 +5,7 @@ import com.ocbc.finance.dto.AmortizationResponse;
 import com.ocbc.finance.dto.JournalEntryDto;
 import com.ocbc.finance.dto.PaymentPreviewResponse;
 import com.ocbc.finance.dto.PaymentRequest;
+import com.ocbc.finance.repository.AmortizationEntryRepository;
 import com.ocbc.finance.repository.ContractRepository;
 import com.ocbc.finance.repository.JournalEntryRepository;
 import com.ocbc.finance.repository.PaymentRepository;
@@ -34,13 +35,16 @@ class PaymentServiceTest {
     private ContractRepository contractRepository;
     
     @Mock
+    private AmortizationEntryRepository amortizationEntryRepository;
+    
+    @Mock
     private ContractService contractService;
 
     private PaymentService service;
 
     @BeforeEach
     void setUp() {
-        service = new PaymentService(paymentRepository, journalEntryRepository, contractRepository, contractService);
+        service = new PaymentService(paymentRepository, journalEntryRepository, contractRepository, amortizationEntryRepository, contractService);
     }
 
     private AmortizationResponse createMockAmortization() {

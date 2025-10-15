@@ -1,0 +1,50 @@
+{
+  "description": "合同附件查看接口请求示例",
+  "examples": {
+    "get_attachment_info": {
+      "description": "获取附件信息",
+      "method": "GET",
+      "url": "/contracts/1/attachment",
+      "note": "不传download参数或download=false时返回附件信息"
+    },
+    "download_attachment": {
+      "description": "下载附件文件",
+      "method": "GET", 
+      "url": "/contracts/1/attachment?download=true",
+      "note": "download=true时直接返回文件流"
+    },
+    "preview_attachment": {
+      "description": "在浏览器中预览附件",
+      "method": "GET",
+      "url": "/contracts/1/attachment?download=true",
+      "note": "可以在新窗口中打开进行预览"
+    }
+  },
+  "path_parameters": {
+    "contractId": {
+      "type": "Long",
+      "required": true,
+      "description": "合同ID"
+    }
+  },
+  "query_parameters": {
+    "download": {
+      "type": "Boolean",
+      "required": false,
+      "default": false,
+      "description": "是否下载文件，true=下载文件流，false=返回附件信息"
+    }
+  },
+  "response_types": {
+    "attachment_info": {
+      "condition": "download=false或不传",
+      "content_type": "application/json",
+      "description": "返回附件信息的JSON格式"
+    },
+    "file_stream": {
+      "condition": "download=true",
+      "content_type": "根据文件类型动态设置",
+      "description": "返回文件二进制流，浏览器会触发下载"
+    }
+  }
+}

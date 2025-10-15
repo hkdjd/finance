@@ -25,8 +25,22 @@
 ### 1. 生成会计分录（步骤3摊销）
 - **URL**: `/journal-entries/generate/{contractId}`
 - **Method**: POST
-- **Description**: 根据合同ID和摊销明细生成摊销会计分录
+- **Description**: 根据合同ID和请求参数生成指定类型的会计分录
 - **返回格式**: JournalEntryListResponse（合同信息 + 会计分录列表）
+
+#### 请求参数
+```json
+{
+  "entryType": "AMORTIZATION",
+  "description": "生成摊销会计分录"
+}
+```
+
+#### 参数说明
+- **entryType** (String, 必填): 会计分录类型
+  - `AMORTIZATION`: 生成摊销会计分录（步骤3）
+  - `PAYMENT`: 生成付款会计分录（通常在步骤4通过付款接口调用）
+- **description** (String, 可选): 分录描述，用于自定义分录说明
 
 ### 2. 查询合同会计分录列表
 - **URL**: `/journal-entries/contract/{contractId}`
@@ -138,11 +152,14 @@ Booking Date    会计科目    ENTERED DR    ENTERED CR
 ## 使用场景
 
 ### 步骤3工作流程
-1. 前端通过合同ID请求生成会计分录
-2. 后端读取步骤2的摊销明细数据
-3. 根据摊销明细自动生成会计分录
-4. 保存到数据库并返回给前端
-5. 前端展示会计分录列表，支持增删改操作
+1. 前端通过合同ID和分录类型请求生成会计分录
+2. 后端验证请求参数（entryType必填）
+3. 根据分录类型执行相应的生成逻辑：
+   - `AMORTIZATION`: 读取步骤2的摊销明细数据生成摊销分录
+   - `PAYMENT`: 通常在付款接口中调用，不直接支持
+4. 如果提供了自定义描述，更新分录描述
+5. 保存到数据库并返回给前端
+6. 前端展示会计分录列表，支持增删改操作
 
 ### 前端操作支持
 - **查询**: 获取合同的所有会计分录
@@ -151,7 +168,94 @@ Booking Date    会计科目    ENTERED DR    ENTERED CR
 - **删除**: 删除不需要的会计分录行
 
 ## 错误处理
-- 合同不存在: 404 Not Found
-- 摊销明细未生成: 400 Bad Request
-- 数据验证失败: 400 Bad Request
-- 权限不足: 403 Forbidden
+
+### 常见错误码
+- **400 Bad Request**: 请求参数错误
+  - `entryType`字段为空或无效
+  - 不支持的分录类型
+  - 付款分录不支持直接生成
+- **404 Not Found**: 资源不存在
+  - 合同不存在
+  - 摊销明细未生成
+- **403 Forbidden**: 权限不足
+- **500 Internal Server Error**: 服务器内部错误
+
+### 错误响应示例
+```json
+{
+  "error": "INVALID_ENTRY_TYPE",
+  "message": "分录类型不能为空",
+  "timestamp": "2024-01-01T10:30:00.123456"
+}
+```
+
+```json
+{
+  "error": "PAYMENT_NOT_SUPPORTED",
+  "message": "付款分录应通过付款接口生成，不支持直接调用",
+  "timestamp": "2024-01-01T10:30:00.123456"
+}
+```
+
+## 前端使用示例
+
+### JavaScript调用示例
+```javascript
+// 1. 生成摊销会计分录
+const generateAmortizationEntries = async (contractId) => {
+  const response = await fetch(`/journal-entries/generate/${contractId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      entryType: 'AMORTIZATION',
+      description: '生成摊销会计分录'
+    })
+  });
+  
+  if (response.ok) {
+    const data = await response.json();
+    console.log('合同信息:', data.contract);
+    console.log('会计分录:', data.journalEntries);
+    return data;
+  } else {
+    const error = await response.json();
+    throw new Error(error.message);
+  }
+};
+
+// 2. 生成自定义描述的摊销分录
+const generateCustomEntries = async (contractId, customDescription) => {
+  const response = await fetch(`/journal-entries/generate/${contractId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      entryType: 'AMORTIZATION',
+      description: customDescription
+    })
+  });
+  
+  return await response.json();
+};
+
+// 3. 错误处理示例
+const handleGenerateEntries = async (contractId) => {
+  try {
+    const result = await generateAmortizationEntries(contractId);
+    // 处理成功结果
+    displayJournalEntries(result);
+  } catch (error) {
+    // 处理错误
+    if (error.message.includes('付款分录')) {
+      alert('付款分录请通过付款功能生成');
+    } else if (error.message.includes('合同不存在')) {
+      alert('合同不存在，请检查合同ID');
+    } else {
+      alert('生成会计分录失败：' + error.message);
+    }
+  }
+};
+```

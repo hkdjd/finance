@@ -3,8 +3,11 @@ package com.ocbc.finance.service.calculation;
 import com.ocbc.finance.dto.AmortizationEntryDto;
 import com.ocbc.finance.dto.AmortizationResponse;
 import com.ocbc.finance.dto.CalculateAmortizationRequest;
+import com.ocbc.finance.repository.ContractRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,10 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class AmortizationCalculationServiceTest {
 
     private AmortizationCalculationService service;
+    
+    @Mock
+    private ContractRepository contractRepository;
 
     @BeforeEach
     void setUp() {
-        service = new AmortizationCalculationService();
+        MockitoAnnotations.openMocks(this);
+        service = new AmortizationCalculationService(contractRepository);
     }
 
     @Test

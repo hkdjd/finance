@@ -1,0 +1,57 @@
+{
+  "description": "会计分录生成接口请求示例",
+  "examples": {
+    "amortization_generation": {
+      "description": "生成摊销会计分录（步骤3）",
+      "url": "POST /journal-entries/generate/1",
+      "request": {
+        "entryType": "AMORTIZATION",
+        "description": "生成摊销会计分录"
+      }
+    },
+    "payment_generation": {
+      "description": "生成付款会计分录（通常在付款接口中调用）",
+      "url": "POST /journal-entries/generate/1", 
+      "request": {
+        "entryType": "PAYMENT",
+        "description": "生成付款会计分录"
+      },
+      "note": "通常不直接调用，而是在 /payments/execute 接口中内部调用"
+    },
+    "custom_description": {
+      "description": "自定义分录描述",
+      "url": "POST /journal-entries/generate/1",
+      "request": {
+        "entryType": "AMORTIZATION",
+        "description": "2024年第一季度摊销分录"
+      }
+    }
+  },
+  "field_descriptions": {
+    "entryType": {
+      "type": "String",
+      "required": true,
+      "values": ["AMORTIZATION", "PAYMENT"],
+      "description": "会计分录类型，决定生成哪种类型的会计分录"
+    },
+    "description": {
+      "type": "String", 
+      "required": false,
+      "description": "分录描述，用于自定义分录说明，如果不提供则使用默认描述"
+    }
+  },
+  "business_logic": {
+    "AMORTIZATION": {
+      "description": "摊销会计分录生成逻辑",
+      "data_source": "基于合同的摊销明细表（AmortizationEntry）",
+      "generated_entries": "每个摊销期间生成借方（费用）和贷方（应付）分录",
+      "typical_usage": "步骤3：用户确认摊销明细后生成会计分录"
+    },
+    "PAYMENT": {
+      "description": "付款会计分录生成逻辑", 
+      "data_source": "基于付款记录（Payment）",
+      "generated_entries": "生成借方（应付）和贷方（银行存款）分录",
+      "typical_usage": "步骤4：执行付款时自动调用生成"
+    }
+  }
+}

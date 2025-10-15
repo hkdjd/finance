@@ -1,44 +1,71 @@
-[
-  {
-    "bookingDate": "2024-01-27",
-    "account": "费用",
-    "dr": 1000.00,
-    "cr": 0.00,
-    "memo": "period:2024-01"
+{
+  "contract": {
+    "id": 1,
+    "totalAmount": 3000.00,
+    "startDate": "2024-01-01",
+    "endDate": "2024-03-31",
+    "vendorName": "供应商A"
   },
-  {
-    "bookingDate": "2024-01-27",
-    "account": "应付",
-    "dr": 0.00,
-    "cr": 1000.00,
-    "memo": "period:2024-01"
-  },
-  {
-    "bookingDate": "2024-02-27",
-    "account": "费用",
-    "dr": 1000.00,
-    "cr": 0.00,
-    "memo": "period:2024-02"
-  },
-  {
-    "bookingDate": "2024-02-27",
-    "account": "应付",
-    "dr": 0.00,
-    "cr": 1000.00,
-    "memo": "period:2024-02"
-  },
-  {
-    "bookingDate": "2024-03-27",
-    "account": "费用",
-    "dr": 1000.00,
-    "cr": 0.00,
-    "memo": "period:2024-03"
-  },
-  {
-    "bookingDate": "2024-03-27",
-    "account": "应付",
-    "dr": 0.00,
-    "cr": 1000.00,
-    "memo": "period:2024-03"
-  }
-]
+  "previewEntries": [
+    {
+      "entryType": "AMORTIZATION",
+      "bookingDate": "2024-01-31",
+      "accountName": "费用",
+      "debitAmount": 1000.00,
+      "creditAmount": 0.00,
+      "description": "摊销费用预览",
+      "memo": "摊销费用预览 - 2024-01",
+      "entryOrder": 1
+    },
+    {
+      "entryType": "AMORTIZATION",
+      "bookingDate": "2024-01-31",
+      "accountName": "应付",
+      "debitAmount": 0.00,
+      "creditAmount": 1000.00,
+      "description": "摊销应付预览",
+      "memo": "摊销应付预览 - 2024-01",
+      "entryOrder": 2
+    },
+    {
+      "entryType": "AMORTIZATION",
+      "bookingDate": "2024-02-29",
+      "accountName": "费用",
+      "debitAmount": 1000.00,
+      "creditAmount": 0.00,
+      "description": "摊销费用预览",
+      "memo": "摊销费用预览 - 2024-02",
+      "entryOrder": 3
+    },
+    {
+      "entryType": "AMORTIZATION",
+      "bookingDate": "2024-02-29",
+      "accountName": "应付",
+      "debitAmount": 0.00,
+      "creditAmount": 1000.00,
+      "description": "摊销应付预览",
+      "memo": "摊销应付预览 - 2024-02",
+      "entryOrder": 4
+    },
+    {
+      "entryType": "AMORTIZATION",
+      "bookingDate": "2024-03-31",
+      "accountName": "费用",
+      "debitAmount": 1000.00,
+      "creditAmount": 0.00,
+      "description": "摊销费用预览",
+      "memo": "摊销费用预览 - 2024-03",
+      "entryOrder": 5
+    },
+    {
+      "entryType": "AMORTIZATION",
+      "bookingDate": "2024-03-31",
+      "accountName": "应付",
+      "debitAmount": 0.00,
+      "creditAmount": 1000.00,
+      "description": "摊销应付预览",
+      "memo": "摊销应付预览 - 2024-03",
+      "entryOrder": 6
+    }
+  ]
+}

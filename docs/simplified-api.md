@@ -30,6 +30,7 @@
 | localhost:8081/payments/contracts/{contractId} | GET | 查询合同付款记录 | /payments/contracts/{contractId} |
 | localhost:8081/payments/{paymentId} | GET | 查询付款详情 | /payments/{paymentId} |
 | localhost:8081/payments/operate | POST | 付款操作（增删改、取消） | /payments/operate |
+| localhost:8081/contracts/{contractId}/attachment | GET | 合同附件查看和下载 | /contracts/{contractId}/attachment |
 
 ## 会计分录统一设计
 

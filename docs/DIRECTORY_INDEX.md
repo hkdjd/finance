@@ -71,7 +71,11 @@
 
 - `16-payments-operate付款操作/` - 付款操作（增删改、取消）
   - **URL**: `POST /payments/operate`
-  - **功能**: 付款操作接口，支持增删改和取消操作接口
+  - **功能**: 付款操作接口，支持增删改和取消操作
+
+- `17-contracts-attachment合同附件查看/` - 合同附件查看和下载
+  - **URL**: `GET /contracts/{contractId}/attachment`
+  - **功能**: 根据合同ID查看附件信息和下载合同文件
 
 ## 业务流程对应
 
