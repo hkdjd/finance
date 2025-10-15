@@ -2,11 +2,14 @@ package com.ocbc.finance.service;
 
 import com.ocbc.finance.dto.AmortizationListResponse;
 import com.ocbc.finance.dto.AmortizationUpdateRequest;
+import com.ocbc.finance.dto.AmortizationResponse;
+import com.ocbc.finance.dto.AmortizationEntryDto;
 import com.ocbc.finance.dto.OperationRequest;
 import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.model.Contract;
 import com.ocbc.finance.repository.AmortizationEntryRepository;
 import com.ocbc.finance.repository.ContractRepository;
+import com.ocbc.finance.service.calculation.AmortizationCalculationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +31,14 @@ public class AmortizationEntryService {
 
     private final AmortizationEntryRepository amortizationEntryRepository;
     private final ContractRepository contractRepository;
+    private final AmortizationCalculationService amortizationCalculationService;
 
     public AmortizationEntryService(AmortizationEntryRepository amortizationEntryRepository,
-                                    ContractRepository contractRepository) {
+                                    ContractRepository contractRepository,
+                                    AmortizationCalculationService amortizationCalculationService) {
         this.amortizationEntryRepository = amortizationEntryRepository;
         this.contractRepository = contractRepository;
+        this.amortizationCalculationService = amortizationCalculationService;
     }
 
     /**
@@ -44,7 +50,9 @@ public class AmortizationEntryService {
 
     /**
      * 查询合同的摊销明细列表（返回包装格式：合同信息+摊销明细数组）
+     * 如果摊销明细列表为空，则自动调用摊销计算并保存到数据库
      */
+    @Transactional
     public AmortizationListResponse getAmortizationListByContract(Long contractId) {
         // 查询合同信息
         Contract contract = contractRepository.findById(contractId)
@@ -52,6 +60,35 @@ public class AmortizationEntryService {
         
         // 查询摊销明细列表
         List<AmortizationEntry> entries = amortizationEntryRepository.findByContractIdOrderByAmortizationPeriodAsc(contractId);
+        
+        // 如果摊销明细列表为空，自动调用摊销计算并保存到数据库
+        if (entries.isEmpty()) {
+            // 调用摊销计算服务
+            AmortizationResponse calculationResult = amortizationCalculationService.calculateByContractId(contractId);
+            
+            // 将计算结果保存到数据库
+            List<AmortizationEntry> calculatedEntries = new ArrayList<>();
+            for (AmortizationEntryDto entryDto : calculationResult.getEntries()) {
+                AmortizationEntry entry = new AmortizationEntry();
+                entry.setContract(contract);
+                entry.setAmortizationPeriod(entryDto.getAmortizationPeriod());
+                entry.setAccountingPeriod(entryDto.getAccountingPeriod());
+                entry.setAmount(entryDto.getAmount());
+                
+                // 解析期间日期
+                String periodStr = entryDto.getAmortizationPeriod() + "-01";
+                entry.setPeriodDate(LocalDate.parse(periodStr));
+                
+                // 设置默认状态
+                // entry.setPaymentStatus("PENDING"); // 根据实际的状态字段调整
+                
+                AmortizationEntry savedEntry = amortizationEntryRepository.save(entry);
+                calculatedEntries.add(savedEntry);
+            }
+            
+            // 使用新生成的摊销明细
+            entries = calculatedEntries;
+        }
         
         // 转换为DTO格式
         AmortizationListResponse.ContractInfo contractInfo = new AmortizationListResponse.ContractInfo(contract);

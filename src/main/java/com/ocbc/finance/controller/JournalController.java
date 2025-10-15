@@ -2,7 +2,11 @@ package com.ocbc.finance.controller;
 
 import com.ocbc.finance.dto.AmortizationResponse;
 import com.ocbc.finance.dto.JournalEntryDto;
+import com.ocbc.finance.dto.JournalEntriesPreviewResponse;
 import com.ocbc.finance.service.JournalService;
+import com.ocbc.finance.service.calculation.AmortizationCalculationService;
+import com.ocbc.finance.model.Contract;
+import com.ocbc.finance.repository.ContractRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,18 +23,49 @@ import java.util.List;
 public class JournalController {
 
     private final JournalService journalService;
+    private final AmortizationCalculationService amortizationCalculationService;
+    private final ContractRepository contractRepository;
 
-    public JournalController(JournalService journalService) {
+    public JournalController(JournalService journalService,
+                             AmortizationCalculationService amortizationCalculationService,
+                             ContractRepository contractRepository) {
         this.journalService = journalService;
+        this.amortizationCalculationService = amortizationCalculationService;
+        this.contractRepository = contractRepository;
     }
 
     // 预览会计分录（基于步骤2返回的摊销结果）
     @PostMapping("/preview")
-    public ResponseEntity<List<JournalEntryDto>> preview(@RequestBody AmortizationResponse amort,
-                                                         @RequestParam(required = false)
-                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                         LocalDate bookingDate) {
-        List<JournalEntryDto> list = journalService.previewFromAmortization(amort, bookingDate);
-        return ResponseEntity.ok(list);
+    public ResponseEntity<JournalEntriesPreviewResponse> preview(@RequestBody Object request,
+                                                                 @RequestParam(required = false)
+                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                                 LocalDate bookingDate) {
+        
+        // 检查请求类型
+        if (request instanceof java.util.Map) {
+            @SuppressWarnings("unchecked")
+            java.util.Map<String, Object> requestMap = (java.util.Map<String, Object>) request;
+            
+            // 检查是否包含contractId字段（前端格式）
+            if (requestMap.containsKey("contractId")) {
+                Integer contractId = (Integer) requestMap.get("contractId");
+                String previewType = (String) requestMap.get("previewType");
+                
+                // 获取合同信息
+                Contract contract = contractRepository.findById(contractId.longValue())
+                        .orElseThrow(() -> new IllegalArgumentException("未找到合同，ID=" + contractId));
+                
+                // 根据预览类型生成符合规范的响应
+                JournalEntriesPreviewResponse response = journalService.generatePreviewResponse(contract, previewType, bookingDate);
+                return ResponseEntity.ok(response);
+            } else {
+                // 处理其他格式，返回空响应
+                return ResponseEntity.ok(new JournalEntriesPreviewResponse());
+            }
+        } else {
+            // 如果是AmortizationResponse对象（向后兼容）
+            // 这种情况下我们没有合同信息，需要特殊处理
+            return ResponseEntity.ok(new JournalEntriesPreviewResponse());
+        }
     }
 }

@@ -50,7 +50,22 @@ public class AmortizationEntryController {
     public ResponseEntity<AmortizationListResponse> updateAmortizationEntries(
             @Valid @RequestBody AmortizationUpdateRequest request) {
         
-        AmortizationListResponse response = amortizationEntryService.updateAmortizationEntriesFromRequest(request);
-        return ResponseEntity.ok(response);
+        try {
+            // 添加请求参数验证
+            if (request.getContractId() == null) {
+                throw new IllegalArgumentException("合同ID不能为空");
+            }
+            if (request.getAmortization() == null || request.getAmortization().isEmpty()) {
+                throw new IllegalArgumentException("摊销明细列表不能为空");
+            }
+            
+            AmortizationListResponse response = amortizationEntryService.updateAmortizationEntriesFromRequest(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // 记录详细错误信息
+            System.err.println("摊销明细操作失败: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

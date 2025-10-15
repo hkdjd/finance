@@ -4,7 +4,9 @@ import com.ocbc.finance.dto.AmortizationEntryDto;
 import com.ocbc.finance.dto.AmortizationResponse;
 import com.ocbc.finance.dto.CalculateAmortizationRequest;
 import com.ocbc.finance.model.Contract;
+import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.repository.ContractRepository;
+import com.ocbc.finance.repository.AmortizationEntryRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,9 +23,12 @@ public class AmortizationCalculationService {
     private static final DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyy-MM");
     
     private final ContractRepository contractRepository;
+    private final AmortizationEntryRepository amortizationEntryRepository;
     
-    public AmortizationCalculationService(ContractRepository contractRepository) {
+    public AmortizationCalculationService(ContractRepository contractRepository,
+                                          AmortizationEntryRepository amortizationEntryRepository) {
         this.contractRepository = contractRepository;
+        this.amortizationEntryRepository = amortizationEntryRepository;
     }
 
     public AmortizationResponse calculate(CalculateAmortizationRequest req) {
@@ -43,14 +48,9 @@ public class AmortizationCalculationService {
             scenario = "SCENARIO_1"; // 当前时间小于合同开始时间，平均摊销到每个月，入账期间等于摊销期间
             entries = buildEqualEntries(req.getTotalAmount(), start, end, null);
         } else if (now.isAfter(end.atEndOfMonth())) {
-            scenario = "SCENARIO_3"; // 当前时间大于合同结束时间，不用摊销到每个月，记当前月份即可
-            entries = new ArrayList<>();
-            entries.add(new AmortizationEntryDto(
-                    null,
-                    current.format(YM),
-                    current.format(YM),
-                    req.getTotalAmount().setScale(2, RoundingMode.HALF_UP)
-            ));
+            scenario = "SCENARIO_3"; // 当前时间大于合同结束时间，按合同期间平均摊销到每个月
+            // 修复：对于已结束的合同，仍然按月生成摊销明细，而不是只生成一条记录
+            entries = buildEqualEntries(req.getTotalAmount(), start, end, null);
         } else {
             scenario = "SCENARIO_2"; // 当前位于合同期间内，未开始期间集中入账到本月，其余按月入账
             entries = buildEqualEntries(req.getTotalAmount(), start, end, current);
@@ -69,6 +69,7 @@ public class AmortizationCalculationService {
     /**
      * 根据合同ID计算摊销明细
      * 从数据库获取合同信息，然后调用计算方法
+     * 如果数据库中已有摊销明细，则返回真实的ID
      */
     public AmortizationResponse calculateByContractId(Long contractId) {
         Contract contract = contractRepository.findById(contractId)
@@ -82,7 +83,32 @@ public class AmortizationCalculationService {
         request.setTaxRate(contract.getTaxRate() != null ? contract.getTaxRate() : BigDecimal.ZERO);
         request.setVendorName(contract.getVendorName());
         
-        return calculate(request);
+        AmortizationResponse response = calculate(request);
+        
+        // 检查数据库中是否已有摊销明细，如果有则使用真实ID
+        List<AmortizationEntry> existingEntries = amortizationEntryRepository.findByContractIdOrderByAmortizationPeriodAsc(contractId);
+        if (!existingEntries.isEmpty()) {
+            // 将数据库中的ID映射到计算结果中
+            for (int i = 0; i < response.getEntries().size() && i < existingEntries.size(); i++) {
+                AmortizationEntryDto entryDto = response.getEntries().get(i);
+                AmortizationEntry existingEntry = existingEntries.get(i);
+                
+                // 检查期间是否匹配，如果匹配则使用真实ID
+                if (entryDto.getAmortizationPeriod().equals(existingEntry.getAmortizationPeriod())) {
+                    // 创建新的DTO对象，包含真实ID
+                    AmortizationEntryDto updatedDto = new AmortizationEntryDto(
+                        existingEntry.getId(),
+                        entryDto.getAmortizationPeriod(),
+                        entryDto.getAccountingPeriod(),
+                        entryDto.getAmount(),
+                        entryDto.getStatus()
+                    );
+                    response.getEntries().set(i, updatedDto);
+                }
+            }
+        }
+        
+        return response;
     }
 
     private List<AmortizationEntryDto> buildEqualEntries(BigDecimal total, YearMonth start, YearMonth end, YearMonth concentrateTo) {

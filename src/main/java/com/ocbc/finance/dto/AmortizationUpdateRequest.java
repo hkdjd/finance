@@ -1,5 +1,7 @@
 package com.ocbc.finance.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -8,7 +10,10 @@ import java.util.List;
  */
 public class AmortizationUpdateRequest {
     
+    @NotNull(message = "合同ID不能为空")
     private Long contractId;
+    
+    @NotEmpty(message = "摊销明细列表不能为空")
     private List<AmortizationEntryData> amortization;
     
     public AmortizationUpdateRequest() {}

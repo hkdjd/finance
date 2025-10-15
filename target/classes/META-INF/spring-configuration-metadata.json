@@ -11,29 +11,19 @@
       "name": "file.upload.allowed-types",
       "type": "java.lang.String[]",
       "description": "允许的文件类型",
-      "sourceType": "com.ocbc.finance.config.FileUploadConfig",
-      "defaultValue": [
-        "pdf",
-        "doc",
-        "docx",
-        "jpg",
-        "jpeg",
-        "png"
-      ]
+      "sourceType": "com.ocbc.finance.config.FileUploadConfig"
     },
     {
       "name": "file.upload.contract-path",
       "type": "java.lang.String",
       "description": "合同附件上传目录",
-      "sourceType": "com.ocbc.finance.config.FileUploadConfig",
-      "defaultValue": ".\/uploads\/contracts\/"
+      "sourceType": "com.ocbc.finance.config.FileUploadConfig"
     },
     {
       "name": "file.upload.max-file-size",
       "type": "java.lang.Long",
       "description": "最大文件大小（字节）",
-      "sourceType": "com.ocbc.finance.config.FileUploadConfig",
-      "defaultValue": 0
+      "sourceType": "com.ocbc.finance.config.FileUploadConfig"
     }
   ],
   "hints": []

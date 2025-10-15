@@ -28,20 +28,23 @@ public class ContractService {
     private final PaymentRepository paymentRepository;
     private final AmortizationCalculationService calculationService;
     private final FileUploadService fileUploadService;
-    private final ExternalContractParseService externalContractParseService;
+    // TODO: 待外部解析接口就绪后重新启用
+    // private final ExternalContractParseService externalContractParseService;
 
     public ContractService(ContractRepository contractRepository,
                            AmortizationEntryRepository amortizationEntryRepository,
                            PaymentRepository paymentRepository,
                            AmortizationCalculationService calculationService,
-                           FileUploadService fileUploadService,
-                           ExternalContractParseService externalContractParseService) {
+                           FileUploadService fileUploadService) {
+                           // TODO: 待外部解析接口就绪后重新添加参数
+                           // ExternalContractParseService externalContractParseService) {
         this.contractRepository = contractRepository;
         this.amortizationEntryRepository = amortizationEntryRepository;
         this.paymentRepository = paymentRepository;
         this.calculationService = calculationService;
         this.fileUploadService = fileUploadService;
-        this.externalContractParseService = externalContractParseService;
+        // TODO: 待外部解析接口就绪后重新启用
+        // this.externalContractParseService = externalContractParseService;
     }
 
     @Transactional
@@ -149,27 +152,22 @@ public class ContractService {
             // 1.1 上传文件到指定目录
             String savedFileName = fileUploadService.uploadContractFile(file);
             
-            // 1.2 调用外部接口解析合同
-            ExternalContractParseResponse parseResult = externalContractParseService.parseContract(
-                    fileUploadService.getContractFile(savedFileName)
-            );
+            // 1.2 使用mock数据代替外部接口解析（外部接口暂未就绪）
+            // TODO: 待外部解析接口就绪后，替换为真实的解析调用
             
-            if (!parseResult.isSuccess()) {
-                throw new RuntimeException("合同解析失败: " + parseResult.getErrorMessage());
-            }
-            
-            // 1.3 保存合同信息到数据库
+            // 1.3 保存合同信息到数据库（使用mock数据）
             Contract contract = new Contract();
-            contract.setTotalAmount(parseResult.getTotalAmount());
-            contract.setStartDate(LocalDate.parse(parseResult.getStartDate()));
-            contract.setEndDate(LocalDate.parse(parseResult.getEndDate()));
-            contract.setVendorName(parseResult.getVendorName());
-            contract.setTaxRate(parseResult.getTaxRate());
-            contract.setAttachmentName(savedFileName);
+            contract.setTotalAmount(new BigDecimal("6000.00"));
+            contract.setStartDate(LocalDate.parse("2024-01-01"));
+            contract.setEndDate(LocalDate.parse("2024-06-30"));
+            contract.setVendorName("测试供应商_contract_20240124");
+            contract.setTaxRate(new BigDecimal("0.06"));
+            // 在数据库中保存原始文件名，便于显示
+            contract.setAttachmentName(file.getOriginalFilename());
             
             contract = contractRepository.save(contract);
             
-            // 构建响应
+            // 构建响应（使用mock数据格式，但文件名使用真实的原始文件名）
             ContractUploadResponse response = new ContractUploadResponse();
             response.setContractId(contract.getId());
             response.setTotalAmount(contract.getTotalAmount());
@@ -177,7 +175,8 @@ public class ContractService {
             response.setEndDate(contract.getEndDate().toString());
             response.setVendorName(contract.getVendorName());
             response.setTaxRate(contract.getTaxRate());
-            response.setAttachmentName(contract.getAttachmentName());
+            // 使用原始文件名而不是保存后的文件名
+            response.setAttachmentName(file.getOriginalFilename());
             response.setCreatedAt(java.time.OffsetDateTime.now());
             response.setMessage("合同上传和解析成功");
             
