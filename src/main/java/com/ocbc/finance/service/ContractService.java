@@ -158,9 +158,9 @@ public class ContractService {
             // 1.3 保存合同信息到数据库（使用mock数据）
             Contract contract = new Contract();
             contract.setTotalAmount(new BigDecimal("6000.00"));
-            contract.setStartDate(LocalDate.parse("2024-01-01"));
-            contract.setEndDate(LocalDate.parse("2024-06-30"));
-            contract.setVendorName("测试供应商_contract_20240124");
+            contract.setStartDate(LocalDate.parse("2025-01-01"));
+            contract.setEndDate(LocalDate.parse("2025-06-30"));
+            contract.setVendorName("史密斯净水设备有限公司");
             contract.setTaxRate(new BigDecimal("0.06"));
             // 在数据库中保存原始文件名，便于显示
             contract.setAttachmentName(file.getOriginalFilename());

@@ -1,0 +1,215 @@
+/* 主容器样式 */
+.modalContainer {
+  padding: 12px;
+  background-color: #ffffff; /* 确保容器背景为白色 */
+}
+
+/* 合同信息部分样式 */
+.contractInfo {
+  width: 95%;
+  margin: 0 auto 20px;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding: 16px;
+  background-color: #fffbe6; /* 米色背景 */
+}
+
+/* Descriptions 组件样式覆盖 */
+.contractInfo :global(.ant-descriptions) {
+  background-color: transparent;
+}
+
+.contractInfo :global(.ant-descriptions-title) {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.contractInfo :global(.ant-descriptions-item-label) {
+  font-weight: bold;
+  color: #262626;
+  background-color: #fafafa !important;
+}
+
+.contractInfo :global(.ant-descriptions-item-content) {
+  color: #595959;
+  background-color: #ffffff !important;
+}
+
+.contractInfo :global(.ant-descriptions-bordered .ant-descriptions-item) {
+  border-color: #d9d9d9;
+}
+/* 预付时间表部分样式 */
+.prepaymentTable {
+  width: 95%;
+  margin: 20px auto 0;
+  border: 1px solid black;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #ffffff; /* 表格容器背景白色 */
+}
+
+/* 仅在预付时间表区域内，将输入框与按钮背景强制为白色 */
+.prepaymentTable input,
+.prepaymentTable input[type="date"],
+.prepaymentTable :global(.ant-input),
+.prepaymentTable :global(.ant-input-affix-wrapper) {
+  background-color: #ffffff !important;
+}
+
+.prepaymentTable :global(.ant-btn) {
+  background-color: #ffffff !important;
+}
+
+/* 覆盖按钮的交互状态，确保仍为白色背景 */
+.prepaymentTable :global(.ant-btn:hover),
+.prepaymentTable :global(.ant-btn:focus),
+.prepaymentTable :global(.ant-btn:active) {
+  background-color: #ffffff !important;
+}
+
+
+/* 表格工具栏样式 */
+.tableToolbar {
+  padding: 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 覆盖 AntD Modal 背景为白色 */
+:global(.ant-modal-content) {
+  background-color: #ffffff !important;
+}
+
+:global(.ant-modal-body) {
+  background-color: #ffffff !important;
+}
+
+/* Modal 头部与底部也置白 */
+:global(.ant-modal-header) {
+  background-color: #ffffff !important;
+}
+
+:global(.ant-modal-footer) {
+  background-color: #ffffff !important;
+}
+
+/* AntD 表格背景白色（表头与表体） */
+:global(.ant-table) {
+  background: #ffffff !important;
+}
+
+:global(.ant-table-thead > tr > th) {
+  background: #ffffff !important;
+}
+
+/* 表格容器与单元格、悬浮态全部置白 */
+:global(.ant-table-container) {
+  background: #ffffff !important;
+}
+
+:global(.ant-table-wrapper) {
+  background: #ffffff !important;
+}
+
+:global(.ant-table-tbody > tr > td) {
+  background: #ffffff !important;
+}
+
+:global(.ant-table-tbody > tr:hover > td),
+:global(.ant-table-tbody > tr.ant-table-row-hover > td) {
+  background: #ffffff !important;
+}
+
+/* 表格其他区域（标题、表头容器、空状态、汇总等） */
+:global(.ant-table-title),
+:global(.ant-table-header),
+:global(.ant-table-body),
+:global(.ant-table-placeholder),
+:global(.ant-table-summary) {
+  background: #ffffff !important;
+}
+
+/* 选中行/斑马纹行也置白 */
+:global(.ant-table-tbody > tr.ant-table-row-selected > td),
+:global(.ant-table-tbody > tr:nth-child(odd) > td) {
+  background: #ffffff !important;
+}
+
+/* 更细粒度的单元格覆盖 */
+:global(.ant-table-cell) {
+  background: #ffffff !important;
+}
+
+:global(.ant-table-thead .ant-table-cell) {
+  background: #ffffff !important;
+}
+
+/* 固定列置白 */
+:global(.ant-table-cell-fix-left),
+:global(.ant-table-cell-fix-right) {
+  background: #ffffff !important;
+}
+
+/* 展开行置白 */
+:global(tr.ant-table-expanded-row > td) {
+  background: #ffffff !important;
+}
+
+/* 表头分割线伪元素去灰底 */
+:global(.ant-table-thead > tr > th::before) {
+  background-color: transparent !important;
+}
+
+/* 选择列（checkbox 列）也置白 */
+:global(.ant-table-selection-column),
+:global(.ant-table-thead .ant-table-selection-column),
+:global(.ant-table-tbody .ant-table-selection-column) {
+  background: #ffffff !important;
+}
+
+/* EditableProTable 外层 ProCard 相关区域置白 */
+:global(.ant-pro-card),
+:global(.ant-pro-card .ant-pro-card-body),
+:global(.ant-pro-card .ant-pro-card-header),
+:global(.ant-pro-card .ant-pro-card-header-wrap),
+:global(.ant-pro-card .ant-pro-card-title),
+:global(.ant-pro-card .ant-card),
+:global(.ant-pro-card .ant-card-body) {
+  background: #ffffff !important;
+}
+
+/* ProTable 工具栏/查询区域置白 */
+:global(.ant-pro-table-toolbar),
+:global(.ant-pro-table-list-toolbar),
+:global(.ant-pro-table .ant-pro-card .ant-pro-table-search) {
+  background: #ffffff !important;
+}
+
+/* ProTable 工具栏、标题区域置白（EditableProTable 使用的 Toolbar） */
+:global(.ant-pro-table-toolbar) {
+  background: #ffffff;
+}
+
+:global(.ant-pro-table-list-toolbar) {
+  background: #ffffff;
+}
+
+/* 新增按钮样式 */
+.addButton {
+  margin-bottom: 16px;
+}
+
+/* 删除按钮样式 */
+.deleteButton {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+.deleteButton:hover {
+  color: #fff;
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+}

@@ -4,6 +4,7 @@ import com.ocbc.finance.dto.AmortizationEntryDto;
 import com.ocbc.finance.dto.AmortizationResponse;
 import com.ocbc.finance.dto.CalculateAmortizationRequest;
 import com.ocbc.finance.repository.ContractRepository;
+import com.ocbc.finance.repository.AmortizationEntryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -21,11 +22,14 @@ class AmortizationCalculationServiceTest {
     
     @Mock
     private ContractRepository contractRepository;
+    
+    @Mock
+    private AmortizationEntryRepository amortizationEntryRepository;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        service = new AmortizationCalculationService(contractRepository);
+        service = new AmortizationCalculationService(contractRepository, amortizationEntryRepository);
     }
 
     @Test

@@ -1,0 +1,176 @@
+/* PageA 主容器 */
+.pageContainer {
+  padding: 20px;
+  min-height: calc(100vh - 15vh); /* 减去 Header 高度 */
+}
+
+/* 区域A - 文件上传区域 */
+.uploadArea {
+  width: 80%;
+  height: 30vh;
+  margin: 0 auto;
+  border: 1px solid #000000;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 上传组件样式 */
+.uploadDragger {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fafafa;
+  transition: border-color 0.3s ease;
+}
+
+.uploadDragger:hover {
+  border-color: #1890ff;
+  background-color: #f0f8ff;
+}
+
+.uploadDragger.dragOver {
+  border-color: #1890ff;
+  background-color: #e6f7ff;
+}
+
+/* 上传图标和文本 */
+.uploadIcon {
+  font-size: 48px;
+  color: #1890ff;
+  margin-bottom: 16px;
+}
+
+.uploadText {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.uploadHint {
+  font-size: 14px;
+  color: #999;
+}
+
+/* 区域B - 合同列表区域 */
+.contractTableArea {
+  width: 80%;
+  margin: 40px auto 0;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 表格标题 */
+.tableTitle {
+  padding: 16px 24px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+/* 表格容器 */
+.tableContainer {
+  padding: 0;
+}
+
+/* 操作按钮样式 */
+.actionButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.actionButton {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+/* 加载状态 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* 空状态 */
+.emptyState {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.emptyHint {
+  font-size: 14px;
+  color: #999;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .uploadArea,
+  .contractTableArea {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .uploadArea {
+    height: 25vh;
+    padding: 8px;
+  }
+  
+  .contractTableArea {
+    margin-top: 20px;
+  }
+  
+  .uploadIcon {
+    font-size: 36px;
+  }
+  
+  .uploadText {
+    font-size: 14px;
+  }
+  
+  .uploadHint {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageContainer {
+    padding: 10px;
+  }
+  
+  .uploadArea {
+    height: 20vh;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .actionButton {
+    width: 100%;
+  }
+}
