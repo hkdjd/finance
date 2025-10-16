@@ -47,5 +47,11 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
      * 按合同与类型删除分录
      */
     void deleteByContractIdAndEntryType(Long contractId, com.ocbc.finance.model.JournalEntry.EntryType entryType);
+    
+    /**
+     * 检查是否存在指定条件的付款会计分录
+     */
+    boolean existsByContractIdAndAccountNameAndEntryTypeAndMemo(Long contractId, String accountName, 
+            com.ocbc.finance.model.JournalEntry.EntryType entryType, String memo);
 }
 

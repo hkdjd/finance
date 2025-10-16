@@ -26,6 +26,9 @@ public class AmortizationEntry extends BaseAuditEntity {
     @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
+    @Column(name = "paid_amount", nullable = false, precision = 19, scale = 2)
+    private BigDecimal paidAmount = BigDecimal.ZERO; // 累积已付金额
+
     @Column(name = "period_date")
     private LocalDate periodDate; // 对应月份第一天，便于排序
 
@@ -46,6 +49,27 @@ public class AmortizationEntry extends BaseAuditEntity {
     public void setStatus(String status) {
         if (status != null) {
             this.paymentStatus = PaymentStatus.valueOf(status);
+        }
+    }
+    
+    // 获取剩余应付金额
+    public BigDecimal getRemainingAmount() {
+        return amount.subtract(paidAmount != null ? paidAmount : BigDecimal.ZERO);
+    }
+    
+    // 检查是否已完全付款
+    public boolean isFullyPaid() {
+        return getRemainingAmount().compareTo(BigDecimal.ZERO) <= 0;
+    }
+    
+    // 添加付款金额
+    public void addPayment(BigDecimal paymentAmount) {
+        if (paymentAmount != null && paymentAmount.compareTo(BigDecimal.ZERO) > 0) {
+            this.paidAmount = (this.paidAmount != null ? this.paidAmount : BigDecimal.ZERO).add(paymentAmount);
+            // 如果已完全付款，更新状态
+            if (isFullyPaid()) {
+                this.paymentStatus = PaymentStatus.COMPLETED;
+            }
         }
     }
 }

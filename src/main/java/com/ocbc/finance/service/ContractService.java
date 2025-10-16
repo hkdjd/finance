@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -155,13 +156,46 @@ public class ContractService {
             // 1.2 使用mock数据代替外部接口解析（外部接口暂未就绪）
             // TODO: 待外部解析接口就绪后，替换为真实的解析调用
             
-            // 1.3 保存合同信息到数据库（使用mock数据）
+            // 1.3 保存合同信息到数据库（使用动态mock数据）
             Contract contract = new Contract();
-            contract.setTotalAmount(new BigDecimal("6000.00"));
-            contract.setStartDate(LocalDate.parse("2025-01-01"));
-            contract.setEndDate(LocalDate.parse("2025-06-30"));
-            contract.setVendorName("史密斯净水设备有限公司");
-            contract.setTaxRate(new BigDecimal("0.06"));
+            
+            // 生成动态的mock数据，避免重复
+            long timestamp = System.currentTimeMillis();
+            Random random = new Random(timestamp);
+            
+            // 动态生成开始日期（2025年内的随机月份）
+            int startMonth = 1 + random.nextInt(8); // 1-8月
+            LocalDate startDate = LocalDate.of(2025, startMonth, 1);
+            contract.setStartDate(startDate);
+            
+            // 结束日期为开始日期后3-12个月
+            int durationMonths = 3 + random.nextInt(10);
+            LocalDate endDate = startDate.plusMonths(durationMonths).withDayOfMonth(
+                startDate.plusMonths(durationMonths).lengthOfMonth()
+            );
+            contract.setEndDate(endDate);
+            
+            // 根据月数计算总金额（每月1000元）
+            BigDecimal totalAmount = new BigDecimal(durationMonths * 1000).setScale(2, RoundingMode.HALF_UP);
+            contract.setTotalAmount(totalAmount);
+            
+            // 动态生成供应商名称
+            String[] vendors = {
+                "史密斯净水设备有限公司",
+                "华为技术服务有限公司", 
+                "阿里云计算有限公司",
+                "腾讯云服务有限公司",
+                "京东物流有限公司",
+                "美团配送服务公司",
+            };
+            contract.setVendorName(vendors[random.nextInt(vendors.length)]);
+            
+            // 动态生成税率（0.03-0.13之间）
+            BigDecimal taxRate = new BigDecimal("0.03").add(
+                new BigDecimal(random.nextDouble() * 0.10).setScale(2, RoundingMode.HALF_UP)
+            );
+            contract.setTaxRate(taxRate);
+            
             // 在数据库中保存原始文件名，便于显示
             contract.setAttachmentName(file.getOriginalFilename());
             

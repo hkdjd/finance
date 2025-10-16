@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space } from 'antd';
-import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest } from '../../api/contracts';
+import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
 
 const { Title, Text } = Typography;
@@ -30,8 +30,8 @@ const ContractDetail: React.FC = () => {
   const [journalEntriesData, setJournalEntriesData] = useState<JournalEntriesPreviewResponse | null>(null);
   const [journalEntriesLoading, setJournalEntriesLoading] = useState(false);
   
-  // 付款会计分录预览数据
-  const [paymentJournalEntriesData, setPaymentJournalEntriesData] = useState<JournalEntriesPreviewResponse | null>(null);
+  // 付款会计分录数据（实际执行后的分录）
+  const [paymentJournalEntriesData, setPaymentJournalEntriesData] = useState<any[]>([]);
   const [paymentJournalEntriesLoading, setPaymentJournalEntriesLoading] = useState(false);
   
   // 预提会计分录筛选和排序状态
@@ -76,18 +76,40 @@ const ContractDetail: React.FC = () => {
     }
   };
 
-  // 获取付款会计分录预览数据
-  const fetchPaymentJournalEntriesPreview = async () => {
+  // 获取付款会计分录数据（实际执行后的分录）
+  const fetchPaymentJournalEntries = async () => {
     setPaymentJournalEntriesLoading(true);
     try {
-      const response = await getJournalEntriesPreview({
-        contractId,
-        previewType: 'PAYMENT'
-      });
-      setPaymentJournalEntriesData(response);
+      // 使用API客户端调用后端获取合同的实际付款记录及其会计分录
+      const payments = await getContractPaymentRecords(contractId);
+      
+      // 提取所有付款的会计分录
+      const allEntries: any[] = [];
+      if (payments && Array.isArray(payments)) {
+        payments.forEach((payment: any, paymentIndex: number) => {
+          if (payment.journalEntries) {
+            payment.journalEntries.forEach((entry: any, entryIndex: number) => {
+              allEntries.push({
+                key: `${payment.paymentId}-${entryIndex}`,
+                paymentId: payment.paymentId,
+                paymentDate: payment.bookingDate,
+                entryOrder: entry.entryOrder || (entryIndex + 1),
+                entryType: 'PAYMENT',
+                bookingDate: entry.bookingDate,
+                account: entry.account,
+                debitAmount: entry.dr,
+                creditAmount: entry.cr,
+                memo: entry.memo,
+                paymentAmount: payment.paymentAmount
+              });
+            });
+          }
+        });
+      }
+      setPaymentJournalEntriesData(allEntries);
     } catch (error) {
-      message.error('获取付款会计分录预览失败');
-      console.error('API调用失败:', error);
+      console.error('获取付款会计分录失败:', error);
+      setPaymentJournalEntriesData([]);
     } finally {
       setPaymentJournalEntriesLoading(false);
     }
@@ -113,8 +135,8 @@ const ContractDetail: React.FC = () => {
           await fetchContractData();
         }
       } else if (activeKey === 'payment') {
-        // 付款会计分录页面，调用真实API
-        await fetchPaymentJournalEntriesPreview();
+        // 付款会计分录页面，获取实际的付款分录
+        await fetchPaymentJournalEntries();
       }
     };
 
@@ -134,6 +156,12 @@ const ContractDetail: React.FC = () => {
 
   // 打开支付弹窗
   const handleEditAmount = (record: ContractAmortizationEntry) => {
+    // 检查是否已完成，如果已完成则不允许再次付款
+    if (record.paymentStatus === 'COMPLETED' || record.paymentStatus === 'PAID') {
+      message.warning('该期间已完成付款，无法重复操作');
+      return;
+    }
+    
     setCurrentEditRecord(record);
     setNewAmount(record.amount);
     setIsModalVisible(true);
@@ -146,7 +174,31 @@ const ContractDetail: React.FC = () => {
       return;
     }
 
+    // 重新获取最新数据，检查当前记录是否已被其他操作完成付款
+    await fetchContractData();
+    
+    // 从最新数据中查找当前记录
+    const latestRecord = contractData?.amortization?.find(record => record.id === currentEditRecord.id);
+    if (!latestRecord) {
+      message.error('记录不存在，请刷新页面重试');
+      setIsModalVisible(false);
+      return;
+    }
+    
+    // 检查记录是否已完成付款
+    if (latestRecord.paymentStatus === 'COMPLETED' || latestRecord.paymentStatus === 'PAID') {
+      message.warning('该期间已完成付款，无法重复操作');
+      setIsModalVisible(false);
+      setCurrentEditRecord(null);
+      setNewAmount(null);
+      return;
+    }
+
     setPaymentLoading(true);
+    
+    // 显示处理中的提示
+    const hideLoading = message.loading('正在处理付款...', 0);
+    
     try {
       // 构造支付请求参数
       const paymentRequest: PaymentExecuteRequest = {
@@ -159,6 +211,9 @@ const ContractDetail: React.FC = () => {
       // 调用支付接口
       const response = await executePayment(paymentRequest);
       
+      // 隐藏处理中提示
+      hideLoading();
+      
       // 显示支付结果
       message.success(response.message || '付款执行成功');
       
@@ -167,9 +222,40 @@ const ContractDetail: React.FC = () => {
       setCurrentEditRecord(null);
       setNewAmount(null);
       
-      // 重新获取数据以更新状态
+      // 添加短暂延迟确保后端数据已更新
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // 重新获取合同数据以更新摊销条目状态
       await fetchContractData();
+      
+      // 清理已完成记录的选中状态
+      setSelectedRowKeys(prev => {
+        if (!contractData?.amortization) return [];
+        return prev.filter(key => {
+          const record = contractData.amortization.find(r => r.id === key);
+          return record && record.paymentStatus !== 'COMPLETED' && record.paymentStatus !== 'PAID';
+        });
+      });
+      
+      // 额外的状态更新来触发重新渲染
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      setLoading(false);
+      
+      // 无论当前在哪个页面，都刷新付款分录数据以保持数据一致性
+      await fetchPaymentJournalEntries();
+      
+      // 如果当前在预提会计分录页面，也刷新预提分录数据
+      if (activeKey === 'accrual') {
+        await fetchJournalEntriesPreview();
+      }
+      
+      // 付款完成后取消所有选中的复选框并切换到预提支付页面
+      setSelectedRowKeys([]);
+      setActiveKey('timeline');
     } catch (error) {
+      // 隐藏处理中提示
+      hideLoading();
       message.error('支付失败，请重试');
       console.error('支付失败:', error);
     } finally {
@@ -190,6 +276,18 @@ const ContractDetail: React.FC = () => {
       message.warning('请先选择要编辑的项目');
       return;
     }
+    
+    // 检查选中的记录中是否有已完成的记录
+    const selectedRecords = getSelectedRecords();
+    const completedRecords = selectedRecords.filter(record => 
+      record.paymentStatus === 'COMPLETED' || record.paymentStatus === 'PAID'
+    );
+    
+    if (completedRecords.length > 0) {
+      message.warning('选中的记录中包含已完成的付款，请重新选择');
+      return;
+    }
+    
     setBatchNewAmount(null);
     setIsBatchModalVisible(true);
   };
@@ -201,18 +299,53 @@ const ContractDetail: React.FC = () => {
       return;
     }
 
+    // 重新获取最新数据，检查选中的记录是否有已完成付款的
+    await fetchContractData();
+    
+    // 获取最新的选中记录
+    const latestSelectedRecords = contractData?.amortization?.filter(record => 
+      selectedRowKeys.includes(record.id)
+    ) || [];
+    
+    // 过滤掉已完成的记录
+    const validRecords = latestSelectedRecords.filter(record => 
+      record.paymentStatus !== 'COMPLETED' && record.paymentStatus !== 'PAID'
+    );
+    
+    // 检查是否还有有效记录
+    if (validRecords.length === 0) {
+      message.warning('所选记录均已完成付款，无法执行批量操作');
+      setIsBatchModalVisible(false);
+      setBatchNewAmount(null);
+      setSelectedRowKeys([]);
+      return;
+    }
+    
+    // 如果有部分记录已完成，提示用户
+    if (validRecords.length < latestSelectedRecords.length) {
+      const completedCount = latestSelectedRecords.length - validRecords.length;
+      message.info(`已过滤 ${completedCount} 条已完成的记录，将对剩余 ${validRecords.length} 条记录执行付款`);
+    }
+
     setPaymentLoading(true);
+    
+    // 显示处理中的提示
+    const hideLoading = message.loading('正在处理批量付款...', 0);
+    
     try {
-      // 构造批量支付请求参数
+      // 构造批量支付请求参数，只包含有效记录
       const paymentRequest: PaymentExecuteRequest = {
         contractId,
         paymentAmount: batchNewAmount,
         bookingDate: new Date().toISOString().split('T')[0], // 当前日期 YYYY-MM-DD
-        selectedPeriods: selectedRowKeys.map(key => Number(key)) // 选中的期次
+        selectedPeriods: validRecords.map(record => record.id) // 只提交有效的期次
       };
 
       // 调用支付接口
       const response = await executePayment(paymentRequest);
+      
+      // 隐藏处理中提示
+      hideLoading();
       
       // 显示支付结果
       message.success(response.message || '批量付款执行成功');
@@ -222,9 +355,30 @@ const ContractDetail: React.FC = () => {
       setBatchNewAmount(null);
       setSelectedRowKeys([]); // 清空选择
       
-      // 重新获取数据以更新状态
+      // 添加短暂延迟确保后端数据已更新
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // 重新获取合同数据以更新摊销条目状态
       await fetchContractData();
+      
+      // 强制重新渲染以确保按钮样式更新
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // 额外的状态更新来触发重新渲染
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      setLoading(false);
+      
+      // 无论当前在哪个页面，都刷新付款分录数据以保持数据一致性
+      await fetchPaymentJournalEntries();
+      
+      // 如果当前在预提会计分录页面，也刷新预提分录数据
+      if (activeKey === 'accrual') {
+        await fetchJournalEntriesPreview();
+      }
     } catch (error) {
+      // 隐藏处理中提示
+      hideLoading();
       message.error('批量支付失败，请重试');
       console.error('批量支付失败:', error);
     } finally {
@@ -256,6 +410,10 @@ const ContractDetail: React.FC = () => {
     onSelect: (record: ContractAmortizationEntry, selected: boolean, selectedRows: ContractAmortizationEntry[]) => {
       console.log('Select:', record, selected, selectedRows);
     },
+    getCheckboxProps: (record: ContractAmortizationEntry) => ({
+      disabled: record.paymentStatus === 'COMPLETED' || record.paymentStatus === 'PAID',
+      name: record.amortizationPeriod,
+    }),
   };
 
   // 预提支付表表头（匹配API返回数据）
@@ -303,7 +461,8 @@ const ContractDetail: React.FC = () => {
       render: (status: string) => {
         const statusMap: Record<string, { text: string; color: string; bgColor: string }> = {
           'PENDING': { text: '待付款', color: '#B45309', bgColor: '#FEF3C7' },
-          'PAID': { text: '已付款', color: '#065F46', bgColor: '#D1FAE5' },
+          'PAID': { text: '已完成', color: '#065F46', bgColor: '#D1FAE5' },
+          'COMPLETED': { text: '已完成', color: '#065F46', bgColor: '#D1FAE5' },
           'OVERDUE': { text: '逾期', color: '#DC2626', bgColor: '#FEE2E2' }
         };
         const statusInfo = statusMap[status] || { text: status, color: '#6B7280', bgColor: '#F3F4F6' };
@@ -334,31 +493,49 @@ const ContractDetail: React.FC = () => {
       title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>操作</span>, 
       key: 'action', 
       width: 120, 
-      render: (_: any, record: ContractAmortizationEntry) => (
-        <Button 
-          type="primary"
-          size="small" 
-          onClick={() => handleEditAmount(record)}
-          style={{
-            backgroundColor: '#E31E24',
-            borderColor: '#E31E24',
-            color: '#FFFFFF',
-            fontWeight: '600',
-            fontSize: '13px',
-            borderRadius: '8px'
-          }}
-          onMouseEnter={(e) => {
-            (e.target as HTMLElement).style.backgroundColor = '#C41E3A';
-            (e.target as HTMLElement).style.borderColor = '#C41E3A';
-          }}
-          onMouseLeave={(e) => {
-            (e.target as HTMLElement).style.backgroundColor = '#E31E24';
-            (e.target as HTMLElement).style.borderColor = '#E31E24';
-          }}
-        >
-          支付
-        </Button>
-      )
+      render: (_: any, record: ContractAmortizationEntry) => {
+        const isCompleted = record.paymentStatus === 'COMPLETED' || record.paymentStatus === 'PAID';
+        return (
+          <Button 
+            key={`${record.id}-${record.paymentStatus}-${Date.now()}`}
+            type={isCompleted ? "default" : "primary"}
+            size="small" 
+            disabled={isCompleted}
+            onClick={() => handleEditAmount(record)}
+            style={{
+              backgroundColor: isCompleted ? '#F3F4F6' : '#E31E24',
+              borderColor: isCompleted ? '#D1D5DB' : '#E31E24',
+              color: isCompleted ? '#9CA3AF' : '#FFFFFF',
+              fontWeight: '600',
+              fontSize: '13px',
+              borderRadius: '8px',
+              cursor: isCompleted ? 'not-allowed' : 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              if (!isCompleted) {
+                (e.target as HTMLElement).style.backgroundColor = '#C41E3A';
+                (e.target as HTMLElement).style.borderColor = '#C41E3A';
+              } else {
+                // 已完成状态保持灰色，不改变颜色
+                (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
+                (e.target as HTMLElement).style.borderColor = '#D1D5DB';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isCompleted) {
+                (e.target as HTMLElement).style.backgroundColor = '#E31E24';
+                (e.target as HTMLElement).style.borderColor = '#E31E24';
+              } else {
+                // 已完成状态保持灰色，不改变颜色
+                (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
+                (e.target as HTMLElement).style.borderColor = '#D1D5DB';
+              }
+            }}
+          >
+            {isCompleted ? '已完成' : '支付'}
+          </Button>
+        );
+      }
     },
   ];
 
@@ -709,9 +886,9 @@ const ContractDetail: React.FC = () => {
 
   // 处理付款分录数据的排序和筛选
   const getFilteredAndSortedPaymentEntries = () => {
-    if (!paymentJournalEntriesData?.previewEntries) return [];
+    if (!paymentJournalEntriesData || paymentJournalEntriesData.length === 0) return [];
     
-    let filteredEntries = [...paymentJournalEntriesData.previewEntries];
+    let filteredEntries = [...paymentJournalEntriesData];
     
     // 日期范围筛选
     if (dateRangeFilter.startDate || dateRangeFilter.endDate) {
@@ -791,8 +968,8 @@ const ContractDetail: React.FC = () => {
     },
     {
       title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>会计科目</span>,
-      dataIndex: 'accountName',
-      key: 'accountName',
+      dataIndex: 'account',
+      key: 'account',
       width: 120,
       render: (account: string) => (
         <span style={{ color: '#1F2937', fontSize: '13px', fontWeight: '500' }}>{account}</span>
@@ -855,10 +1032,10 @@ const ContractDetail: React.FC = () => {
       );
     }
 
-    if (!paymentJournalEntriesData) {
+    if (!paymentJournalEntriesData || paymentJournalEntriesData.length === 0) {
       return (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <Text type="secondary">暂无付款会计分录数据</Text>
+          <Text type="secondary">暂无付款会计分录数据，请先执行付款操作</Text>
         </div>
       );
     }
