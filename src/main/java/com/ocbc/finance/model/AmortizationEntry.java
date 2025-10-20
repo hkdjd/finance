@@ -66,10 +66,9 @@ public class AmortizationEntry extends BaseAuditEntity {
     public void addPayment(BigDecimal paymentAmount) {
         if (paymentAmount != null && paymentAmount.compareTo(BigDecimal.ZERO) > 0) {
             this.paidAmount = (this.paidAmount != null ? this.paidAmount : BigDecimal.ZERO).add(paymentAmount);
-            // 如果已完全付款，更新状态
-            if (isFullyPaid()) {
-                this.paymentStatus = PaymentStatus.COMPLETED;
-            }
+            // 任何付款都将状态设置为已完成（包括不足付款）
+            this.paymentStatus = PaymentStatus.COMPLETED;
         }
     }
+    
 }

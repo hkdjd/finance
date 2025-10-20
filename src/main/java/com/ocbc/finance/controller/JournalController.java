@@ -1,7 +1,5 @@
 package com.ocbc.finance.controller;
 
-import com.ocbc.finance.dto.AmortizationResponse;
-import com.ocbc.finance.dto.JournalEntryDto;
 import com.ocbc.finance.dto.JournalEntriesPreviewResponse;
 import com.ocbc.finance.service.JournalService;
 import com.ocbc.finance.service.calculation.AmortizationCalculationService;
@@ -16,21 +14,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/journals")
 public class JournalController {
 
     private final JournalService journalService;
-    private final AmortizationCalculationService amortizationCalculationService;
     private final ContractRepository contractRepository;
 
     public JournalController(JournalService journalService,
                              AmortizationCalculationService amortizationCalculationService,
                              ContractRepository contractRepository) {
         this.journalService = journalService;
-        this.amortizationCalculationService = amortizationCalculationService;
         this.contractRepository = contractRepository;
     }
 

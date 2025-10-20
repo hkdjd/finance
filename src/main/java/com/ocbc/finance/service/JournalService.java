@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,8 @@ public class JournalService {
             BigDecimal amt = e.getAmount();
             // 借：费用；贷：应付
             LocalDate book = bookingDateFromAccountingPeriod(e.getAccountingPeriod(), bookingDate);
-            list.add(new JournalEntryDto(book, "费用", amt, BigDecimal.ZERO, periodMemo(e)));
-            list.add(new JournalEntryDto(book, "应付", BigDecimal.ZERO, amt, periodMemo(e)));
+            list.add(new JournalEntryDto(book, "费用", amt, BigDecimal.ZERO, periodMemo(e),LocalDateTime.now()));
+            list.add(new JournalEntryDto(book, "应付", BigDecimal.ZERO, amt, periodMemo(e),LocalDateTime.now()));
         }
         return list;
     }

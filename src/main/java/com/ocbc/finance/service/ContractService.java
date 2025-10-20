@@ -113,7 +113,7 @@ public class ContractService {
         List<AmortizationEntryDto> dtoList = entries.stream()
                 .sorted(Comparator.comparing(AmortizationEntry::getPeriodDate))
                 .map(e -> {
-                    String status = paidPeriods.contains(e.getAmortizationPeriod()) ? "COMPLETED" : "PENDING";
+                    String status = e.getPaymentStatus() != null ? e.getPaymentStatus().name() : "PENDING";
                     return new AmortizationEntryDto(
                             e.getId(),
                             e.getAmortizationPeriod(),
@@ -306,14 +306,24 @@ public class ContractService {
      */
     private ContractListResponse.ContractSummary convertToContractSummary(Contract contract) {
         ContractListResponse.ContractSummary summary = new ContractListResponse.ContractSummary();
+        // 确保合同ID正确设置
         summary.setContractId(contract.getId());
         summary.setTotalAmount(contract.getTotalAmount());
         summary.setStartDate(contract.getStartDate().toString());
         summary.setEndDate(contract.getEndDate().toString());
         summary.setVendorName(contract.getVendorName());
         summary.setAttachmentName(contract.getAttachmentName());
-        summary.setCreatedAt(java.time.OffsetDateTime.now()); // 简化处理，实际应该从数据库获取
+        // 使用实际的创建时间，转换为OffsetDateTime
+        if (contract.getCreatedAt() != null) {
+            summary.setCreatedAt(contract.getCreatedAt().atOffset(java.time.ZoneOffset.of("+08:00")));
+        } else {
+            summary.setCreatedAt(java.time.OffsetDateTime.now());
+        }
         summary.setStatus("ACTIVE");
+        
+        // 调试日志
+        System.out.println("转换合同摘要 - ID: " + contract.getId() + ", 供应商: " + contract.getVendorName());
+        
         return summary;
     }
 }

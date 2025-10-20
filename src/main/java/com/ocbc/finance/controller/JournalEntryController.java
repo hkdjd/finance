@@ -88,4 +88,7 @@ public class JournalEntryController {
         List<JournalEntry> results = journalEntryService.batchOperateJournalEntries(requests);
         return ResponseEntity.ok(results);
     }
+
+
+    
 }

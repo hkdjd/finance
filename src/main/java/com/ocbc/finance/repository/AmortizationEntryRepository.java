@@ -1,6 +1,7 @@
 package com.ocbc.finance.repository;
 
 import com.ocbc.finance.model.AmortizationEntry;
+import com.ocbc.finance.model.Contract;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +14,9 @@ public interface AmortizationEntryRepository extends JpaRepository<AmortizationE
      * 根据合同ID查询摊销明细，按摊销期间排序
      */
     List<AmortizationEntry> findByContractIdOrderByAmortizationPeriodAsc(Long contractId);
+    
+    /**
+     * 根据合同对象查询摊销明细，按摊销期间排序
+     */
+    List<AmortizationEntry> findByContractOrderByAmortizationPeriodAsc(Contract contract);
 }

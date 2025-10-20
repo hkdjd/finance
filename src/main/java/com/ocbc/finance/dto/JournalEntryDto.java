@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +17,5 @@ public class JournalEntryDto {
     private BigDecimal dr;  // 借方
     private BigDecimal cr;  // 贷方
     private String memo;
+    private LocalDateTime createdAt;
 }

@@ -1044,7 +1044,6 @@ const ContractDetail: React.FC = () => {
 
     return (
       <div>
-        {/* 付款分录列表 */}
         <div style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '12px',

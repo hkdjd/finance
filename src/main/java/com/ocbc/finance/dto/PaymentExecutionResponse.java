@@ -21,6 +21,6 @@ public class PaymentExecutionResponse {
     private LocalDate bookingDate;
     private List<String> selectedPeriods;
     private String status;
-    private List<JournalEntryDto> journalEntries;
+    private List<PaymentJournalEntryDto> journalEntries;
     private String message;
 }

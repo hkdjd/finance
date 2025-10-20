@@ -1,6 +1,5 @@
 package com.ocbc.finance.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +7,6 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class AmortizationEntryDto {
     /** 主键ID */
     private Long id;
@@ -29,4 +27,14 @@ public class AmortizationEntryDto {
         this.amount = amount;
         this.status = "PENDING";
     }
+    
+    // 包含状态的构造函数（用于向后兼容）
+    public AmortizationEntryDto(Long id, String amortizationPeriod, String accountingPeriod, BigDecimal amount, String status) {
+        this.id = id;
+        this.amortizationPeriod = amortizationPeriod;
+        this.accountingPeriod = accountingPeriod;
+        this.amount = amount;
+        this.status = status;
+    }
+    
 }

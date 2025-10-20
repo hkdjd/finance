@@ -2,8 +2,6 @@ package com.ocbc.finance.controller;
 
 import com.ocbc.finance.dto.PaymentExecutionRequest;
 import com.ocbc.finance.dto.PaymentExecutionResponse;
-import com.ocbc.finance.dto.PaymentPreviewResponse;
-import com.ocbc.finance.dto.PaymentRequest;
 import com.ocbc.finance.service.PaymentService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +19,10 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/preview")
-    public ResponseEntity<PaymentPreviewResponse> preview(@RequestBody PaymentRequest request) {
-        return ResponseEntity.ok(paymentService.preview(request));
-    }
+    // @PostMapping("/preview")
+    // public ResponseEntity<PaymentPreviewResponse> preview(@RequestBody PaymentRequest request) {
+    //     return ResponseEntity.ok(paymentService.preview(request));
+    // }
 
     /**
      * 执行付款 - 步骤4付款阶段

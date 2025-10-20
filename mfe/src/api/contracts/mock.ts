@@ -228,6 +228,178 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
     };
   }
 
+  if (contractId === 2) {
+    return {
+      contract: {
+        id: 2,
+        totalAmount: 7500.00,
+        startDate: "2024-02-01",
+        endDate: "2024-07-31",
+        vendorName: "美的空调租赁有限公司"
+      },
+      amortization: [
+        {
+          id: 5,
+          amortizationPeriod: "2024-02",
+          accountingPeriod: "2024-02",
+          amount: 1250.00,
+          periodDate: "2024-02-01",
+          paymentStatus: PaymentStatus.PAID,
+          createdAt: "2024-01-24T14:30:52.123456",
+          updatedAt: "2024-02-15T10:20:30.123456",
+          createdBy: "system",
+          updatedBy: "admin"
+        },
+        {
+          id: 6,
+          amortizationPeriod: "2024-03",
+          accountingPeriod: "2024-03",
+          amount: 1250.00,
+          periodDate: "2024-03-01",
+          paymentStatus: PaymentStatus.PAID,
+          createdAt: "2024-01-24T14:30:52.123456",
+          updatedAt: "2024-03-15T09:15:45.123456",
+          createdBy: "system",
+          updatedBy: "admin"
+        },
+        {
+          id: 7,
+          amortizationPeriod: "2024-04",
+          accountingPeriod: "2024-04",
+          amount: 1250.00,
+          periodDate: "2024-04-01",
+          paymentStatus: PaymentStatus.PENDING,
+          createdAt: "2024-01-24T14:30:52.123456",
+          updatedAt: "2024-01-24T14:30:52.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        },
+        {
+          id: 8,
+          amortizationPeriod: "2024-05",
+          accountingPeriod: "2024-05",
+          amount: 1250.00,
+          periodDate: "2024-05-01",
+          paymentStatus: PaymentStatus.PENDING,
+          createdAt: "2024-01-24T14:30:52.123456",
+          updatedAt: "2024-01-24T14:30:52.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        },
+        {
+          id: 9,
+          amortizationPeriod: "2024-06",
+          accountingPeriod: "2024-06",
+          amount: 1250.00,
+          periodDate: "2024-06-01",
+          paymentStatus: PaymentStatus.PENDING,
+          createdAt: "2024-01-24T14:30:52.123456",
+          updatedAt: "2024-01-24T14:30:52.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        },
+        {
+          id: 10,
+          amortizationPeriod: "2024-07",
+          accountingPeriod: "2024-07",
+          amount: 1250.00,
+          periodDate: "2024-07-01",
+          paymentStatus: PaymentStatus.PENDING,
+          createdAt: "2024-01-24T14:30:52.123456",
+          updatedAt: "2024-01-24T14:30:52.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        }
+      ]
+    };
+  }
+
+  if (contractId === 3) {
+    return {
+      contract: {
+        id: 3,
+        totalAmount: 8000.00,
+        startDate: "2024-03-01",
+        endDate: "2024-08-31",
+        vendorName: "海尔冰箱设备租赁公司"
+      },
+      amortization: [
+        {
+          id: 11,
+          amortizationPeriod: "2024-03",
+          accountingPeriod: "2024-03",
+          amount: 1333.33,
+          periodDate: "2024-03-01",
+          paymentStatus: PaymentStatus.PAID,
+          createdAt: "2024-02-24T14:30:52.123456",
+          updatedAt: "2024-03-20T11:45:30.123456",
+          createdBy: "system",
+          updatedBy: "admin"
+        },
+        {
+          id: 12,
+          amortizationPeriod: "2024-04",
+          accountingPeriod: "2024-04",
+          amount: 1333.33,
+          periodDate: "2024-04-01",
+          paymentStatus: PaymentStatus.PAID,
+          createdAt: "2024-02-24T14:30:52.123456",
+          updatedAt: "2024-04-18T16:30:15.123456",
+          createdBy: "system",
+          updatedBy: "admin"
+        },
+        {
+          id: 13,
+          amortizationPeriod: "2024-05",
+          accountingPeriod: "2024-05",
+          amount: 1333.33,
+          periodDate: "2024-05-01",
+          paymentStatus: PaymentStatus.OVERDUE,
+          createdAt: "2024-02-24T14:30:52.123456",
+          updatedAt: "2024-05-25T08:15:45.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        },
+        {
+          id: 14,
+          amortizationPeriod: "2024-06",
+          accountingPeriod: "2024-06",
+          amount: 1333.33,
+          periodDate: "2024-06-01",
+          paymentStatus: PaymentStatus.PENDING,
+          createdAt: "2024-02-24T14:30:52.123456",
+          updatedAt: "2024-02-24T14:30:52.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        },
+        {
+          id: 15,
+          amortizationPeriod: "2024-07",
+          accountingPeriod: "2024-07",
+          amount: 1333.33,
+          periodDate: "2024-07-01",
+          paymentStatus: PaymentStatus.PENDING,
+          createdAt: "2024-02-24T14:30:52.123456",
+          updatedAt: "2024-02-24T14:30:52.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        },
+        {
+          id: 16,
+          amortizationPeriod: "2024-08",
+          accountingPeriod: "2024-08",
+          amount: 1333.35,
+          periodDate: "2024-08-01",
+          paymentStatus: PaymentStatus.PENDING,
+          createdAt: "2024-02-24T14:30:52.123456",
+          updatedAt: "2024-02-24T14:30:52.123456",
+          createdBy: "system",
+          updatedBy: "system"
+        }
+      ]
+    };
+  }
+
   // 为其他合同ID提供默认数据
   const contract = mockContractsList.contracts.find(c => c.contractId === contractId);
   if (contract) {

@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "journal_entries")
@@ -45,6 +46,9 @@ public class JournalEntry extends BaseAuditEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "entry_type", nullable = false, length = 20)
     private EntryType entryType = EntryType.AMORTIZATION; // 分录类型
+    
+    @Column(name = "payment_timestamp")
+    private LocalDateTime paymentTimestamp; // 支付操作时间戳，用于区分不同批次的分录
 
     /**
      * 会计分录类型枚举

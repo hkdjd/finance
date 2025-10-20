@@ -3,7 +3,6 @@ package com.ocbc.finance.service;
 import com.ocbc.finance.dto.JournalEntryGenerateRequest;
 import com.ocbc.finance.dto.JournalEntryListResponse;
 import com.ocbc.finance.dto.OperationRequest;
-import com.ocbc.finance.enums.EntryType;
 import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.model.Contract;
 import com.ocbc.finance.model.JournalEntry;
@@ -246,5 +245,53 @@ public class JournalEntryService {
         }
         
         return results;
+    }
+    
+    /**
+     * 根据新规则调整会计分录的入账日期
+     * 实现新需求：付款日期晚于应付入账日期，则入账日期为付款日期；
+     * 付款日期早于应付入账日期，则预付以及应付入账日期均为该分录的初始入账日期
+     */
+    @Transactional
+    public void adjustBookingDatesForPayment(Long contractId, LocalDate paymentDate) {
+        List<JournalEntry> paymentEntries = journalEntryRepository.findByContractIdAndEntryTypeOrderByBookingDateAscIdAsc(
+                contractId, JournalEntry.EntryType.PAYMENT);
+        
+        for (JournalEntry entry : paymentEntries) {
+            LocalDate originalBookingDate = entry.getBookingDate();
+            LocalDate adjustedBookingDate;
+            
+            if ("应付".equals(entry.getAccountName()) || "预付".equals(entry.getAccountName())) {
+                // 对于应付和预付科目，应用新的日期规则
+                if (paymentDate.isAfter(originalBookingDate)) {
+                    // 付款日期晚于应付入账日期，则入账日期为付款日期
+                    adjustedBookingDate = paymentDate;
+                } else {
+                    // 付款日期早于应付入账日期，则使用原始入账日期
+                    adjustedBookingDate = originalBookingDate;
+                }
+                
+                entry.setBookingDate(adjustedBookingDate);
+                journalEntryRepository.save(entry);
+            }
+        }
+    }
+    
+    /**
+     * 为差异调整分录设置最后期间末日期
+     * 实现新需求：差异调整，放到最后一个期间末
+     */
+    @Transactional
+    public void adjustDifferenceEntryDate(Long contractId, LocalDate lastPeriodEndDate) {
+        List<JournalEntry> entries = journalEntryRepository.findByContractIdAndEntryTypeOrderByBookingDateAscIdAsc(
+                contractId, JournalEntry.EntryType.PAYMENT);
+        
+        for (JournalEntry entry : entries) {
+            if (entry.getMemo() != null && 
+                (entry.getMemo().contains("差异调整") || entry.getMemo().contains("多付") || entry.getMemo().contains("少付"))) {
+                entry.setBookingDate(lastPeriodEndDate);
+                journalEntryRepository.save(entry);
+            }
+        }
     }
 }

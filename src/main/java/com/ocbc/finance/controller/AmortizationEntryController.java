@@ -4,6 +4,7 @@ import com.ocbc.finance.dto.AmortizationListResponse;
 import com.ocbc.finance.dto.AmortizationUpdateRequest;
 import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.service.AmortizationEntryService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ import jakarta.validation.Valid;
 public class AmortizationEntryController {
 
     private final AmortizationEntryService amortizationEntryService;
-
+    
     public AmortizationEntryController(AmortizationEntryService amortizationEntryService) {
         this.amortizationEntryService = amortizationEntryService;
     }
@@ -68,4 +69,6 @@ public class AmortizationEntryController {
             throw e;
         }
     }
+
+    
 }

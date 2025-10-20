@@ -14,5 +14,8 @@ import java.util.List;
 @Builder
 public class PaymentPreviewResponse {
     private BigDecimal paymentAmount;
+    private Long contractId;
+    private Long paymentId;
     private List<JournalEntryDto> entries;
+
 }
