@@ -8,7 +8,10 @@ import {
   message, 
   Spin,
   Empty,
-  Typography
+  Typography,
+  Checkbox,
+  Input,
+  Tag
 } from 'antd';
 import { 
   InboxOutlined, 
@@ -35,6 +38,8 @@ const PageA: React.FC<PageAProps> = () => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadFile[]>([]);
   const [contractList, setContractList] = useState<ContractData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [customFields, setCustomFields] = useState<string[]>([]);
+  const [customFieldInput, setCustomFieldInput] = useState<string>('');
   
   // 加载合同列表
   useEffect(() => {
@@ -246,21 +251,99 @@ const PageA: React.FC<PageAProps> = () => {
     },
   };
 
+  // 合同分析字段配置
+  const analysisFields = [
+    { label: '合同名称', value: 'contractName', disabled: true, checked: true },
+    { label: '供应商名称', value: 'vendorName', disabled: true, checked: true },
+    { label: '合同总金额', value: 'totalAmount', disabled: true, checked: true },
+    { label: '合同开始时间', value: 'startDate', disabled: true, checked: true },
+    { label: '合同结束时间', value: 'endDate', disabled: true, checked: true },
+    { label: '税率', value: 'taxRate', disabled: true, checked: true },
+  ];
+
+  // 处理自定义字段添加
+  const handleCustomFieldAdd = () => {
+    const trimmedValue = customFieldInput.trim();
+    if (trimmedValue && !customFields.includes(trimmedValue)) {
+      setCustomFields([...customFields, trimmedValue]);
+      setCustomFieldInput('');
+    } else if (customFields.includes(trimmedValue)) {
+      message.warning('该字段已存在');
+    }
+  };
+
+  // 处理自定义字段删除
+  const handleCustomFieldRemove = (fieldToRemove: string) => {
+    setCustomFields(customFields.filter(field => field !== fieldToRemove));
+  };
+
   return (
     <div className={styles.pageContainer}>
       {/* 区域A - 文件上传区域 */}
       <div className={styles.uploadArea}>
-        <Dragger {...uploadProps} className={styles.uploadDragger}>
-          <p className={styles.uploadIcon}>
-            <InboxOutlined />
-          </p>
-          <p className={styles.uploadText}>
-            点击或拖拽文件到此区域上传
-          </p>
-          <p className={styles.uploadHint}>
-            支持单个或批量上传，支持 PDF、Word、Excel、TXT 格式
-          </p>
-        </Dragger>
+        {/* 左侧：合同解析内容区 */}
+        <div className={styles.leftSection}>
+          <div className={styles.sectionHeader}>
+            <Title level={4} style={{ margin: 0, color: '#262626' }}>
+              合同解析内容
+            </Title>
+          </div>
+          <div className={styles.checkboxContainer}>
+            {analysisFields.map((field) => (
+              <div key={field.value} className={styles.checkboxItem}>
+                <Checkbox
+                  checked={field.checked}
+                  disabled={field.disabled}
+                >
+                  {field.label}
+                </Checkbox>
+              </div>
+            ))}
+          </div>
+          
+          {/* 自定义字段标签展示区域 */}
+          {customFields.length > 0 && (
+            <div className={styles.customTagsContainer}>
+              {customFields.map((field) => (
+                <Tag
+                  key={field}
+                  closable
+                  onClose={() => handleCustomFieldRemove(field)}
+                  color="blue"
+                >
+                  {field}
+                </Tag>
+              ))}
+            </div>
+          )}
+          
+          {/* 自定义字段输入框 */}
+          <div className={styles.customInputContainer}>
+            <Input
+              placeholder="自定义"
+              value={customFieldInput}
+              onChange={(e) => setCustomFieldInput(e.target.value)}
+              onPressEnter={handleCustomFieldAdd}
+              style={{ width: '100%', backgroundColor: '#ffffff' }}
+              prefix={<span style={{ color: '#999', marginRight: 4 }}>自定义：</span>}
+            />
+          </div>
+        </div>
+
+        {/* 右侧：文件上传功能 */}
+        <div className={styles.rightSection}>
+          <Dragger {...uploadProps} className={styles.uploadDragger}>
+            <p className={styles.uploadIcon}>
+              <InboxOutlined />
+            </p>
+            <p className={styles.uploadText}>
+              点击或拖拽文件到此区域上传
+            </p>
+            <p className={styles.uploadHint}>
+              支持单个或批量上传，支持 PDF、Word、Excel、TXT 格式
+            </p>
+          </Dragger>
+        </div>
       </div>
 
       {/* 区域B - 合同列表区域 */}
