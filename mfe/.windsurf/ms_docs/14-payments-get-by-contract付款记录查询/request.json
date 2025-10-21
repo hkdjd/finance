@@ -1,0 +1,4 @@
+{
+  "note": "GET请求，路径参数contractId=1",
+  "example_url": "/payments/contracts/1"
+}

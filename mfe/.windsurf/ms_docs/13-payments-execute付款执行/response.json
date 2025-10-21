@@ -1,0 +1,95 @@
+{
+  "paymentId": 1,
+  "contractId": 1,
+  "paymentAmount": 6000.00,
+  "bookingDate": "2024-03-20",
+  "selectedPeriods": ["2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06"],
+  "status": "CONFIRMED",
+  "journalEntries": [
+    {
+      "bookingDate": "2024-01-27",
+      "account": "应付",
+      "dr": 1000.00,
+      "cr": 0.00,
+      "memo": "period:2024-01"
+    },
+    {
+      "bookingDate": "2024-02-27",
+      "account": "应付",
+      "dr": 1000.00,
+      "cr": 0.00,
+      "memo": "period:2024-02"
+    },
+    {
+      "bookingDate": "2024-03-20",
+      "account": "预付",
+      "dr": 4000.00,
+      "cr": 0.00,
+      "memo": "over prepayment"
+    },
+    {
+      "bookingDate": "2024-03-20",
+      "account": "活期存款",
+      "dr": 0.00,
+      "cr": 6000.00,
+      "memo": "payment"
+    },
+    {
+      "bookingDate": "2024-03-27",
+      "account": "应付",
+      "dr": 1000.00,
+      "cr": 0.00,
+      "memo": "period:2024-03"
+    },
+    {
+      "bookingDate": "2024-03-27",
+      "account": "预付",
+      "dr": 0.00,
+      "cr": 1000.00,
+      "memo": "period:2024-03"
+    },
+    {
+      "bookingDate": "2024-04-27",
+      "account": "应付",
+      "dr": 1000.00,
+      "cr": 0.00,
+      "memo": "period:2024-04"
+    },
+    {
+      "bookingDate": "2024-04-27",
+      "account": "预付",
+      "dr": 0.00,
+      "cr": 1000.00,
+      "memo": "period:2024-04"
+    },
+    {
+      "bookingDate": "2024-05-27",
+      "account": "应付",
+      "dr": 1000.00,
+      "cr": 0.00,
+      "memo": "period:2024-05"
+    },
+    {
+      "bookingDate": "2024-05-27",
+      "account": "预付",
+      "dr": 0.00,
+      "cr": 1000.00,
+      "memo": "period:2024-05"
+    },
+    {
+      "bookingDate": "2024-06-27",
+      "account": "应付",
+      "dr": 1000.00,
+      "cr": 0.00,
+      "memo": "period:2024-06"
+    },
+    {
+      "bookingDate": "2024-06-27",
+      "account": "预付",
+      "dr": 0.00,
+      "cr": 1000.00,
+      "memo": "period:2024-06"
+    }
+  ],
+  "message": "付款执行成功"
+}

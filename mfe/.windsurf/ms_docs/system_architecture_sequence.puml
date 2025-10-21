@@ -1,0 +1,158 @@
+@startuml 系统架构交互时序图
+
+!theme plain
+title 财务系统架构层次交互图
+
+box "前端层" #LightBlue
+    participant "Web前端" as Frontend
+end box
+
+box "控制器层" #LightGreen
+    participant "AmortizationController" as AmortController
+    participant "ContractController" as ContractController
+    participant "JournalController" as JournalController
+    participant "PaymentController" as PaymentController
+end box
+
+box "服务层" #LightYellow
+    participant "AmortizationCalculationService" as AmortCalcService
+    participant "ContractService" as ContractService
+    participant "JournalService" as JournalService
+    participant "PaymentService" as PaymentService
+end box
+
+box "仓储层" #LightCoral
+    participant "ContractRepository" as ContractRepo
+    participant "AmortizationEntryRepository" as AmortRepo
+    participant "PaymentRepository" as PaymentRepo
+    participant "JournalEntryRepository" as JournalRepo
+end box
+
+box "数据层" #LightGray
+    database "PostgreSQL\n数据库" as DB
+end box
+
+== 完整业务流程的系统交互 ==
+
+Frontend -> AmortController: 步骤1: 摊销计算请求
+activate AmortController
+AmortController -> AmortCalcService: 调用计算服务
+activate AmortCalcService
+AmortCalcService -> AmortCalcService: 业务逻辑计算
+AmortCalcService --> AmortController: 返回计算结果
+deactivate AmortCalcService
+AmortController --> Frontend: 返回摊销明细
+deactivate AmortController
+
+Frontend -> ContractController: 步骤2: 保存合同和摊销台账
+activate ContractController
+ContractController -> ContractService: 调用合同服务
+activate ContractService
+
+ContractService -> AmortCalcService: 重新计算摊销
+activate AmortCalcService
+AmortCalcService --> ContractService: 返回摊销数据
+deactivate AmortCalcService
+
+ContractService -> ContractRepo: 保存合同实体
+activate ContractRepo
+ContractRepo -> DB: INSERT INTO contracts
+DB --> ContractRepo: 返回合同ID
+ContractRepo --> ContractService: 合同实体
+deactivate ContractRepo
+
+ContractService -> AmortRepo: 批量保存摊销明细
+activate AmortRepo
+AmortRepo -> DB: INSERT INTO amortization_entries
+DB --> AmortRepo: 返回明细ID列表
+AmortRepo --> ContractService: 摊销明细实体列表
+deactivate AmortRepo
+
+ContractService --> ContractController: 返回完整数据
+deactivate ContractService
+ContractController --> Frontend: 返回保存结果
+deactivate ContractController
+
+Frontend -> JournalController: 步骤3: 会计分录预览
+activate JournalController
+JournalController -> JournalService: 调用分录服务
+activate JournalService
+JournalService -> JournalService: 生成会计分录逻辑
+JournalService --> JournalController: 返回分录列表
+deactivate JournalService
+JournalController --> Frontend: 返回会计分录
+deactivate JournalController
+
+Frontend -> PaymentController: 步骤4: 付款执行
+activate PaymentController
+PaymentController -> PaymentService: 调用付款服务
+activate PaymentService
+
+PaymentService -> ContractService: 获取最新摊销数据
+activate ContractService
+ContractService -> ContractRepo: 查询合同
+activate ContractRepo
+ContractRepo -> DB: SELECT FROM contracts
+DB --> ContractRepo: 合同数据
+ContractRepo --> ContractService: 合同实体
+deactivate ContractRepo
+
+ContractService -> AmortRepo: 查询摊销明细
+activate AmortRepo
+AmortRepo -> DB: SELECT FROM amortization_entries
+DB --> AmortRepo: 摊销明细数据
+AmortRepo --> ContractService: 摊销明细列表
+deactivate AmortRepo
+ContractService --> PaymentService: 返回摊销数据
+deactivate ContractService
+
+PaymentService -> PaymentService: 执行付款业务逻辑
+
+PaymentService -> PaymentRepo: 保存付款记录
+activate PaymentRepo
+PaymentRepo -> DB: INSERT INTO payments
+DB --> PaymentRepo: 返回付款ID
+PaymentRepo --> PaymentService: 付款实体
+deactivate PaymentRepo
+
+PaymentService -> JournalRepo: 批量保存会计分录
+activate JournalRepo
+JournalRepo -> DB: INSERT INTO journal_entries
+DB --> JournalRepo: 返回分录ID列表
+JournalRepo --> PaymentService: 分录实体列表
+deactivate JournalRepo
+
+PaymentService --> PaymentController: 返回执行结果
+deactivate PaymentService
+PaymentController --> Frontend: 返回付款结果
+deactivate PaymentController
+
+== 数据查询流程 ==
+
+Frontend -> PaymentController: 查询付款记录
+activate PaymentController
+PaymentController -> PaymentService: 调用查询服务
+activate PaymentService
+
+PaymentService -> PaymentRepo: 查询付款数据
+activate PaymentRepo
+PaymentRepo -> DB: SELECT FROM payments
+DB --> PaymentRepo: 付款数据
+PaymentRepo --> PaymentService: 付款实体列表
+deactivate PaymentRepo
+
+PaymentService -> JournalRepo: 查询关联分录
+activate JournalRepo
+JournalRepo -> DB: SELECT FROM journal_entries
+DB --> JournalRepo: 分录数据
+JournalRepo --> PaymentService: 分录实体列表
+deactivate JournalRepo
+
+PaymentService --> PaymentController: 返回完整数据
+deactivate PaymentService
+PaymentController --> Frontend: 返回查询结果
+deactivate PaymentController
+
+note over Frontend, DB: 系统采用分层架构设计\n• 控制器层：处理HTTP请求\n• 服务层：业务逻辑处理\n• 仓储层：数据访问抽象\n• 数据层：数据持久化
+
+@enduml

@@ -1,0 +1,51 @@
+{
+  "totalAmount": 6000.00,
+  "startDate": "2024-01",
+  "endDate": "2024-06",
+  "scenario": null,
+  "generatedAt": "2024-01-15T11:00:15.789012+08:00",
+  "entries": [
+    {
+      "id": 1,
+      "amortizationPeriod": "2024-01",
+      "accountingPeriod": "2024-01",
+      "amount": 1000.00,
+      "status": "COMPLETED"
+    },
+    {
+      "id": 2,
+      "amortizationPeriod": "2024-02",
+      "accountingPeriod": "2024-02",
+      "amount": 1000.00,
+      "status": "COMPLETED"
+    },
+    {
+      "id": 3,
+      "amortizationPeriod": "2024-03",
+      "accountingPeriod": "2024-03",
+      "amount": 1000.00,
+      "status": "PENDING"
+    },
+    {
+      "id": 4,
+      "amortizationPeriod": "2024-04",
+      "accountingPeriod": "2024-04",
+      "amount": 1000.00,
+      "status": "PENDING"
+    },
+    {
+      "id": 5,
+      "amortizationPeriod": "2024-05",
+      "accountingPeriod": "2024-05",
+      "amount": 1000.00,
+      "status": "PENDING"
+    },
+    {
+      "id": 6,
+      "amortizationPeriod": "2024-06",
+      "accountingPeriod": "2024-06",
+      "amount": 1000.00,
+      "status": "PENDING"
+    }
+  ]
+}

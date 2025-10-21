@@ -1,0 +1,168 @@
+@startuml 步骤4付款阶段详细时序图
+
+!theme plain
+title 步骤4 付款阶段详细业务流程
+
+actor 用户 as User
+participant "前端界面" as Frontend
+participant "PaymentController" as PaymentController
+participant "PaymentService" as PaymentService
+participant "ContractService" as ContractService
+database "数据库" as DB
+
+== 付款预览阶段 ==
+
+User -> Frontend: 选择合同进入付款页面
+Frontend -> ContractService: GET /contracts/{id}/amortization
+activate ContractService
+ContractService -> DB: 查询合同摊销台账
+ContractService --> Frontend: 返回摊销明细列表
+deactivate ContractService
+
+Frontend --> User: 展示摊销台账\n供用户勾选期间
+
+User -> Frontend: 输入付款参数\n• 付款金额\n• 付款时间\n• 勾选付款期间
+Frontend -> PaymentController: POST /payments/preview
+activate PaymentController
+
+PaymentController -> PaymentService: preview(PaymentRequest)
+activate PaymentService
+
+PaymentService -> PaymentService: 计算选中期间总金额
+note right: selectedSum = Σ(选中期间摊销金额)
+
+PaymentService -> PaymentService: 计算付款差异
+note right: delta = paymentAmount - selectedSum
+
+PaymentService -> PaymentService: 判断差异阈值
+note right: tiny = min(选中期间金额) / 10
+
+alt delta == 0 (平账情况)
+    PaymentService -> PaymentService: 生成标准分录
+    note right: 借：应付 (各期间)\n贷：活期存款
+    
+else delta > 0 (多付情况)
+    alt delta <= tiny (小额多付)
+        PaymentService -> PaymentService: 多付金额记费用
+        note right: 借：应付 (各期间)\n借：费用 (差额)\n贷：活期存款
+    else delta > tiny (大额多付)
+        PaymentService -> PaymentService: 多付金额记预付
+        note right: 借：应付 (各期间)\n借：预付 (差额)\n贷：活期存款
+    end
+    
+else delta < 0 (少付情况)
+    alt |delta| <= tiny (小额少付)
+        PaymentService -> PaymentService: 少付金额贷记费用
+        note right: 借：应付 (各期间)\n贷：费用 (差额)\n贷：活期存款
+    else |delta| > tiny (大额少付)
+        PaymentService -> PaymentService: 少付金额贷记预付
+        note right: 借：应付 (各期间)\n贷：预付 (差额)\n贷：活期存款
+    end
+end
+
+PaymentService -> PaymentService: 设置各分录的记账日期
+note right: • 应付分录：对应期间27日\n• 其他分录：付款日期
+
+PaymentService --> PaymentController: PaymentPreviewResponse
+deactivate PaymentService
+
+PaymentController --> Frontend: 返回预览结果
+deactivate PaymentController
+
+Frontend --> User: 展示付款预览\n• 付款金额\n• 会计分录明细
+
+== 付款执行阶段 ==
+
+User -> Frontend: 确认执行付款
+Frontend -> PaymentController: POST /payments/execute
+activate PaymentController
+
+PaymentController -> PaymentService: executePayment(PaymentExecutionRequest)
+activate PaymentService
+
+PaymentService -> ContractService: getContractAmortization(contractId)
+activate ContractService
+ContractService -> DB: 查询最新摊销数据
+ContractService --> PaymentService: AmortizationResponse
+deactivate ContractService
+
+PaymentService -> PaymentService: 重新执行付款计算逻辑
+note right: 确保使用最新的摊销数据
+
+PaymentService -> DB: 创建Payment记录
+activate DB
+note right: Payment实体包含：\n• contract_id\n• payment_amount\n• booking_date\n• selected_periods\n• status = CONFIRMED
+DB --> PaymentService: Payment ID
+deactivate DB
+
+PaymentService -> DB: 批量创建JournalEntry记录
+activate DB
+note right: JournalEntry实体包含：\n• payment_id\n• booking_date\n• account_name\n• debit_amount\n• credit_amount\n• memo\n• entry_order
+DB --> PaymentService: JournalEntry IDs
+deactivate DB
+
+PaymentService --> PaymentController: PaymentExecutionResponse
+deactivate PaymentService
+
+PaymentController --> Frontend: 返回执行结果
+deactivate PaymentController
+
+Frontend --> User: 显示付款成功\n• 付款ID\n• 执行状态\n• 会计分录详情
+
+== 付款查询和管理 ==
+
+User -> Frontend: 查询付款记录
+Frontend -> PaymentController: GET /payments/contracts/{contractId}
+activate PaymentController
+
+PaymentController -> PaymentService: getPaymentsByContract(contractId)
+activate PaymentService
+
+PaymentService -> DB: 查询Payment记录
+PaymentService -> DB: 关联查询JournalEntry记录
+PaymentService --> PaymentController: List<PaymentExecutionResponse>
+deactivate PaymentService
+
+PaymentController --> Frontend: 返回付款记录列表
+deactivate PaymentController
+
+Frontend --> User: 展示付款历史\n• 付款时间\n• 付款金额\n• 付款状态\n• 会计分录
+
+User -> Frontend: 查看付款详情
+Frontend -> PaymentController: GET /payments/{paymentId}
+activate PaymentController
+
+PaymentController -> PaymentService: getPaymentDetail(paymentId)
+activate PaymentService
+
+PaymentService -> DB: 查询Payment详情
+PaymentService -> DB: 查询关联的JournalEntry
+PaymentService --> PaymentController: PaymentExecutionResponse
+deactivate PaymentService
+
+PaymentController --> Frontend: 返回付款详情
+deactivate PaymentController
+
+Frontend --> User: 展示完整付款信息\n包含所有会计分录
+
+== 付款取消 (可选) ==
+
+User -> Frontend: 取消付款
+Frontend -> PaymentController: PUT /payments/{paymentId}/cancel
+activate PaymentController
+
+PaymentController -> PaymentService: cancelPayment(paymentId)
+activate PaymentService
+
+PaymentService -> DB: 更新Payment状态为CANCELLED
+note right: 不删除记录，只修改状态\n保留审计轨迹
+
+PaymentService --> PaymentController: PaymentExecutionResponse
+deactivate PaymentService
+
+PaymentController --> Frontend: 返回取消结果
+deactivate PaymentController
+
+Frontend --> User: 显示取消成功
+
+@enduml

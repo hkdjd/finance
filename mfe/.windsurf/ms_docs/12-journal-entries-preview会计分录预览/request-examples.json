@@ -1,0 +1,28 @@
+{
+  "description": "会计分录预览接口请求示例",
+  "examples": {
+    "amortization_preview": {
+      "description": "预览摊销会计分录",
+      "request": {
+        "contractId": 1,
+        "previewType": "AMORTIZATION"
+      }
+    },
+    "payment_preview": {
+      "description": "预览付款会计分录",
+      "request": {
+        "contractId": 1,
+        "previewType": "PAYMENT"
+      }
+    }
+  },
+  "field_descriptions": {
+    "contractId": "合同ID，必填",
+    "previewType": "预览类型，AMORTIZATION（摊销）或 PAYMENT（付款）"
+  },
+  "usage_notes": [
+    "此接口仅用于预览，不会保存数据到数据库",
+    "可以在实际生成会计分录前进行预览确认",
+    "支持摊销和付款两种类型的会计分录预览"
+  ]
+}

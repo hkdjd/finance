@@ -1,0 +1,63 @@
+@startuml 数据流转时序图
+
+!theme plain
+title 财务系统数据实体流转图
+
+participant "用户输入" as Input
+participant "CalculateAmortizationRequest" as CalcReq
+participant "AmortizationResponse" as AmortResp
+participant "Contract实体" as Contract
+participant "AmortizationEntry实体" as AmortEntry
+participant "JournalEntryDto" as JournalDto
+participant "PaymentExecutionRequest" as PaymentReq
+participant "Payment实体" as Payment
+participant "JournalEntry实体" as JournalEntity
+participant "数据库" as DB
+
+== 数据创建和转换流程 ==
+
+Input -> CalcReq: 封装用户输入
+note right: • totalAmount: 6000.00\n• startDate: "2024-01"\n• endDate: "2024-06"\n• taxRate: 0.06\n• vendorName: "供应商"
+
+CalcReq -> AmortResp: 摊销计算转换
+note right: • 计算场景判断\n• 生成摊销明细\n• 设置生成时间
+
+AmortResp -> Contract: 创建合同实体
+note right: Contract字段：\n• id: auto\n• totalAmount: 6000.00\n• startDate: 2024-01-01\n• endDate: 2024-06-30\n• vendorName: "供应商"\n• taxRate: 0.06\n• 审计字段
+
+AmortResp -> AmortEntry: 创建摊销明细实体列表
+note right: AmortizationEntry字段：\n• id: auto\n• contractId: FK\n• amortizationPeriod: "2024-01"\n• accountingPeriod: "2024-01"\n• amount: 1000.00\n• periodDate: 2024-01-01\n• 审计字段
+
+Contract -> DB: 持久化合同
+AmortEntry -> DB: 批量持久化摊销明细
+
+== 会计分录生成流程 ==
+
+DB -> AmortResp: 查询摊销数据
+AmortResp -> JournalDto: 生成会计分录DTO
+note right: JournalEntryDto字段：\n• bookingDate: 2024-01-27\n• account: "费用"\n• dr: 1000.00\n• cr: 0.00\n• memo: "period:2024-01"
+
+== 付款执行数据流程 ==
+
+Input -> PaymentReq: 封装付款请求
+note right: PaymentExecutionRequest：\n• contractId: 1\n• paymentAmount: 6000.00\n• bookingDate: "2024-03-20"\n• selectedPeriods: ["2024-01"...]
+
+PaymentReq -> Payment: 创建付款实体
+note right: Payment字段：\n• id: auto\n• contractId: FK\n• paymentAmount: 6000.00\n• bookingDate: 2024-03-20\n• selectedPeriods: "2024-01,2024-02..."\n• status: CONFIRMED\n• 审计字段
+
+JournalDto -> JournalEntity: DTO转实体
+note right: JournalEntry字段：\n• id: auto\n• paymentId: FK\n• bookingDate: 2024-01-27\n• accountName: "应付"\n• debitAmount: 1000.00\n• creditAmount: 0.00\n• memo: "period:2024-01"\n• entryOrder: 1\n• 审计字段
+
+Payment -> DB: 持久化付款记录
+JournalEntity -> DB: 批量持久化会计分录
+
+== 数据查询和响应流程 ==
+
+DB -> Payment: 查询付款数据
+DB -> JournalEntity: 查询关联分录
+Payment -> PaymentReq: 转换为响应DTO
+JournalEntity -> JournalDto: 转换为DTO列表
+
+note over Input, DB: 数据转换规则：\n• 输入验证和格式化\n• DTO与实体双向转换\n• 审计字段自动填充\n• 外键关系维护\n• 状态枚举管理
+
+@enduml

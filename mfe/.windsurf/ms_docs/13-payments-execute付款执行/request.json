@@ -1,0 +1,6 @@
+{
+  "contractId": 1,
+  "paymentAmount": 6000.00,
+  "bookingDate": "2024-03-20",
+  "selectedPeriods": [1, 2, 3, 4, 5, 6]
+}
