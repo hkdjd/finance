@@ -1,0 +1,2077 @@
+2025-10-21 00:02:27 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h15m38s865ms).
+2025-10-21 01:38:10 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h35m42s679ms).
+2025-10-21 03:15:30 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h37m20s577ms).
+2025-10-21 04:22:13 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h6m42s837ms).
+2025-10-21 05:40:43 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h18m30s197ms).
+2025-10-21 07:11:03 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h30m19s696ms).
+2025-10-21 08:14:07 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h3m3s577ms).
+2025-10-21 09:26:07 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h12m131ms).
+2025-10-21 10:15:45 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=49m37s792ms).
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 史密斯牌净水器租赁合同.pdf, 文件大小: 89300 bytes
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 史密斯牌净水器租赁合同.pdf
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 89300 bytes
+2025-10-21 10:15:52 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 89300 bytes
+2025-10-21 10:15:52 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 2052
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 17ms
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 2052 字符
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+========================================================
+======================== 
+                            净水器设备租赁合同 
+========================================================
+======================== 
+ 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 24 日 
+ 
+---------------------------------------------------------------------------
+----- 
+                              合同双方信息 
+---------------------------------------------------------------------------
+----- 
+ 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+ 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+ 
+---------------------------------------------------------------------------
+----- 
+                              合同正文 
+---------------------------------------------------------------------------
+----- 
+ 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+ 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+ 
+第二条 租赁期限 
+租赁期限自 2025-01-01 起至 2025-06-30 止，共计 6 个月。 
+ 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 6,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+ 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+ 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。 
+3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+ 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+ 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+ 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+ 
+---------------------------------------------------------------------------
+----- 
+                              签字栏 
+---------------------------------------------------------------------------
+----- 
+ 
+甲方（盖章）：                          乙方（盖章）： 
+ 
+ 
+华侨银行（中国）有限公司                史密斯净水设备有限公司 
+ 
+ 
+法定代表人：_____________               法定代表人：_____________ 
+ 
+ 
+日期：2025 年 1 月 24 日                    日期：2025 年 1 月 24 日 
+ 
+========================================================
+======================== 
+                              合同结束 
+========================================================
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 10:15:52 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 10:15:53 [http-nio-8082-exec-7] ERROR c.o.f.service.DeepSeekAiService - 调用DeepSeek API异常: I/O error on POST request for "https://api.deepseek.com/chat/completions": Connection reset
+org.springframework.web.client.ResourceAccessException: I/O error on POST request for "https://api.deepseek.com/chat/completions": Connection reset
+	at org.springframework.web.client.RestTemplate.createResourceAccessException(RestTemplate.java:905)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:885)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:781)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:529)
+	at com.ocbc.finance.service.DeepSeekAiService.callDeepSeekApi(DeepSeekAiService.java:78)
+	at com.ocbc.finance.service.DeepSeekAiService.parseContractWithAI(DeepSeekAiService.java:113)
+	at com.ocbc.finance.service.ContractParseService.tryAiParsing(ContractParseService.java:120)
+	at com.ocbc.finance.service.ContractParseService.parseContractContent(ContractParseService.java:102)
+	at com.ocbc.finance.service.ContractParseService.parseContractFile(ContractParseService.java:60)
+	at com.ocbc.finance.controller.ContractParseController.parseContract(ContractParseController.java:46)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:254)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:182)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:917)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:829)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:340)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:1575)
+Caused by: java.net.SocketException: Connection reset
+	at java.base/sun.nio.ch.NioSocketImpl.implRead(NioSocketImpl.java:318)
+	at java.base/sun.nio.ch.NioSocketImpl.read(NioSocketImpl.java:346)
+	at java.base/sun.nio.ch.NioSocketImpl$1.read(NioSocketImpl.java:796)
+	at java.base/java.net.Socket$SocketInputStream.implRead(Socket.java:1116)
+	at java.base/java.net.Socket$SocketInputStream.read(Socket.java:1103)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.read(SSLSocketInputRecord.java:489)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.readHeader(SSLSocketInputRecord.java:483)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.decode(SSLSocketInputRecord.java:160)
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:111)
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1507)
+	at java.base/sun.security.ssl.SSLSocketImpl.readHandshakeRecord(SSLSocketImpl.java:1422)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:455)
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:426)
+	at java.base/sun.net.www.protocol.https.HttpsClient.afterConnect(HttpsClient.java:586)
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:187)
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.connect(HttpsURLConnectionImpl.java:141)
+	at org.springframework.http.client.SimpleClientHttpRequest.executeInternal(SimpleClientHttpRequest.java:79)
+	at org.springframework.http.client.AbstractStreamingClientHttpRequest.executeInternal(AbstractStreamingClientHttpRequest.java:70)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:66)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:879)
+	... 56 common frames omitted
+2025-10-21 10:15:53 [http-nio-8082-exec-7] ERROR c.o.f.service.DeepSeekAiService - DeepSeekAI解析失败，耗时: 132ms (0.132秒)，错误: 调用DeepSeek API失败: I/O error on POST request for "https://api.deepseek.com/chat/completions": Connection reset
+2025-10-21 10:15:53 [http-nio-8082-exec-7] WARN  c.o.f.service.ContractParseService - AI解析失败: AI解析失败: 调用DeepSeek API失败: I/O error on POST request for "https://api.deepseek.com/chat/completions": Connection reset
+2025-10-21 10:15:53 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 使用关键字匹配解析合同
+2025-10-21 10:15:53 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - PDF文本内容预览: ========================================================
+======================== 
+                            净水器设备租赁合同 
+========================================================
+======================== 
+ 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 24 日 
+ 
+---------------------------------------------------------------------------
+----- 
+                              合同双方信息 
+---------------------------------------------------------------------------
+----- 
+ 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 ...
+2025-10-21 10:15:53 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 关键字匹配结果: {taxRate=6.0, endDate=2025-06-30, partyB=史密斯净水设备有限公司, contractAmount=6,000.00, _aiParsed=false, startDate=2025-01-01, _parseMessage=使用关键字匹配解析完成}
+2025-10-21 10:15:53 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用关键字匹配解析完成
+2025-10-21 10:15:53 [http-nio-8082-exec-7] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 史密斯牌净水器租赁合同.pdf, AI解析: false, 状态: SUCCESS
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 10:16:12 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 10:16:12 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 15ms
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 10:16:12 [http-nio-8082-exec-8] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 10:16:21 [http-nio-8082-exec-8] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 10:16:21 [http-nio-8082-exec-8] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.0,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 10:16:21 [http-nio-8082-exec-8] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 10:16:21 [http-nio-8082-exec-8] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9469ms (9.469秒)
+2025-10-21 10:16:21 [http-nio-8082-exec-8] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 10:16:21 [http-nio-8082-exec-8] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 史密斯牌净水器租赁合同.pdf, 文件大小: 89300 bytes
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 史密斯牌净水器租赁合同.pdf
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 89300 bytes
+2025-10-21 10:16:52 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 89300 bytes
+2025-10-21 10:16:52 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 2052
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 43ms
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 2052 字符
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+========================================================
+======================== 
+                            净水器设备租赁合同 
+========================================================
+======================== 
+ 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 24 日 
+ 
+---------------------------------------------------------------------------
+----- 
+                              合同双方信息 
+---------------------------------------------------------------------------
+----- 
+ 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+ 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+ 
+---------------------------------------------------------------------------
+----- 
+                              合同正文 
+---------------------------------------------------------------------------
+----- 
+ 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+ 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+ 
+第二条 租赁期限 
+租赁期限自 2025-01-01 起至 2025-06-30 止，共计 6 个月。 
+ 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 6,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+ 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+ 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。 
+3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+ 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+ 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+ 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+ 
+---------------------------------------------------------------------------
+----- 
+                              签字栏 
+---------------------------------------------------------------------------
+----- 
+ 
+甲方（盖章）：                          乙方（盖章）： 
+ 
+ 
+华侨银行（中国）有限公司                史密斯净水设备有限公司 
+ 
+ 
+法定代表人：_____________               法定代表人：_____________ 
+ 
+ 
+日期：2025 年 1 月 24 日                    日期：2025 年 1 月 24 日 
+ 
+========================================================
+======================== 
+                              合同结束 
+========================================================
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 10:16:52 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 10:17:02 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 10:17:02 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 6000,
+    "currency": "人民币",
+    "startDate": "2025-01-01",
+    "endDate": "2025-06-30",
+    "signDate": "2025-01-24",
+    "effectiveDate": null,
+    "taxRate": 6,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 10:17:02 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-06-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-24, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=6000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=人民币, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 10:17:02 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9492ms (9.492秒)
+2025-10-21 10:17:02 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 10:17:02 [http-nio-8082-exec-9] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 史密斯牌净水器租赁合同.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 10:53:51 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m6s373ms).
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 10:55:05 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 10:55:05 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 14ms
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 10:55:05 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 10:55:15 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 10:55:15 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.0,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 10:55:15 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 10:55:15 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9814ms (9.814秒)
+2025-10-21 10:55:15 [http-nio-8082-exec-1] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 10:55:15 [http-nio-8082-exec-1] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 10:59:30 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 10:59:30 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 21ms
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 10:59:30 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 10:59:39 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 10:59:40 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 10:59:40 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 10:59:40 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9845ms (9.845秒)
+2025-10-21 10:59:40 [http-nio-8082-exec-3] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 10:59:40 [http-nio-8082-exec-3] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 史密斯牌净水器租赁合同.pdf, 文件大小: 89300 bytes
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 史密斯牌净水器租赁合同.pdf
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 89300 bytes
+2025-10-21 11:03:08 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 89300 bytes
+2025-10-21 11:03:08 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 2052
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 17ms
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 2052 字符
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+========================================================
+======================== 
+                            净水器设备租赁合同 
+========================================================
+======================== 
+ 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 24 日 
+ 
+---------------------------------------------------------------------------
+----- 
+                              合同双方信息 
+---------------------------------------------------------------------------
+----- 
+ 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+ 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+ 
+---------------------------------------------------------------------------
+----- 
+                              合同正文 
+---------------------------------------------------------------------------
+----- 
+ 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+ 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+ 
+第二条 租赁期限 
+租赁期限自 2025-01-01 起至 2025-06-30 止，共计 6 个月。 
+ 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 6,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+ 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+ 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。 
+3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+ 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+ 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+ 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+ 
+---------------------------------------------------------------------------
+----- 
+                              签字栏 
+---------------------------------------------------------------------------
+----- 
+ 
+甲方（盖章）：                          乙方（盖章）： 
+ 
+ 
+华侨银行（中国）有限公司                史密斯净水设备有限公司 
+ 
+ 
+法定代表人：_____________               法定代表人：_____________ 
+ 
+ 
+日期：2025 年 1 月 24 日                    日期：2025 年 1 月 24 日 
+ 
+========================================================
+======================== 
+                              合同结束 
+========================================================
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:03:08 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:03:17 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:03:17 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 6000.0,
+    "currency": "人民币",
+    "startDate": "2025-01-01",
+    "endDate": "2025-06-30",
+    "signDate": "2025-01-24",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:03:17 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-06-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-24, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=6000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=人民币, startDate=2025-01-01, effectiveDate=null, paymentTerms=每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:03:17 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9723ms (9.723秒)
+2025-10-21 11:03:17 [http-nio-8082-exec-5] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:03:17 [http-nio-8082-exec-5] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 史密斯牌净水器租赁合同.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:05:45 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:05:45 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 11ms
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:05:45 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:05:54 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:05:54 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.0,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:05:54 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:05:54 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9402ms (9.402秒)
+2025-10-21 11:05:54 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:05:54 [http-nio-8082-exec-7] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:10:13 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:10:13 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 13ms
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:10:13 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:10:22 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:10:22 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.00,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:10:22 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:10:22 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9357ms (9.357秒)
+2025-10-21 11:10:22 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:10:22 [http-nio-8082-exec-9] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:13:02 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:13:02 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 30ms
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:13:02 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:13:12 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:13:12 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.0,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:13:12 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:13:12 [http-nio-8082-exec-1] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9841ms (9.841秒)
+2025-10-21 11:13:12 [http-nio-8082-exec-1] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:13:12 [http-nio-8082-exec-1] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:16:28 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:16:28 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 17ms
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:16:28 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:16:38 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:16:38 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.0,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:16:38 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:16:38 [http-nio-8082-exec-3] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 10016ms (10.016秒)
+2025-10-21 11:16:38 [http-nio-8082-exec-3] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:16:38 [http-nio-8082-exec-3] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:30:05 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:30:05 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 28ms
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:30:05 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:30:21 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:30:21 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:30:21 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:30:21 [http-nio-8082-exec-5] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 15555ms (15.555秒)
+2025-10-21 11:30:21 [http-nio-8082-exec-5] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:30:21 [http-nio-8082-exec-5] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:30:47 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:30:47 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 12ms
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:30:47 [http-nio-8082-exec-6] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:30:57 [http-nio-8082-exec-6] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:30:57 [http-nio-8082-exec-6] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "甲方将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1台）出租给乙方使用，包括主机、滤芯、管路等全套配件",
+    "contractAmount": 8000,
+    "currency": "人民币",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:30:57 [http-nio-8082-exec-6] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=甲方将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1台）出租给乙方使用，包括主机、滤芯、管路等全套配件, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=人民币, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:30:57 [http-nio-8082-exec-6] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9282ms (9.282秒)
+2025-10-21 11:30:57 [http-nio-8082-exec-6] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:30:57 [http-nio-8082-exec-6] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:31:54 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:31:54 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 11ms
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:31:54 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:32:03 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:32:03 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.0,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:32:03 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:32:03 [http-nio-8082-exec-7] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9065ms (9.065秒)
+2025-10-21 11:32:03 [http-nio-8082-exec-7] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:32:03 [http-nio-8082-exec-7] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:37:29 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:37:29 [PDF-Processing-2] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 18ms
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:37:29 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:37:44 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:37:44 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁",
+    "contractAmount": 8000.0,
+    "currency": "人民币",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:37:44 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=史密斯牌净水器设备（型号：RO-400G，数量：1台）租赁, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=人民币, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:37:44 [http-nio-8082-exec-9] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 15362ms (15.362秒)
+2025-10-21 11:37:44 [http-nio-8082-exec-9] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:37:44 [http-nio-8082-exec-9] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.f.c.ContractParseController - 接收到合同解析请求，文件名: 文档2.pdf, 文件大小: 94730 bytes
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.f.service.ContractParseService - 开始解析合同文件: 文档2.pdf
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.finance.service.ContractService - 开始提取PDF文本内容，文件大小: 94730 bytes
+2025-10-21 11:37:48 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 使用快速PDF文本提取方案，文件大小: 94730 bytes
+2025-10-21 11:37:48 [PDF-Processing-1] INFO  c.o.finance.service.ContractService - 优化PDFBox提取成功，文本长度: 1793
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.finance.service.ContractService - PDF文本提取完成，总耗时: 9ms
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.f.service.ContractParseService - AI服务提供商配置: deepseek
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.f.service.DeepSeekAiService - 开始调用DeepSeek AI解析合同，文本长度: 1793 字符
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI 请求提示词: 请深刻理解以下合同内容，并以JSON格式返回合同中的关键财务信息。
+
+合同内容：
+======================================================== 
+======================== 
+净水器设备租赁合同 
+======================================================== 
+======================== 
+合同编号：OCBC-WP-2025-001 
+签订日期：2025 年 1 月 30 日 
+--------------------------------------------------------------------------- 
+----- 
+合同双方信息 
+--------------------------------------------------------------------------- 
+----- 
+甲方（出租方）：华侨银行（中国）有限公司 
+地址：上海市浦东新区世纪大道 88 号金茂大厦 
+联系电话：021-38888888 
+法定代表人：张明 
+乙方（承租方）：史密斯净水设备有限公司 
+地址：上海市徐汇区漕河泾开发区桂平路 481 号 
+联系电话：021-66666666 
+法定代表人：史密斯 
+--------------------------------------------------------------------------- 
+----- 
+合同正文--------------------------------------------------------------------------- 
+----- 
+根据《中华人民共和国合同法》及相关法律法规，甲乙双方在平等、自愿、公平、 
+诚实信用的基础上，就净水器设备租赁事宜达成如下协议： 
+第一条 租赁设备 
+甲方同意将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1 台）出租给 
+乙方使用。设备包括主机、滤芯、管路等全套配件。 
+第二条 租赁期限 
+1. 租赁期限自 2025-01-01 起至 2025-08-30 止，共计 8 个月。 
+第三条 租金及支付方式 
+1. 租赁总金额为人民币 8,000.00 元（含税）。 
+2. 月租金为人民币 1,000.00 元。 
+3. 税率为 6.0%。 
+4. 乙方应于每月 1 日前支付当月租金。 
+第四条 甲方权利义务 
+1. 甲方保证所出租设备的合法性和完好性。 
+2. 甲方负责设备的安装调试和技术培训。 
+3. 甲方提供设备保修服务，保修期内免费维修。 
+第五条 乙方权利义务 
+1. 乙方有权在租赁期内正常使用租赁设备。 
+2. 乙方应按时支付租金，不得拖欠。3. 乙方应妥善保管设备，不得擅自拆卸或转租。 
+第六条 违约责任 
+任何一方违反本合同约定，应承担相应的违约责任，并赔偿对方因此遭受的损失。 
+第七条 争议解决 
+因本合同引起的争议，双方应友好协商解决；协商不成的，提交上海仲裁委员会 
+仲裁。 
+第八条 其他 
+本合同一式两份，甲乙双方各执一份，具有同等法律效力。 
+--------------------------------------------------------------------------- 
+----- 
+签字栏 
+--------------------------------------------------------------------------- 
+----- 
+甲方（盖章）： 乙方（盖章）： 
+华侨银行（中国）有限公司 史密斯净水设备有限公司 
+法定代表人：_____________ 法定代表人：_____________日期：2025 年 1 月 
+30 日 日期：2025 年 1 月 30 日 
+======================================================== 
+======================== 
+合同结束 
+======================================================== 
+======================== 
+
+
+请提取以下信息并以JSON格式返回（如果某些信息在合同中找不到，请返回null）：
+{
+    "contractNo": "合同编号",
+    "contractName": "合同名称",
+    "partyA": "甲方名称",
+    "partyAId": "甲方统一社会信用代码",
+    "partyB": "乙方名称",
+    "partyBId": "乙方统一社会信用代码",
+    "contractDescription": "合同描述/服务内容",
+    "contractAmount": "合同总金额（数字）",
+    "currency": "币种",
+    "startDate": "合同开始日期",
+    "endDate": "合同结束日期",
+    "signDate": "签订日期",
+    "effectiveDate": "生效日期",
+    "taxRate": "税率（百分比数字）",
+    "paymentTerms": "付款条款",
+    "paymentMethod": "付款方式"
+}
+
+注意：
+1. 只返回JSON格式的数据，不要包含任何其他文字说明
+2. 日期格式统一为YYYY-MM-DD
+3. 金额只返回数字，不包含货币符号
+4. 如果信息不明确或找不到，返回null
+
+2025-10-21 11:37:48 [http-nio-8082-exec-10] INFO  c.o.f.service.DeepSeekAiService - 调用DeepSeek API: https://api.deepseek.com/chat/completions
+2025-10-21 11:37:58 [http-nio-8082-exec-10] INFO  c.o.f.service.DeepSeekAiService - DeepSeek API调用成功
+2025-10-21 11:37:58 [http-nio-8082-exec-10] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI返回内容: {
+    "contractNo": "OCBC-WP-2025-001",
+    "contractName": "净水器设备租赁合同",
+    "partyA": "华侨银行（中国）有限公司",
+    "partyAId": null,
+    "partyB": "史密斯净水设备有限公司",
+    "partyBId": null,
+    "contractDescription": "净水器设备租赁事宜，甲方将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1台）出租给乙方使用",
+    "contractAmount": 8000.0,
+    "currency": "CNY",
+    "startDate": "2025-01-01",
+    "endDate": "2025-08-30",
+    "signDate": "2025-01-30",
+    "effectiveDate": null,
+    "taxRate": 6.0,
+    "paymentTerms": "乙方应于每月1日前支付当月租金",
+    "paymentMethod": null
+}
+2025-10-21 11:37:58 [http-nio-8082-exec-10] INFO  c.o.f.service.DeepSeekAiService - DeepSeek AI解析结果: {endDate=2025-08-30, contractNo=OCBC-WP-2025-001, contractDescription=净水器设备租赁事宜，甲方将其拥有的史密斯牌净水器设备（型号：RO-400G，数量：1台）出租给乙方使用, signDate=2025-01-30, _aiParsed=true, partyA=华侨银行（中国）有限公司, taxRate=6.0, partyBId=null, partyAId=null, partyB=史密斯净水设备有限公司, contractAmount=8000.0, paymentMethod=null, contractName=净水器设备租赁合同, currency=CNY, startDate=2025-01-01, effectiveDate=null, paymentTerms=乙方应于每月1日前支付当月租金, _parseMessage=DeepSeek AI解析成功}
+2025-10-21 11:37:58 [http-nio-8082-exec-10] INFO  c.o.f.service.DeepSeekAiService - DeepSeekAI解析完成，总耗时: 9279ms (9.279秒)
+2025-10-21 11:37:58 [http-nio-8082-exec-10] INFO  c.o.f.service.ContractParseService - 合同解析完成: 使用DeepSeek AI解析成功
+2025-10-21 11:37:58 [http-nio-8082-exec-10] INFO  c.o.f.c.ContractParseController - 合同解析完成，文件: 文档2.pdf, AI解析: true, 状态: SUCCESS
+2025-10-21 11:50:23 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m1s425ms).
+2025-10-21 11:53:43 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m20s432ms).
+2025-10-21 12:04:30 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m46s465ms).
+2025-10-21 13:37:07 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h32m37s281ms).
+2025-10-21 13:45:52 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m44s756ms).
