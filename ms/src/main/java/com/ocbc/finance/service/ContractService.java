@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -29,23 +30,23 @@ public class ContractService {
     private final PaymentRepository paymentRepository;
     private final AmortizationCalculationService calculationService;
     private final FileUploadService fileUploadService;
-    // TODO: 待外部解析接口就绪后重新启用
-    // private final ExternalContractParseService externalContractParseService;
+    private final ExternalContractParseService externalContractParseService;
+    private final CustomKeywordService customKeywordService;
 
     public ContractService(ContractRepository contractRepository,
                            AmortizationEntryRepository amortizationEntryRepository,
                            PaymentRepository paymentRepository,
                            AmortizationCalculationService calculationService,
-                           FileUploadService fileUploadService) {
-                           // TODO: 待外部解析接口就绪后重新添加参数
-                           // ExternalContractParseService externalContractParseService) {
+                           FileUploadService fileUploadService,
+                           ExternalContractParseService externalContractParseService,
+                           CustomKeywordService customKeywordService) {
         this.contractRepository = contractRepository;
         this.amortizationEntryRepository = amortizationEntryRepository;
         this.paymentRepository = paymentRepository;
         this.calculationService = calculationService;
         this.fileUploadService = fileUploadService;
-        // TODO: 待外部解析接口就绪后重新启用
-        // this.externalContractParseService = externalContractParseService;
+        this.externalContractParseService = externalContractParseService;
+        this.customKeywordService = customKeywordService;
     }
 
     @Transactional
@@ -146,62 +147,51 @@ public class ContractService {
 
     /**
      * 上传合同文件并解析
+     * @param file 上传的合同文件
+     * @param userId 用户ID（用于获取自定义关键字）
+     * @return 合同上传响应
      */
     @Transactional
-    public ContractUploadResponse uploadContract(MultipartFile file) {
+    public ContractUploadResponse uploadContract(MultipartFile file, Long userId) {
         try {
             // 1.1 上传文件到指定目录
             String savedFileName = fileUploadService.uploadContractFile(file);
             
-            // 1.2 使用mock数据代替外部接口解析（外部接口暂未就绪）
-            // TODO: 待外部解析接口就绪后，替换为真实的解析调用
+            // 1.2 获取用户的自定义关键字
+            List<String> customKeywords = null;
+            if (userId != null) {
+                customKeywords = customKeywordService.getKeywordStringsByUserId(userId);
+            }
             
-            // 1.3 保存合同信息到数据库（使用动态mock数据）
+            // 1.3 调用AI模块解析合同（传递自定义关键字）
+            File contractFile = fileUploadService.getContractFile(savedFileName);
+            ExternalContractParseResponse parseResponse = externalContractParseService.parseContract(contractFile, customKeywords);
+            
+            // 1.4 保存合同信息到数据库（使用AI解析结果）
             Contract contract = new Contract();
             
-            // 生成动态的mock数据，避免重复
-            long timestamp = System.currentTimeMillis();
-            Random random = new Random(timestamp);
-            
-            // 动态生成开始日期（2025年内的随机月份）
-            int startMonth = 1 + random.nextInt(8); // 1-8月
-            LocalDate startDate = LocalDate.of(2025, startMonth, 1);
-            contract.setStartDate(startDate);
-            
-            // 结束日期为开始日期后3-12个月
-            int durationMonths = 3 + random.nextInt(10);
-            LocalDate endDate = startDate.plusMonths(durationMonths).withDayOfMonth(
-                startDate.plusMonths(durationMonths).lengthOfMonth()
-            );
-            contract.setEndDate(endDate);
-            
-            // 根据月数计算总金额（每月1000元）
-            BigDecimal totalAmount = new BigDecimal(durationMonths * 1000).setScale(2, RoundingMode.HALF_UP);
-            contract.setTotalAmount(totalAmount);
-            
-            // 动态生成供应商名称
-            String[] vendors = {
-                "史密斯净水设备有限公司",
-                "华为技术服务有限公司", 
-                "阿里云计算有限公司",
-                "腾讯云服务有限公司",
-                "京东物流有限公司",
-                "美团配送服务公司",
-            };
-            contract.setVendorName(vendors[random.nextInt(vendors.length)]);
-            
-            // 动态生成税率（0.03-0.13之间）
-            BigDecimal taxRate = new BigDecimal("0.03").add(
-                new BigDecimal(random.nextDouble() * 0.10).setScale(2, RoundingMode.HALF_UP)
-            );
-            contract.setTaxRate(taxRate);
+            // 使用AI解析结果
+            if (parseResponse.isSuccess()) {
+                contract.setTotalAmount(parseResponse.getTotalAmount());
+                contract.setStartDate(LocalDate.parse(parseResponse.getStartDate()));
+                contract.setEndDate(LocalDate.parse(parseResponse.getEndDate()));
+                contract.setVendorName(parseResponse.getVendorName());
+                contract.setTaxRate(parseResponse.getTaxRate());
+            } else {
+                // 解析失败，使用默认值
+                contract.setTotalAmount(BigDecimal.ZERO);
+                contract.setStartDate(LocalDate.now());
+                contract.setEndDate(LocalDate.now().plusMonths(1));
+                contract.setVendorName("未知供应商");
+                contract.setTaxRate(BigDecimal.ZERO);
+            }
             
             // 在数据库中保存原始文件名，便于显示
             contract.setAttachmentName(file.getOriginalFilename());
             
             contract = contractRepository.save(contract);
             
-            // 构建响应（使用mock数据格式，但文件名使用真实的原始文件名）
+            // 构建响应
             ContractUploadResponse response = new ContractUploadResponse();
             response.setContractId(contract.getId());
             response.setTotalAmount(contract.getTotalAmount());
@@ -209,10 +199,15 @@ public class ContractService {
             response.setEndDate(contract.getEndDate().toString());
             response.setVendorName(contract.getVendorName());
             response.setTaxRate(contract.getTaxRate());
-            // 使用原始文件名而不是保存后的文件名
             response.setAttachmentName(file.getOriginalFilename());
+            
+            // 如果有自定义字段结果，也返回给前端
+            if (parseResponse.getCustomFields() != null && !parseResponse.getCustomFields().isEmpty()) {
+                response.setCustomFields(parseResponse.getCustomFields());
+            }
+            
             response.setCreatedAt(java.time.OffsetDateTime.now());
-            response.setMessage("合同上传和解析成功");
+            response.setMessage(parseResponse.isSuccess() ? "合同上传和解析成功" : "合同上传成功，但解析失败：" + parseResponse.getErrorMessage());
             
             return response;
             

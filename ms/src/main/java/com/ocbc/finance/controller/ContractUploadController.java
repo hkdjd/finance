@@ -25,11 +25,16 @@ public class ContractUploadController {
 
     /**
      * 上传合同文件
+     * 
+     * @param file 合同文件
+     * @param userId 用户ID（可选，用于获取自定义关键字）
+     * @return 合同上传响应
      */
     @PostMapping("/upload")
     public ResponseEntity<ContractUploadResponse> uploadContract(
-            @RequestParam("file") MultipartFile file) {
-        ContractUploadResponse response = contractService.uploadContract(file);
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "userId", required = false) Long userId) {
+        ContractUploadResponse response = contractService.uploadContract(file, userId);
         return ResponseEntity.ok(response);
     }
 
