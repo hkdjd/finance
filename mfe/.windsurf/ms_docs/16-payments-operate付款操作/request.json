@@ -1,0 +1,4 @@
+{
+  "note": "PUT请求，路径参数paymentId=1",
+  "example_url": "/payments/1/cancel"
+}

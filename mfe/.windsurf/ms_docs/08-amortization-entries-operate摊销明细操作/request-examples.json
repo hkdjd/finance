@@ -1,0 +1,62 @@
+{
+  "description": "摊销明细增删改操作示例",
+  "examples": {
+    "update_existing": {
+      "description": "更新现有摊销明细",
+      "request": {
+        "contractId": 1,
+        "amortization": [
+          {
+            "id": 1,
+            "amortizationPeriod": "2025-01",
+            "accountingPeriod": "2025-01",
+            "amount": 1500.00,
+            "periodDate": "2025-01-01",
+            "paymentStatus": "PENDING"
+          }
+        ]
+      }
+    },
+    "add_new": {
+      "description": "新增摊销明细",
+      "request": {
+        "contractId": 1,
+        "amortization": [
+          {
+            "id": null,
+            "amortizationPeriod": "2025-05",
+            "accountingPeriod": "2025-05",
+            "amount": 800.00,
+            "periodDate": "2025-05-01",
+            "paymentStatus": "PENDING"
+          }
+        ]
+      }
+    },
+    "mixed_operations": {
+      "description": "混合操作：更新、新增、删除",
+      "request": {
+        "contractId": 1,
+        "amortization": [
+          {
+            "id": 1,
+            "amortizationPeriod": "2025-01",
+            "accountingPeriod": "2025-01",
+            "amount": 1200.00,
+            "periodDate": "2025-01-01",
+            "paymentStatus": "COMPLETED"
+          },
+          {
+            "id": null,
+            "amortizationPeriod": "2025-05",
+            "accountingPeriod": "2025-05",
+            "amount": 800.00,
+            "periodDate": "2025-05-01",
+            "paymentStatus": "PENDING"
+          }
+        ]
+      },
+      "note": "原有ID=2的摊销明细不在列表中，将被删除"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "bookingDate": "2024-01-27",
+    "account": "费用",
+    "dr": 1000.00,
+    "cr": 0.00,
+    "memo": "period:2024-01"
+  },
+  {
+    "bookingDate": "2024-01-27",
+    "account": "应付",
+    "dr": 0.00,
+    "cr": 1000.00,
+    "memo": "period:2024-01"
+  },
+  {
+    "bookingDate": "2024-02-27",
+    "account": "费用",
+    "dr": 1000.00,
+    "cr": 0.00,
+    "memo": "period:2024-02"
+  },
+  {
+    "bookingDate": "2024-02-27",
+    "account": "应付",
+    "dr": 0.00,
+    "cr": 1000.00,
+    "memo": "period:2024-02"
+  },
+  {
+    "bookingDate": "2024-03-27",
+    "account": "费用",
+    "dr": 1000.00,
+    "cr": 0.00,
+    "memo": "period:2024-03"
+  },
+  {
+    "bookingDate": "2024-03-27",
+    "account": "应付",
+    "dr": 0.00,
+    "cr": 1000.00,
+    "memo": "period:2024-03"
+  }
+]

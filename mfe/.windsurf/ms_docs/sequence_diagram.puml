@@ -1,0 +1,181 @@
+@startuml 财务系统业务流程时序图
+
+!theme plain
+title 财务系统完整业务流程时序图
+
+actor 用户 as User
+participant "前端界面" as Frontend
+participant "AmortizationController" as AmortController
+participant "ContractController" as ContractController  
+participant "AmortizationPersistenceController" as AmortPersistController
+participant "JournalController" as JournalController
+participant "PaymentController" as PaymentController
+participant "AmortizationCalculationService" as AmortService
+participant "ContractService" as ContractService
+participant "JournalService" as JournalService
+participant "PaymentService" as PaymentService
+database "数据库" as DB
+
+== 步骤1: 合同信息输入和摊销计算 ==
+
+User -> Frontend: 输入合同信息\n(总金额、开始时间、结束时间、税率、供应商)
+Frontend -> AmortController: GET /amortization/calculate/{contractId}
+activate AmortController
+
+AmortController -> AmortService: calculateByContractId(contractId)
+activate AmortService
+
+AmortService -> DB: 查询合同信息
+DB --> AmortService: Contract
+
+AmortService -> AmortService: 判断场景类型\n(场景1/2/3)
+note right: 场景1: 当前时间 < 合同开始时间\n场景2: 合同开始时间 <= 当前时间 <= 合同结束时间\n场景3: 当前时间 > 合同结束时间
+
+AmortService -> AmortService: 计算摊销明细
+AmortService --> AmortController: AmortizationResponse
+deactivate AmortService
+
+AmortController --> Frontend: 返回摊销计算结果
+deactivate AmortController
+Frontend --> User: 展示摊销明细表格\n(可编辑)
+
+== 步骤2: 保存合同和摊销台账 ==
+
+User -> Frontend: 确认并保存摊销台账
+Frontend -> ContractController: POST /contracts\n{CalculateAmortizationRequest}
+activate ContractController
+
+ContractController -> ContractService: createContractAndInitialize(request)
+activate ContractService
+
+ContractService -> AmortService: calculate(request)
+activate AmortService
+AmortService --> ContractService: AmortizationResponse
+deactivate AmortService
+
+ContractService -> DB: 保存Contract实体
+ContractService -> DB: 保存AmortizationEntry实体列表
+ContractService --> ContractController: AmortizationResponse(with IDs)
+deactivate ContractService
+
+ContractController --> Frontend: 返回已保存的摊销台账
+deactivate ContractController
+Frontend --> User: 显示保存成功
+
+== 步骤2.1: 摊销明细管理 (可选) ==
+
+User -> Frontend: 修改摊销明细金额
+Frontend -> AmortPersistController: PUT /amortization/entries/{entryId}?amount={amount}
+activate AmortPersistController
+AmortPersistController -> ContractService: updateAmortizationEntry(entryId, amount)
+activate ContractService
+ContractService -> DB: 更新AmortizationEntry
+ContractService --> AmortPersistController: AmortizationResponse
+deactivate ContractService
+AmortPersistController --> Frontend: 返回更新后的摊销台账
+deactivate AmortPersistController
+
+note over User, DB: 注意：根据需求更新，摊销明细只支持修改金额\n不支持增加或删除明细行
+
+== 步骤3: 会计分录预览 ==
+
+User -> Frontend: 查看会计分录预览
+Frontend -> ContractController: GET /contracts/{id}/amortization
+activate ContractController
+ContractController -> ContractService: getContractAmortization(id)
+activate ContractService
+ContractService -> DB: 查询Contract和AmortizationEntry
+ContractService --> ContractController: AmortizationResponse
+deactivate ContractService
+ContractController --> Frontend: 返回摊销台账数据
+deactivate ContractController
+
+Frontend -> JournalController: POST /journals/preview\n{AmortizationResponse}
+activate JournalController
+JournalController -> JournalService: previewFromAmortization(amortization, bookingDate)
+activate JournalService
+
+JournalService -> JournalService: 根据摊销明细生成会计分录\n(费用 借方, 应付 贷方)
+JournalService --> JournalController: List<JournalEntryDto>
+deactivate JournalService
+
+JournalController --> Frontend: 返回会计分录预览
+deactivate JournalController
+Frontend --> User: 展示会计分录表格
+
+== 步骤4: 付款执行阶段 ==
+
+User -> Frontend: 输入付款信息\n(付款金额、付款时间、选择期间)
+Frontend -> PaymentController: POST /payments/preview\n{PaymentRequest}
+activate PaymentController
+
+PaymentController -> PaymentService: preview(request)
+activate PaymentService
+
+PaymentService -> PaymentService: 计算付款差异\n(付款金额 vs 选择期间总额)
+PaymentService -> PaymentService: 判断付款情形\n(平账/多付/少付)
+
+alt 平账情况
+    PaymentService -> PaymentService: 生成标准会计分录\n(应付借方, 活期存款贷方)
+else 多付情况
+    PaymentService -> PaymentService: 判断差异大小
+    alt 小额差异
+        PaymentService -> PaymentService: 差异记入费用科目
+    else 大额差异  
+        PaymentService -> PaymentService: 差异记入预付科目
+    end
+else 少付情况
+    PaymentService -> PaymentService: 判断差异大小
+    alt 小额差异
+        PaymentService -> PaymentService: 差异贷记费用科目
+    else 大额差异
+        PaymentService -> PaymentService: 差异贷记预付科目
+    end
+end
+
+PaymentService --> PaymentController: PaymentPreviewResponse
+deactivate PaymentService
+
+PaymentController --> Frontend: 返回付款预览
+deactivate PaymentController
+Frontend --> User: 展示付款会计分录预览
+
+User -> Frontend: 确认执行付款
+Frontend -> PaymentController: POST /payments/execute\n{PaymentExecutionRequest}
+activate PaymentController
+
+PaymentController -> PaymentService: executePayment(request)
+activate PaymentService
+
+PaymentService -> ContractService: getContractAmortization(contractId)
+activate ContractService
+ContractService -> DB: 查询摊销数据
+ContractService --> PaymentService: AmortizationResponse
+deactivate ContractService
+
+PaymentService -> PaymentService: 重新计算会计分录
+PaymentService -> DB: 保存Payment实体
+PaymentService -> DB: 保存JournalEntry实体列表
+
+PaymentService --> PaymentController: PaymentExecutionResponse
+deactivate PaymentService
+
+PaymentController --> Frontend: 返回付款执行结果
+deactivate PaymentController
+Frontend --> User: 显示付款成功\n(包含付款ID和会计分录)
+
+== 查询和管理功能 ==
+
+User -> Frontend: 查询合同付款记录
+Frontend -> PaymentController: GET /payments/contracts/{contractId}
+activate PaymentController
+PaymentController -> PaymentService: getPaymentsByContract(contractId)
+activate PaymentService
+PaymentService -> DB: 查询Payment和JournalEntry
+PaymentService --> PaymentController: List<PaymentExecutionResponse>
+deactivate PaymentService
+PaymentController --> Frontend: 返回付款记录列表
+deactivate PaymentController
+Frontend --> User: 展示付款历史记录
+
+@enduml
