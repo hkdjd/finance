@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 合同解析控制器
  * 提供合同文件上传和信息提取接口
@@ -29,21 +31,23 @@ public class ContractParseController {
      * 解析合同文件并提取关键信息
      * 
      * @param file 合同文件（PDF格式）
-     * @return 解析结果，包含合同总金额、开始时间、结束时间、税率、乙方公司名称
+     * @param customFields 自定义字段列表（可选）
+     * @return 解析结果，包含合同总金额、开始时间、结束时间、税率、乙方公司名称及自定义字段
      */
     @PostMapping(value = "/parse", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ContractParseResponse> parseContract(
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "customFields", required = false) List<String> customFields) {
         
-        log.info("接收到合同解析请求，文件名: {}, 文件大小: {} bytes", 
-                file.getOriginalFilename(), file.getSize());
+        log.info("接收到合同解析请求，文件名: {}, 文件大小: {} bytes, 自定义字段: {}", 
+                file.getOriginalFilename(), file.getSize(), customFields);
         
         try {
             // 验证文件
             validateFile(file);
             
             // 解析合同
-            ContractParseResponse response = contractParseService.parseContractFile(file);
+            ContractParseResponse response = contractParseService.parseContractFile(file, customFields);
             
             log.info("合同解析完成，文件: {}, AI解析: {}, 状态: {}", 
                     file.getOriginalFilename(), response.getAiParsed(), response.getParseStatus());

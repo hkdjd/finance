@@ -13,6 +13,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 外部合同解析接口调用服务
@@ -37,12 +40,13 @@ public class ExternalContractParseService {
     /**
      * 调用外部接口解析合同文件
      * @param contractFile 合同文件
+     * @param customFields 自定义字段列表
      * @return 解析结果
      */
-    public ExternalContractParseResponse parseContract(File contractFile) {
+    public ExternalContractParseResponse parseContract(File contractFile, List<String> customFields) {
         if (!externalParseEnabled) {
             logger.info("外部接口解析已禁用，使用模拟数据");
-            return createMockResponse(contractFile.getName());
+            return createMockResponse(contractFile.getName(), customFields);
         }
         
         try {
@@ -53,10 +57,17 @@ public class ExternalContractParseService {
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", new FileSystemResource(contractFile));
             
+            // 添加自定义字段参数
+            if (customFields != null && !customFields.isEmpty()) {
+                for (String field : customFields) {
+                    body.add("customFields", field);
+                }
+            }
+            
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             
             // 调用外部接口
-            logger.info("调用外部接口解析合同: {}", externalParseUrl);
+            logger.info("调用外部接口解析合同: {}, 自定义字段: {}", externalParseUrl, customFields);
             ResponseEntity<ExternalContractParseResponse> response = restTemplate.exchange(
                     externalParseUrl,
                     HttpMethod.POST,
@@ -77,14 +88,23 @@ public class ExternalContractParseService {
             logger.error("调用外部接口异常: {}", e.getMessage(), e);
             // 如果外部接口调用失败，返回模拟数据
             logger.info("外部接口调用失败，使用模拟数据");
-            return createMockResponse(contractFile.getName());
+            return createMockResponse(contractFile.getName(), customFields);
         }
+    }
+    
+    /**
+     * 调用外部接口解析合同文件（无自定义字段）
+     * @param contractFile 合同文件
+     * @return 解析结果
+     */
+    public ExternalContractParseResponse parseContract(File contractFile) {
+        return parseContract(contractFile, null);
     }
     
     /**
      * 创建模拟响应数据（用于开发测试）
      */
-    private ExternalContractParseResponse createMockResponse(String fileName) {
+    private ExternalContractParseResponse createMockResponse(String fileName, List<String> customFields) {
         ExternalContractParseResponse response = new ExternalContractParseResponse();
         response.setSuccess(true);
         response.setTotalAmount(new BigDecimal("6000.00"));
@@ -92,6 +112,16 @@ public class ExternalContractParseService {
         response.setEndDate("2024-06-30");
         response.setTaxRate(new BigDecimal("0.06"));
         response.setVendorName("测试供应商_" + fileName.substring(0, Math.min(fileName.length(), 10)));
+        
+        // 生成模拟自定义字段数据
+        if (customFields != null && !customFields.isEmpty()) {
+            Map<String, String> mockCustomFields = new HashMap<>();
+            for (String field : customFields) {
+                mockCustomFields.put(field, "模拟值_" + field);
+            }
+            response.setCustomFields(mockCustomFields);
+        }
+        
         return response;
     }
     

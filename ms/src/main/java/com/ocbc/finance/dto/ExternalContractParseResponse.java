@@ -3,6 +3,7 @@ package com.ocbc.finance.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * 外部接口解析合同返回的数据
@@ -30,4 +31,7 @@ public class ExternalContractParseResponse {
     
     /** 错误信息 */
     private String errorMessage;
+    
+    /** 自定义字段提取结果 (key: 字段名称, value: 字段值) */
+    private Map<String, String> customFields;
 }

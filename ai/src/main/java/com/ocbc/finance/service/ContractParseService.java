@@ -13,6 +13,8 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,11 +49,12 @@ public class ContractParseService {
      * 解析合同文件并提取关键信息
      * 
      * @param file 合同文件
+     * @param customFields 自定义字段列表
      * @return 解析结果
      */
-    public ContractParseResponse parseContractFile(MultipartFile file) {
+    public ContractParseResponse parseContractFile(MultipartFile file, List<String> customFields) {
         try {
-            log.info("开始解析合同文件: {}", file.getOriginalFilename());
+            log.info("开始解析合同文件: {}, 自定义字段: {}", file.getOriginalFilename(), customFields);
             
             // 1. 提取PDF文本内容
             String textContent = extractTextFromPdfInternal(file.getBytes());
@@ -59,7 +62,11 @@ public class ContractParseService {
             // 2. 使用AI服务或关键字匹配解析
             Map<String, Object> extractedInfo = parseContractContent(textContent);
             
-            // 3. 转换为标准响应格式
+            // 3. 提取自定义字段
+            Map<String, String> customFieldsResult = extractCustomFields(textContent, customFields);
+            extractedInfo.put("_customFields", customFieldsResult);
+            
+            // 4. 转换为标准响应格式
             ContractParseResponse response = convertToResponse(extractedInfo);
             
             log.info("合同解析完成: {}", response.getParseMessage());
@@ -279,6 +286,13 @@ public class ContractParseService {
             builder.taxRate(parseTaxRate(taxRateObj.toString()));
         }
         
+        // 自定义字段
+        @SuppressWarnings("unchecked")
+        Map<String, String> customFields = (Map<String, String>) extractedInfo.get("_customFields");
+        if (customFields != null) {
+            builder.customFields(customFields);
+        }
+        
         return builder.build();
     }
 
@@ -360,6 +374,70 @@ public class ContractParseService {
             log.warn("日期解析失败: {}", dateStr);
         }
         
+        return null;
+    }
+
+    /**
+     * 提取自定义字段
+     * 
+     * @param textContent PDF文本内容
+     * @param customFields 自定义字段列表
+     * @return 自定义字段提取结果
+     */
+    private Map<String, String> extractCustomFields(String textContent, List<String> customFields) {
+        Map<String, String> result = new HashMap<>();
+        
+        if (customFields == null || customFields.isEmpty()) {
+            log.debug("没有自定义字段需要提取");
+            return result;
+        }
+        
+        log.info("开始提取自定义字段: {}", customFields);
+        
+        for (String fieldName : customFields) {
+            if (fieldName == null || fieldName.trim().isEmpty()) {
+                continue;
+            }
+            
+            // 使用关键字匹配提取自定义字段值
+            String fieldValue = extractCustomFieldValue(textContent, fieldName.trim());
+            result.put(fieldName.trim(), fieldValue != null ? fieldValue : "");
+        }
+        
+        log.info("自定义字段提取完成: {}", result);
+        return result;
+    }
+
+    /**
+     * 提取单个自定义字段的值
+     * 使用多种模式尝试匹配字段值
+     * 
+     * @param textContent PDF文本内容
+     * @param fieldName 字段名称
+     * @return 字段值
+     */
+    private String extractCustomFieldValue(String textContent, String fieldName) {
+        // 尝试多种匹配模式
+        String[] patterns = {
+            // 模式1: 字段名：值
+            fieldName + "[：:]+\\s*([^\\n\\r]{1,100})",
+            // 模式2: 字段名为 值
+            fieldName + "为\\s*([^\\n\\r]{1,100})",
+            // 模式3: 字段名是 值
+            fieldName + "是\\s*([^\\n\\r]{1,100})",
+            // 模式4: 字段名 值（空格分隔）
+            fieldName + "\\s+([^\\n\\r]{1,100})"
+        };
+        
+        for (String patternStr : patterns) {
+            String value = extractByPattern(textContent, patternStr, 1);
+            if (value != null && !value.trim().isEmpty()) {
+                log.debug("字段 '{}' 提取成功，使用模式: {}", fieldName, patternStr);
+                return value.trim();
+            }
+        }
+        
+        log.debug("字段 '{}' 未找到匹配值", fieldName);
         return null;
     }
 }
