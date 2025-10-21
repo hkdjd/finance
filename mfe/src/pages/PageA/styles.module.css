@@ -10,15 +10,80 @@
   height: 30vh;
   margin: 0 auto;
   border: 1px solid #000000;
-  padding: 10px;
+  padding: 0;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 0;
+}
+
+/* 左侧区域 - 合同分析字段选择 */
+.leftSection {
+  width: 50%;
+  height: 100%;
+  border-right: 1px solid #e8e8e8;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 8px 0 0 8px;
+}
+
+.sectionHeader {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #1890ff;
+}
+
+.checkboxContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 10px;
+  align-items: flex-start;
+  overflow-y: auto;
+}
+
+.checkboxItem {
+  font-size: 14px;
+  color: #262626;
+  min-width: 120px;
+}
+
+/* 自定义字段标签容器 */
+.customTagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* 自定义字段输入框容器 */
+.customInputContainer {
+  padding: 12px 10px;
+  background-color: #ffffff;
+  border-top: 1px solid #e8e8e8;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+/* 右侧区域 - 文件上传功能 */
+.rightSection {
+  width: 50%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 8px 8px 0;
 }
 
 /* 上传组件样式 */
 .uploadDragger {
-  height: 100%;
+  height: 100% !important;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -135,8 +200,28 @@
   }
   
   .uploadArea {
-    height: 25vh;
-    padding: 8px;
+    height: auto;
+    min-height: 40vh;
+    padding: 0;
+    flex-direction: column;
+  }
+  
+  .leftSection,
+  .rightSection {
+    width: 100%;
+    border-right: none;
+    border-radius: 0;
+  }
+  
+  .leftSection {
+    border-bottom: 1px solid #e8e8e8;
+    border-radius: 8px 8px 0 0;
+    min-height: 200px;
+  }
+  
+  .rightSection {
+    border-radius: 0 0 8px 8px;
+    min-height: 200px;
   }
   
   .contractTableArea {
@@ -162,7 +247,15 @@
   }
   
   .uploadArea {
-    height: 20vh;
+    min-height: 50vh;
+  }
+  
+  .leftSection {
+    padding: 15px;
+  }
+  
+  .rightSection {
+    padding: 8px;
   }
   
   .actionButtons {
