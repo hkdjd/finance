@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 外部合同解析接口调用服务
@@ -32,9 +34,11 @@ public class ExternalContractParseService {
     private boolean externalParseEnabled;
     
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     
     public ExternalContractParseService() {
         this.restTemplate = new RestTemplate();
+        this.objectMapper = new ObjectMapper();
     }
     
     /**
@@ -56,6 +60,7 @@ public class ExternalContractParseService {
             
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", new FileSystemResource(contractFile));
+            body.add("createdBy", "system"); // AI服务需要的创建者参数
             
             // 添加自定义字段参数
             if (customFields != null && !customFields.isEmpty()) {
@@ -68,20 +73,20 @@ public class ExternalContractParseService {
             
             // 调用外部接口
             logger.info("调用外部接口解析合同: {}, 自定义字段: {}", externalParseUrl, customFields);
-            ResponseEntity<ExternalContractParseResponse> response = restTemplate.exchange(
+            ResponseEntity<String> response = restTemplate.exchange(
                     externalParseUrl,
                     HttpMethod.POST,
                     requestEntity,
-                    ExternalContractParseResponse.class
+                    String.class
             );
             
-            ExternalContractParseResponse result = response.getBody();
-            if (result != null && result.isSuccess()) {
+            String responseBody = response.getBody();
+            if (responseBody != null) {
                 logger.info("合同解析成功: {}", contractFile.getName());
-                return result;
+                return parseAiServiceResponse(responseBody, contractFile.getName());
             } else {
-                logger.warn("合同解析失败: {}", result != null ? result.getErrorMessage() : "未知错误");
-                return createErrorResponse("外部接口解析失败");
+                logger.warn("合同解析失败: 响应为空");
+                return createErrorResponse("外部接口解析失败：响应为空");
             }
             
         } catch (Exception e) {
@@ -133,5 +138,76 @@ public class ExternalContractParseService {
         response.setSuccess(false);
         response.setErrorMessage(errorMessage);
         return response;
+    }
+    
+    /**
+     * 解析AI服务返回的JSON响应
+     */
+    private ExternalContractParseResponse parseAiServiceResponse(String responseBody, String fileName) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(responseBody);
+            
+            // 检查响应是否成功
+            boolean success = rootNode.path("success").asBoolean(false);
+            if (!success) {
+                String message = rootNode.path("message").asText("AI服务解析失败");
+                return createErrorResponse(message);
+            }
+            
+            // 获取data节点
+            JsonNode dataNode = rootNode.path("data");
+            if (dataNode.isMissingNode()) {
+                return createErrorResponse("AI服务响应缺少data字段");
+            }
+            
+            // 获取extractedInfo节点
+            JsonNode extractedInfoNode = dataNode.path("extractedInfo");
+            if (extractedInfoNode.isMissingNode()) {
+                return createErrorResponse("AI服务响应缺少extractedInfo字段");
+            }
+            
+            // 构建响应对象
+            ExternalContractParseResponse response = new ExternalContractParseResponse();
+            response.setSuccess(true);
+            
+            // 提取合同金额
+            JsonNode contractAmountNode = extractedInfoNode.path("contractAmount");
+            if (!contractAmountNode.isMissingNode()) {
+                response.setTotalAmount(new BigDecimal(contractAmountNode.asDouble()));
+            }
+            
+            // 提取开始日期
+            JsonNode startDateNode = extractedInfoNode.path("startDate");
+            if (!startDateNode.isMissingNode()) {
+                response.setStartDate(startDateNode.asText());
+            }
+            
+            // 提取结束日期
+            JsonNode endDateNode = extractedInfoNode.path("endDate");
+            if (!endDateNode.isMissingNode()) {
+                response.setEndDate(endDateNode.asText());
+            }
+            
+            // 提取税率
+            JsonNode taxRateNode = extractedInfoNode.path("taxRate");
+            if (!taxRateNode.isMissingNode()) {
+                response.setTaxRate(new BigDecimal(taxRateNode.asDouble()).divide(new BigDecimal("100")));
+            }
+            
+            // 提取供应商名称（乙方）
+            JsonNode partyBNode = extractedInfoNode.path("partyB");
+            if (!partyBNode.isMissingNode()) {
+                response.setVendorName(partyBNode.asText());
+            }
+            
+            logger.info("AI服务响应解析成功: 文件={}, 金额={}, 供应商={}", 
+                    fileName, response.getTotalAmount(), response.getVendorName());
+            
+            return response;
+            
+        } catch (Exception e) {
+            logger.error("解析AI服务响应失败: {}", e.getMessage(), e);
+            return createErrorResponse("解析AI服务响应失败: " + e.getMessage());
+        }
     }
 }

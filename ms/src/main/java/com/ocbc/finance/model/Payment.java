@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class Payment extends BaseAuditable {
     private BigDecimal paymentAmount;
 
     @Column(name = "booking_date", nullable = false)
-    private LocalDate bookingDate;
+    private LocalDateTime bookingDate;
 
     @Column(name = "selected_periods", length = 1000)
     private String selectedPeriods; // 存储勾选的期间，用逗号分隔，如"2024-01,2024-02,2024-03"

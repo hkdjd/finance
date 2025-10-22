@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "amortization_entries")
@@ -37,7 +38,7 @@ public class AmortizationEntry extends BaseAuditEntity {
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
     @Column(name = "payment_date")
-    private LocalDate paymentDate; // 支付时间，仅在已支付时有值
+    private LocalDateTime paymentDate; // 支付时间，仅在已支付时有值
 
     public enum PaymentStatus {
         PENDING,    // 待付款
@@ -71,9 +72,19 @@ public class AmortizationEntry extends BaseAuditEntity {
             this.paidAmount = (this.paidAmount != null ? this.paidAmount : BigDecimal.ZERO).add(paymentAmount);
             // 任何付款都将状态设置为已完成（包括不足付款）
             this.paymentStatus = PaymentStatus.COMPLETED;
-            // 设置支付时间为当前日期
-            if (this.paymentDate == null) {
-                this.paymentDate = LocalDate.now();
+            // 注意：支付时间需要在调用此方法前单独设置
+        }
+    }
+    
+    // 添加付款金额并设置支付时间
+    public void addPayment(BigDecimal paymentAmount, LocalDateTime paymentDateTime) {
+        if (paymentAmount != null && paymentAmount.compareTo(BigDecimal.ZERO) > 0) {
+            this.paidAmount = (this.paidAmount != null ? this.paidAmount : BigDecimal.ZERO).add(paymentAmount);
+            // 任何付款都将状态设置为已完成（包括不足付款）
+            this.paymentStatus = PaymentStatus.COMPLETED;
+            // 设置支付时间
+            if (this.paymentDate == null && paymentDateTime != null) {
+                this.paymentDate = paymentDateTime;
             }
         }
     }
