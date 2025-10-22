@@ -20,6 +20,7 @@ const ContractDetail: React.FC = () => {
   // 批量编辑弹窗相关状态
   const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
   const [batchNewAmount, setBatchNewAmount] = useState<number | null>(null);
+  const [batchPaymentDate, setBatchPaymentDate] = useState<dayjs.Dayjs | null>(null);
   
   // 多选相关状态
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -299,6 +300,7 @@ const ContractDetail: React.FC = () => {
     }
     
     setBatchNewAmount(null);
+    setBatchPaymentDate(dayjs()); // 默认为当天
     setIsBatchModalVisible(true);
   };
 
@@ -306,6 +308,11 @@ const ContractDetail: React.FC = () => {
   const handleConfirmBatchEdit = async () => {
     if (batchNewAmount === null) {
       message.warning('请输入有效金额');
+      return;
+    }
+
+    if (!batchPaymentDate) {
+      message.warning('请选择支付时间');
       return;
     }
 
@@ -348,7 +355,8 @@ const ContractDetail: React.FC = () => {
         contractId,
         paymentAmount: batchNewAmount,
         bookingDate: new Date().toISOString().split('T')[0], // 当前日期 YYYY-MM-DD
-        selectedPeriods: validRecords.map(record => record.id) // 只提交有效的期次
+        selectedPeriods: validRecords.map(record => record.id), // 只提交有效的期次
+        paymentDate: batchPaymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
       };
 
       // 调用支付接口
@@ -363,6 +371,7 @@ const ContractDetail: React.FC = () => {
       // 关闭弹窗并重置状态
       setIsBatchModalVisible(false);
       setBatchNewAmount(null);
+      setBatchPaymentDate(null);
       setSelectedRowKeys([]); // 清空选择
       
       // 添加短暂延迟确保后端数据已更新
@@ -400,6 +409,7 @@ const ContractDetail: React.FC = () => {
   const handleCancelBatchEdit = () => {
     setIsBatchModalVisible(false);
     setBatchNewAmount(null);
+    setBatchPaymentDate(null);
   };
 
   // 获取选中的记录
@@ -1574,6 +1584,20 @@ const ContractDetail: React.FC = () => {
                 max={999999999}
                 prefix="¥"
                 placeholder="请输入批量支付金额（将应用到所有选中项）"
+              />
+            </div>
+            <div>
+              <Text style={{ display: 'block', marginBottom: '8px' }}>
+                <strong>支付时间：</strong>
+              </Text>
+              <DatePicker
+                style={{ width: '100%' }}
+                value={batchPaymentDate}
+                onChange={(date) => setBatchPaymentDate(date)}
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="请选择支付时间"
+                size="large"
               />
             </div>
           </Space>
