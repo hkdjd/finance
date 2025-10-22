@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 /**
  * 合同上传响应
@@ -37,4 +38,7 @@ public class ContractUploadResponse {
     
     /** 操作消息 */
     private String message;
+    
+    /** 自定义字段提取结果 (key: 字段名称, value: 字段值) */
+    private Map<String, String> customFields;
 }

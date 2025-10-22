@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 合同解析响应DTO
@@ -59,4 +60,11 @@ public class ContractParseResponse {
      * 是否使用AI解析
      */
     private Boolean aiParsed;
+
+    /**
+     * 自定义字段提取结果
+     * key: 字段名称
+     * value: 字段值
+     */
+    private Map<String, String> customFields;
 }

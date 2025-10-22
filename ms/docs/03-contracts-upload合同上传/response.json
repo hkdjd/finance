@@ -7,5 +7,10 @@
   "vendorName": "史密斯",
   "attachmentName": "contract_20240124_143052_a1b2c3d4.pdf",
   "createdAt": "2025-01-24T14:30:52.123456+08:00",
-  "message": "合同上传和解析成功"
+  "message": "合同上传和解析成功",
+  "customFields": {
+    "法人": "张三",
+    "项目名称": "净水器租赁项目",
+    "合同编号": "HT-2025-001"
+  }
 }
