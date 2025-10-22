@@ -69,10 +69,14 @@ export interface ContractUploadResponse {
   vendorName: string;
   /** 合同附件名称 */
   attachmentName: string;
+  /** 合同附件存放路径 */
+  attachmentPath: string;
   /** 创建时间 */
   createdAt: string;
   /** 操作消息 */
   message: string;
+  /** 自定义字段（可选） */
+  customFields?: Record<string, string>;
 }
 
 /**
@@ -285,6 +289,8 @@ export interface UpdateContractRequest {
   taxRate: number;
   /** 供应商名称，不能为空 */
   vendorName: string;
+  /** 自定义字段（可选） */
+  customFields?: Record<string, string>;
 }
 
 /**
@@ -305,8 +311,12 @@ export interface UpdateContractResponse {
   vendorName: string;
   /** 合同附件名称 */
   attachmentName: string;
+  /** 合同附件存放路径 */
+  attachmentPath: string;
   /** 创建时间 */
   createdAt: string;
   /** 操作消息 */
   message: string;
+  /** 自定义字段（可选） */
+  customFields?: Record<string, string>;
 }

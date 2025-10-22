@@ -24,6 +24,7 @@ import type { ColumnsType } from 'antd/es/table';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { PageAProps, ContractData } from './types';
 import { getAllContracts, uploadContract, calculateAmortization } from '../../api';
+import { getUserKeywords, batchCreateKeywords } from '../../api/customKeywords';
 import styles from './styles.module.css';
 import type { PrepaymentItem } from '../../components/ContractConfirmModal/types';
 
@@ -40,7 +41,7 @@ const PageA: React.FC<PageAProps> = () => {
   const [customFields, setCustomFields] = useState<string[]>([]);
   const [customFieldInput, setCustomFieldInput] = useState<string>('');
   
-  // 加载合同列表
+  // 加载合同列表和自定义关键字
   useEffect(() => {
     const fetchContracts = async () => {
       setLoading(true);
@@ -56,7 +57,20 @@ const PageA: React.FC<PageAProps> = () => {
       }
     };
 
+    const fetchCustomKeywords = async () => {
+      try {
+        const response = await getUserKeywords();
+        // 将 response 中的 keyword 提取成数组
+        const keywords = response.map(item => item.keyword);
+        setCustomFields(keywords);
+      } catch (error) {
+        console.error('获取自定义关键字失败:', error);
+        // 不显示错误提示，静默失败
+      }
+    };
+
     fetchContracts();
+    fetchCustomKeywords();
   }, []);
   
 
@@ -64,6 +78,14 @@ const PageA: React.FC<PageAProps> = () => {
   const handleFileUpload = useCallback(async (file: File) => {
     setLoading(true);
     try {
+      // 步骤1：批量保存自定义关键字
+      if (customFields.length > 0) {
+        message.loading({ content: '正在保存自定义关键字...', key: 'keywords' });
+        console.log('保存自定义关键字:', customFields);
+        await batchCreateKeywords(customFields);
+        message.success({ content: '自定义关键字保存成功', key: 'keywords', duration: 1 });
+      }
+
       // 步骤2：调用上传合同文件接口
       message.loading({ content: '正在上传合同文件...', key: 'upload' });
       console.log('开始上传文件:', file.name);
@@ -102,7 +124,7 @@ const PageA: React.FC<PageAProps> = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [customFields, navigate]);
 
   // 处理文件上传变化
   function handleUploadChange(info: any) {
@@ -318,7 +340,7 @@ const PageA: React.FC<PageAProps> = () => {
               点击或拖拽文件到此区域上传
             </p>
             <p className={styles.uploadHint}>
-              支持单个或批量上传，支持 PDF、Word、Excel、TXT 格式
+              支持单个 PDF 格式
             </p>
           </Dragger>
         </div>
