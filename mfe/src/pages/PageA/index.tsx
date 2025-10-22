@@ -25,8 +25,7 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import { PageAProps, ContractData } from './types';
 import { getAllContracts, uploadContract, calculateAmortization } from '../../api';
 import styles from './styles.module.css';
-import ContractConfirmModal from '../../components/ContractConfirmModal';
-import type { ContractInfo, PrepaymentItem } from '../../components/ContractConfirmModal/types';
+import type { PrepaymentItem } from '../../components/ContractConfirmModal/types';
 
 const { Dragger } = Upload;
 const { Title } = Typography;
@@ -60,10 +59,6 @@ const PageA: React.FC<PageAProps> = () => {
     fetchContracts();
   }, []);
   
-  // 合同确认弹窗状态
-  const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
-  const [contractInfo, setContractInfo] = useState<ContractInfo | null>(null);
-  const [prepaymentData, setPrepaymentData] = useState<PrepaymentItem[]>([]);
 
   // 处理文件上传
   const handleFileUpload = useCallback(async (file: File) => {
@@ -76,26 +71,27 @@ const PageA: React.FC<PageAProps> = () => {
       console.log('上传响应:', uploadResponse);
       message.success({ content: uploadResponse.message || '合同上传成功', key: 'upload' });
 
-      // 设置合同信息
-      setContractInfo(uploadResponse);
-
-      // 步骤3：根据 contractId 调用计算合同摊销明细接口
-      message.loading({ content: '正在计算摊销明细...', key: 'calculate' });
-      console.log('开始计算摊销明细, contractId:', uploadResponse.contractId);
+      // 步骤3：根据 contractId 调用计算合同摘销明细接口
+      message.loading({ content: '正在计算摘销明细...', key: 'calculate' });
+      console.log('开始计算摘销明细, contractId:', uploadResponse.contractId);
       const amortizationResponse = await calculateAmortization(uploadResponse.contractId);
-      console.log('摊销计算响应:', amortizationResponse);
-      message.success({ content: '摊销明细计算完成', key: 'calculate' });
+      console.log('摘销计算响应:', amortizationResponse);
+      message.success({ content: '摘销明细计算完成', key: 'calculate' });
 
       // 步骤4：将摊销明细设置到弹窗中
       const formattedEntries = amortizationResponse.entries.map((entry, index) => ({
         ...entry,
         id: entry.id ?? index,
       })) as PrepaymentItem[];
-      console.log('格式化后的摊销明细:', formattedEntries);
-      setPrepaymentData(formattedEntries);
+      console.log('格式化后的摘销明细:', formattedEntries);
 
-      // 打开合同确认弹窗
-      setConfirmVisible(true);
+      // 跳转到合同预览页面
+      navigate('/contractPreview', {
+        state: {
+          contractInfo: uploadResponse,
+          prepaymentData: formattedEntries,
+        },
+      });
 
       // 刷新合同列表
       const listResponse = await getAllContracts();
@@ -211,24 +207,6 @@ const PageA: React.FC<PageAProps> = () => {
     }, 1000);
   }, []);
 
-  // 合同确认弹窗回调
-  const handleConfirmModalConfirm = useCallback((data: PrepaymentItem[]) => {
-    setPrepaymentData(data);
-    message.success('合同确认已提交');
-    setConfirmVisible(false);
-    // 清空弹窗数据
-    setContractInfo(null);
-    setPrepaymentData([]);
-    setUploadedFiles([]);
-  }, []);
-
-  const handleConfirmModalCancel = useCallback(() => {
-    setConfirmVisible(false);
-    // 清空弹窗数据
-    setContractInfo(null);
-    setPrepaymentData([]);
-    setUploadedFiles([]);
-  }, []);
 
   // 文件上传配置
   const uploadProps: UploadProps = {
@@ -369,14 +347,6 @@ const PageA: React.FC<PageAProps> = () => {
           </Spin>
         </div>
       </div>
-      {/* 合同确认弹窗（默认打开用于样式检查） */}
-      <ContractConfirmModal
-        visible={confirmVisible}
-        contractInfo={contractInfo}
-        prepaymentData={prepaymentData}
-        onConfirm={handleConfirmModalConfirm}
-        onCancel={handleConfirmModalCancel}
-      />
     </div>
   );
 };

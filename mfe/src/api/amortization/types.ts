@@ -1,18 +1,13 @@
-/**
- * 支付状态枚举
- */
-export enum PaymentStatus {
-  /** 待处理 */
-  PENDING = 'PENDING',
-  /** 已完成 */
-  COMPLETED = 'COMPLETED',
-}
+// 从 contracts 模块导入共享类型,避免重复定义
+// PaymentStatus 是枚举,需要作为值导入
+import { PaymentStatus } from '../contracts/types';
+import type { ContractBasicInfo } from '../contracts/types';
 
 /**
- * 摊销明细条目（详细版本）
+ * 摊销明细条目(详细版本)
  */
 export interface AmortizationEntryDetail {
-  /** 条目ID（新建时为null） */
+  /** 条目ID(新建时为null) */
   id: number | null;
   /** 预提/摊销期间 */
   amortizationPeriod: string;
@@ -34,21 +29,9 @@ export interface AmortizationEntryDetail {
   updatedBy?: string;
 }
 
-/**
- * 合同基本信息（用于摊销明细接口）
- */
-export interface ContractBasicInfo {
-  /** 合同ID */
-  id: number;
-  /** 合同总金额 */
-  totalAmount: number;
-  /** 合同开始时间 */
-  startDate: string;
-  /** 合同结束时间 */
-  endDate: string;
-  /** 供应商名称 */
-  vendorName: string;
-}
+// 重新导出共享类型,保持向后兼容
+export { PaymentStatus };
+export type { ContractBasicInfo };
 
 /**
  * 摊销明细操作请求参数

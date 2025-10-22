@@ -3,12 +3,14 @@ import { Menu } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UnorderedListOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import { useNavigationGuard } from '../../contexts/NavigationGuardContext';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
 const AppMenu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { checkNavigation } = useNavigationGuard();
 
   // 菜单项配置
   const items: MenuItem[] = [
@@ -24,7 +26,9 @@ const AppMenu: React.FC = () => {
 
   // 菜单点击处理
   const handleMenuClick: MenuProps['onClick'] = (e) => {
-    navigate(e.key);
+    checkNavigation(() => {
+      navigate(e.key);
+    });
   };
 
   return (
