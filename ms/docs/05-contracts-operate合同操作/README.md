@@ -19,12 +19,28 @@
 | endDate | String | 是 | 合同结束时间，格式：yyyy-MM-dd |
 | taxRate | BigDecimal | 是 | 税率，如0.06表示6% |
 | vendorName | String | 是 | 供应商名称，不能为空 |
+| customFields | Map<String, String> | 否 | 自定义字段（可选，key为字段名，value为字段值） |
 
 ## 请求示例
 参考 `request.json` 文件
 
 ## 响应数据
 参考 `response.json` 文件
+
+### 响应字段说明
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| contractId | Long | 合同ID |
+| totalAmount | BigDecimal | 合同总金额 |
+| startDate | String | 合同开始日期 (格式: yyyy-MM-dd) |
+| endDate | String | 合同结束日期 (格式: yyyy-MM-dd) |
+| taxRate | BigDecimal | 税率 |
+| vendorName | String | 供应商名称 |
+| attachmentName | String | 合同附件名称 |
+| attachmentPath | String | 合同附件存放路径（服务器文件系统路径） |
+| createdAt | String | 创建时间 (ISO 8601格式) |
+| message | String | 操作消息 |
+| customFields | Map<String, String> | 自定义字段（可选，key为字段名，value为字段值） |
 
 ## 验证规则
 - totalAmount: 必须大于0
