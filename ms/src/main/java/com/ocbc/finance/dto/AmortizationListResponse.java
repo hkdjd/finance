@@ -47,6 +47,7 @@ public class AmortizationListResponse {
         private String endDate;
         private String vendorName;
         private String createdAt;
+        private String customFields; // 自定义字段（JSON字符串）
         
         public ContractInfo() {}
         
@@ -57,6 +58,7 @@ public class AmortizationListResponse {
             this.endDate = contract.getEndDate() != null ? contract.getEndDate().toString() : null;
             this.vendorName = contract.getVendorName();
             this.createdAt = contract.getCreatedAt() != null ? contract.getCreatedAt().toString() : null;
+            this.customFields = contract.getCustomFieldsJson();
         }
         
         // Getters and Setters
@@ -106,6 +108,14 @@ public class AmortizationListResponse {
         
         public void setCreatedAt(String createdAt) {
             this.createdAt = createdAt;
+        }
+        
+        public String getCustomFields() {
+            return customFields;
+        }
+        
+        public void setCustomFields(String customFields) {
+            this.customFields = customFields;
         }
     }
     

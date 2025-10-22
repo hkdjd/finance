@@ -18,11 +18,11 @@ public class AmortizationEntry extends BaseAuditEntity {
     @JoinColumn(name = "contract_id")
     private Contract contract;
 
-    @Column(name = "amortization_period", nullable = false, length = 7)
-    private String amortizationPeriod; // yyyy-MM
+    @Column(name = "amortization_period", nullable = false)
+    private String amortizationPeriod; // yyyy-MM (支持任意长度)
 
-    @Column(name = "accounting_period", nullable = false, length = 7)
-    private String accountingPeriod; // yyyy-MM
+    @Column(name = "accounting_period", nullable = false)
+    private String accountingPeriod; // yyyy-MM (支持任意长度)
 
     @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;

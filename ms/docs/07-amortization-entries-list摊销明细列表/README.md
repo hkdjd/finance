@@ -37,7 +37,8 @@
     "totalAmount": 4000.00,
     "startDate": "2025-01-01",
     "endDate": "2025-04-30",
-    "vendorName": "供应商A"
+    "vendorName": "供应商A",
+    "customFields": "{\"法定代表人\":\"张明\",\"项目经理\":\"李华\"}"
   },
   "amortization": [
     {
@@ -82,7 +83,8 @@
     "startDate": "2025-01-01",
     "endDate": "2025-04-30",
     "vendorName": "供应商A",
-    "createdAt": "2024-12-20T09:30:00.123456"
+    "createdAt": "2024-12-20T09:30:00.123456",
+    "customFields": "{\"法定代表人\":\"张明\",\"项目经理\":\"李华\"}"
   },
   "amortizationPeriod": "2025-01",
   "accountingPeriod": "2025-01",
@@ -104,6 +106,7 @@
 - **endDate**: 合同结束日期（格式 yyyy-MM-dd）
 - **vendorName**: 供应商名称
 - **createdAt**: 合同创建时间（格式 yyyy-MM-ddTHH:mm:ss.SSSSSS）
+- **customFields**: 自定义字段（JSON字符串格式），包含AI提取或用户录入的自定义信息，如：`{"法定代表人":"张明","项目经理":"李华"}`
 
 ### 摊销明细字段说明
 - **id**: 摊销明细ID
