@@ -2,12 +2,14 @@ import React from 'react';
 import { Layout, Typography, Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import AppMenu from '../../Menu';
+import { useNavigationGuard } from '../../../contexts/NavigationGuardContext';
 
 const { Header } = Layout;
 const { Title } = Typography;
 
 const AppHeader: React.FC = () => {
   const navigate = useNavigate();
+  const { checkNavigation } = useNavigationGuard();
   
   const headerStyle: React.CSSProperties = {
     backgroundColor: 'rgb(235 235 230 / 50%)',
@@ -31,7 +33,7 @@ const AppHeader: React.FC = () => {
       <Title 
         level={2} 
         style={titleStyle}
-        onClick={() => navigate('/')}
+        onClick={() => checkNavigation(() => navigate('/'))}
       >
         OCBC
       </Title>

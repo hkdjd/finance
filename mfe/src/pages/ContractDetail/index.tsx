@@ -213,7 +213,6 @@ const ContractDetail: React.FC = () => {
       const paymentRequest: PaymentExecuteRequest = {
         contractId,
         paymentAmount: newAmount,
-        bookingDate: new Date().toISOString().split('T')[0], // 当前日期 YYYY-MM-DD
         selectedPeriods: [currentEditRecord.id], // 选中的期次
         paymentDate: paymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
       };
@@ -354,7 +353,6 @@ const ContractDetail: React.FC = () => {
       const paymentRequest: PaymentExecuteRequest = {
         contractId,
         paymentAmount: batchNewAmount,
-        bookingDate: new Date().toISOString().split('T')[0], // 当前日期 YYYY-MM-DD
         selectedPeriods: validRecords.map(record => record.id), // 只提交有效的期次
         paymentDate: batchPaymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
       };

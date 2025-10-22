@@ -400,7 +400,7 @@ public class PaymentService {
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmortization(amortization);
         paymentRequest.setPaymentAmount(request.getPaymentAmount());
-        paymentRequest.setBookingDate(request.getBookingDate() != null ? request.getBookingDate() : LocalDate.now());
+        paymentRequest.setBookingDate(request.getPaymentDate() != null ? request.getPaymentDate().toLocalDate() : LocalDate.now());
         
         // 根据摊销明细ID查询对应的期间值
         List<String> periodStrings = new ArrayList<>();
@@ -419,7 +419,7 @@ public class PaymentService {
         Payment payment = new Payment();
         payment.setContract(contract);
         payment.setPaymentAmount(request.getPaymentAmount());
-        payment.setBookingDate(paymentRequest.getBookingDate());
+        payment.setBookingDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDateTime.now());
         payment.setSelectedPeriods(String.join(",", periodStrings));
         payment.setStatus(Payment.PaymentStatus.CONFIRMED);
 
@@ -491,7 +491,7 @@ public class PaymentService {
             
             if (remainingPayment.compareTo(remainingAmountForEntry) >= 0) {
                 // 付款金额足够覆盖剩余应付金额
-                entry.addPayment(remainingAmountForEntry);
+                entry.addPayment(remainingAmountForEntry, request.getPaymentDate());
                 remainingPayment = remainingPayment.subtract(remainingAmountForEntry);
                 System.out.println("完全付款: ID=" + entry.getId() + 
                                  ", 付款金额=" + remainingAmountForEntry + 
@@ -499,7 +499,7 @@ public class PaymentService {
                                  ", 剩余付款=" + remainingPayment);
             } else {
                 // 付款金额不足，部分付款
-                entry.addPayment(remainingPayment);
+                entry.addPayment(remainingPayment, request.getPaymentDate());
                 System.out.println("部分付款: ID=" + entry.getId() + 
                                  ", 付款金额=" + remainingPayment + 
                                  ", 新累积金额=" + entry.getPaidAmount() + 
@@ -542,7 +542,7 @@ public class PaymentService {
                     .paymentId(payment.getId())
                     .contractId(contract.getId())
                     .paymentAmount(payment.getPaymentAmount())
-                    .bookingDate(payment.getBookingDate())
+                    .paymentDate(payment.getBookingDate())
                     .selectedPeriods(List.of(payment.getSelectedPeriods().split(",")))
                     .status(payment.getStatus().name())
                     .journalEntries(paymentEntryDtos)
@@ -618,7 +618,7 @@ public class PaymentService {
                     .paymentId(payment.getId())
                     .contractId(payment.getContract().getId())
                     .paymentAmount(payment.getPaymentAmount())
-                    .bookingDate(payment.getBookingDate())
+                    .paymentDate(payment.getBookingDate())
                     .selectedPeriods(List.of(payment.getSelectedPeriods().split(",")))
                     .status(payment.getStatus().name())
                     .message("付款已取消")
@@ -726,7 +726,7 @@ public class PaymentService {
                 .paymentId(payment.getId())
                 .contractId(payment.getContract().getId())
                 .paymentAmount(payment.getPaymentAmount())
-                .bookingDate(payment.getBookingDate())
+                .paymentDate(payment.getBookingDate())
                 .selectedPeriods(List.of(payment.getSelectedPeriods().split(",")))
                 .status(payment.getStatus().name())
                 .journalEntries(entryDtos)

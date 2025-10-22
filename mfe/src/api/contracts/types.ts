@@ -69,10 +69,14 @@ export interface ContractUploadResponse {
   vendorName: string;
   /** 合同附件名称 */
   attachmentName: string;
+  /** 合同附件存放路径 */
+  attachmentPath: string;
   /** 创建时间 */
   createdAt: string;
   /** 操作消息 */
   message: string;
+  /** 自定义字段（可选） */
+  customFields?: Record<string, string>;
 }
 
 /**
@@ -205,12 +209,10 @@ export interface PaymentExecuteRequest {
   contractId: number;
   /** 支付金额 */
   paymentAmount: number;
-  /** 记账日期 */
-  bookingDate: string;
+  /** 支付时间，格式：YYYY-MM-DD HH:mm:ss */
+  paymentDate: string;
   /** 选中的账期 */
   selectedPeriods: number[];
-  /** 支付时间 */
-  paymentDate?: string;
 }
 
 /**
@@ -239,8 +241,8 @@ export interface PaymentExecuteResponse {
   contractId: number;
   /** 支付金额 */
   paymentAmount: number;
-  /** 记账日期 */
-  bookingDate: string;
+  /** 支付时间，格式：YYYY-MM-DD HH:mm:ss */
+  paymentDate: string;
   /** 选中的账期 */
   selectedPeriods: string[];
   /** 支付状态 */
@@ -261,8 +263,8 @@ export interface PaymentRecord {
   contractId: number;
   /** 支付金额 */
   paymentAmount: number;
-  /** 记账日期 */
-  bookingDate: string;
+  /** 支付时间，格式：YYYY-MM-DD HH:mm:ss */
+  paymentDate: string;
   /** 选中的账期 */
   selectedPeriods: string[];
   /** 支付状态 */
@@ -289,6 +291,8 @@ export interface UpdateContractRequest {
   taxRate: number;
   /** 供应商名称，不能为空 */
   vendorName: string;
+  /** 自定义字段（可选） */
+  customFields?: Record<string, string>;
 }
 
 /**
@@ -309,8 +313,12 @@ export interface UpdateContractResponse {
   vendorName: string;
   /** 合同附件名称 */
   attachmentName: string;
+  /** 合同附件存放路径 */
+  attachmentPath: string;
   /** 创建时间 */
   createdAt: string;
   /** 操作消息 */
   message: string;
+  /** 自定义字段（可选） */
+  customFields?: Record<string, string>;
 }
