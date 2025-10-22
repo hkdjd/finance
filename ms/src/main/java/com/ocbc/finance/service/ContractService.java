@@ -176,22 +176,46 @@ public class ContractService {
             
             // 使用AI解析结果
             if (parseResponse.isSuccess()) {
-                contract.setTotalAmount(parseResponse.getTotalAmount());
-                contract.setStartDate(LocalDate.parse(parseResponse.getStartDate()));
-                contract.setEndDate(LocalDate.parse(parseResponse.getEndDate()));
-                contract.setVendorName(parseResponse.getVendorName());
-                contract.setTaxRate(parseResponse.getTaxRate());
+                contract.setTotalAmount(parseResponse.getTotalAmount() != null ? parseResponse.getTotalAmount() : BigDecimal.ZERO);
+                
+                // 安全解析日期，如果为null则使用默认值
+                if (parseResponse.getStartDate() != null && !parseResponse.getStartDate().trim().isEmpty()) {
+                    try {
+                        contract.setStartDate(LocalDate.parse(parseResponse.getStartDate()));
+                    } catch (Exception e) {
+                        contract.setStartDate(LocalDate.now());
+                    }
+                } else {
+                    contract.setStartDate(LocalDate.now());
+                }
+                
+                if (parseResponse.getEndDate() != null && !parseResponse.getEndDate().trim().isEmpty()) {
+                    try {
+                        contract.setEndDate(LocalDate.parse(parseResponse.getEndDate()));
+                    } catch (Exception e) {
+                        contract.setEndDate(LocalDate.now().plusMonths(12));
+                    }
+                } else {
+                    contract.setEndDate(LocalDate.now().plusMonths(12));
+                }
+                
+                contract.setVendorName(parseResponse.getVendorName() != null ? parseResponse.getVendorName() : "未知供应商");
+                contract.setTaxRate(parseResponse.getTaxRate() != null ? parseResponse.getTaxRate() : BigDecimal.ZERO);
             } else {
                 // 解析失败，使用默认值
                 contract.setTotalAmount(BigDecimal.ZERO);
                 contract.setStartDate(LocalDate.now());
-                contract.setEndDate(LocalDate.now().plusMonths(1));
+                contract.setEndDate(LocalDate.now().plusMonths(12));
                 contract.setVendorName("未知供应商");
                 contract.setTaxRate(BigDecimal.ZERO);
             }
             
             // 在数据库中保存原始文件名，便于显示
             contract.setAttachmentName(file.getOriginalFilename());
+            
+            // 设置文件路径（完整路径）
+            String fullFilePath = fileUploadService.getContractFile(savedFileName).getAbsolutePath();
+            contract.setFilePath(fullFilePath);
             
             // 保存自定义字段到数据库
             if (parseResponse.getCustomFields() != null && !parseResponse.getCustomFields().isEmpty()) {
@@ -209,7 +233,9 @@ public class ContractService {
             response.setVendorName(contract.getVendorName());
             response.setTaxRate(contract.getTaxRate());
             response.setAttachmentName(file.getOriginalFilename());
-            response.setAttachmentPath(contract.getFilePath());
+            // 设置attachmentPath为下载URL而不是文件系统路径
+            String downloadUrl = "/contracts/" + contract.getId() + "/attachment?download=true";
+            response.setAttachmentPath(downloadUrl);
             
             // 如果有自定义字段结果，也返回给前端
             if (parseResponse.getCustomFields() != null && !parseResponse.getCustomFields().isEmpty()) {
