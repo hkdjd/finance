@@ -16,8 +16,7 @@ import {
   InboxOutlined, 
   EyeOutlined, 
   DeleteOutlined,
-  FileTextOutlined,
-  BarChartOutlined
+  FileTextOutlined
 } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -349,17 +348,10 @@ const PageA: React.FC<PageAProps> = () => {
       {/* 区域B - 合同列表区域 */}
       <div className={styles.contractTableArea}>
         <div className={styles.tableContainer}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div style={{ marginBottom: '16px' }}>
             <Title level={4} style={{ margin: 0, color: '#262626' }}>
               合同列表
             </Title>
-            <Button 
-              type="link" 
-              icon={<BarChartOutlined />}
-              onClick={() => navigate('/reports')}
-            >
-              查看详细报表
-            </Button>
           </div>
           <Spin spinning={loading}>
             <Table
