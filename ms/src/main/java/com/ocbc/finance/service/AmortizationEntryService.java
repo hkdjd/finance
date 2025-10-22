@@ -272,81 +272,49 @@ public class AmortizationEntryService {
      * - 若request的id与数据库中的id一致，则更新
      * - 若数据库中存在的id在request中不存在，则删除
      */
+    /**
+     * 根据请求更新摊销明细（先删除后批量插入）
+     * 业务逻辑：
+     * 1. 先删除该合同的所有摊销明细
+     * 2. 批量插入请求中的所有摊销明细
+     * 3. 忽略请求中的id字段，由数据库自动生成新的id
+     */
     @Transactional
     public AmortizationListResponse updateAmortizationEntriesFromRequest(AmortizationUpdateRequest request) {
         // 验证合同是否存在
         Contract contract = contractRepository.findById(request.getContractId())
                 .orElseThrow(() -> new IllegalArgumentException("未找到合同，ID=" + request.getContractId()));
         
-        // 获取该合同现有的所有摊销明细
-        List<AmortizationEntry> existingEntries = amortizationEntryRepository.findByContractIdOrderByAmortizationPeriodAsc(request.getContractId());
-        Set<Long> existingIds = existingEntries.stream()
-                .map(AmortizationEntry::getId)
-                .collect(Collectors.toSet());
+        // 1. 先删除该合同的所有摊销明细
+        amortizationEntryRepository.deleteByContractId(request.getContractId());
         
-        // 收集请求中的ID
-        Set<Long> requestIds = request.getAmortization().stream()
-                .map(AmortizationUpdateRequest.AmortizationEntryData::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        // 2. 批量插入新的摊销明细
+        List<AmortizationEntry> newEntries = new ArrayList<>();
         
-        // 找出需要删除的ID（存在于数据库但不在请求中）
-        Set<Long> idsToDelete = existingIds.stream()
-                .filter(id -> !requestIds.contains(id))
-                .collect(Collectors.toSet());
-        
-        // 删除不在请求中的摊销明细
-        if (!idsToDelete.isEmpty()) {
-            amortizationEntryRepository.deleteAllById(idsToDelete);
-        }
-        
-        List<AmortizationEntry> resultEntries = new ArrayList<>();
-        
-        // 处理请求中的每个摊销明细
         for (AmortizationUpdateRequest.AmortizationEntryData entryData : request.getAmortization()) {
-            AmortizationEntry entry;
+            AmortizationEntry entry = new AmortizationEntry();
+            entry.setContract(contract);
+            entry.setAmortizationPeriod(entryData.getAmortizationPeriod());
+            entry.setAccountingPeriod(entryData.getAccountingPeriod());
+            entry.setAmount(BigDecimal.valueOf(entryData.getAmount()));
+            entry.setPeriodDate(LocalDate.parse(entryData.getPeriodDate()));
             
-            if (entryData.getId() == null) {
-                // 新增操作
-                entry = new AmortizationEntry();
-                entry.setContract(contract);
-                entry.setAmortizationPeriod(entryData.getAmortizationPeriod());
-                entry.setAccountingPeriod(entryData.getAccountingPeriod());
-                entry.setAmount(BigDecimal.valueOf(entryData.getAmount()));
-                entry.setPeriodDate(LocalDate.parse(entryData.getPeriodDate()));
-                // 设置默认状态
-                // entry.setPaymentStatus(PaymentStatus.PENDING);
+            // 设置支付状态
+            if (entryData.getPaymentStatus() != null) {
+                entry.setPaymentStatus(AmortizationEntry.PaymentStatus.valueOf(entryData.getPaymentStatus()));
             } else {
-                // 更新操作
-                entry = amortizationEntryRepository.findById(entryData.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("未找到摊销明细，ID=" + entryData.getId()));
-                
-                // 更新字段
-                if (entryData.getAmortizationPeriod() != null) {
-                    entry.setAmortizationPeriod(entryData.getAmortizationPeriod());
-                }
-                if (entryData.getAccountingPeriod() != null) {
-                    entry.setAccountingPeriod(entryData.getAccountingPeriod());
-                }
-                if (entryData.getAmount() != null) {
-                    entry.setAmount(BigDecimal.valueOf(entryData.getAmount()));
-                }
-                if (entryData.getPeriodDate() != null) {
-                    entry.setPeriodDate(LocalDate.parse(entryData.getPeriodDate()));
-                }
-                if (entryData.getPaymentStatus() != null) {
-                    // 假设有PaymentStatus枚举，这里需要根据实际情况调整
-                    // entry.setPaymentStatus(PaymentStatus.valueOf(entryData.getPaymentStatus()));
-                }
+                entry.setPaymentStatus(AmortizationEntry.PaymentStatus.PENDING);
             }
             
-            AmortizationEntry savedEntry = amortizationEntryRepository.save(entry);
-            resultEntries.add(savedEntry);
+            newEntries.add(entry);
         }
         
-        // 构造响应
+        // 批量保存
+        List<AmortizationEntry> savedEntries = amortizationEntryRepository.saveAll(newEntries);
+        
+        // 3. 构造响应
         AmortizationListResponse.ContractInfo contractInfo = new AmortizationListResponse.ContractInfo(contract);
-        List<AmortizationListResponse.AmortizationEntryInfo> amortizationList = resultEntries.stream()
+        List<AmortizationListResponse.AmortizationEntryInfo> amortizationList = savedEntries.stream()
                 .map(AmortizationListResponse.AmortizationEntryInfo::new)
                 .collect(Collectors.toList());
         

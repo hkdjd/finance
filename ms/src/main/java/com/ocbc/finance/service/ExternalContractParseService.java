@@ -83,6 +83,7 @@ public class ExternalContractParseService {
             String responseBody = response.getBody();
             if (responseBody != null) {
                 logger.info("合同解析成功: {}", contractFile.getName());
+                logger.info("AI服务完整响应: {}", responseBody);
                 return parseAiServiceResponse(responseBody, contractFile.getName());
             } else {
                 logger.warn("合同解析失败: 响应为空");
@@ -200,8 +201,27 @@ public class ExternalContractParseService {
                 response.setVendorName(partyBNode.asText());
             }
             
-            logger.info("AI服务响应解析成功: 文件={}, 金额={}, 供应商={}", 
-                    fileName, response.getTotalAmount(), response.getVendorName());
+            // 提取自定义字段
+            JsonNode customFieldsNode = extractedInfoNode.path("customFields");
+            logger.info("customFields节点存在: {}, 是对象: {}, 节点类型: {}", 
+                    !customFieldsNode.isMissingNode(), 
+                    customFieldsNode.isObject(),
+                    customFieldsNode.getNodeType());
+            logger.info("customFields节点内容: {}", customFieldsNode);
+            
+            if (!customFieldsNode.isMissingNode() && customFieldsNode.isObject()) {
+                Map<String, String> customFieldsMap = new HashMap<>();
+                customFieldsNode.fields().forEachRemaining(entry -> {
+                    customFieldsMap.put(entry.getKey(), entry.getValue().asText());
+                });
+                response.setCustomFields(customFieldsMap);
+                logger.info("提取到自定义字段: {}", customFieldsMap);
+            } else {
+                logger.warn("customFields节点缺失或不是对象类型");
+            }
+            
+            logger.info("AI服务响应解析成功: 文件={}, 金额={}, 供应商={}, 自定义字段={}", 
+                    fileName, response.getTotalAmount(), response.getVendorName(), response.getCustomFields());
             
             return response;
             

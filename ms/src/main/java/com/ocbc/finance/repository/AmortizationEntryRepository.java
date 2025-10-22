@@ -29,4 +29,9 @@ public interface AmortizationEntryRepository extends JpaRepository<AmortizationE
      * 根据付款状态查询摊销明细
      */
     List<AmortizationEntry> findByPaymentStatus(AmortizationEntry.PaymentStatus paymentStatus);
+    
+    /**
+     * 根据合同ID删除所有摊销明细
+     */
+    void deleteByContractId(Long contractId);
 }

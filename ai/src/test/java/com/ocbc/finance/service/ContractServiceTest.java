@@ -77,7 +77,7 @@ class ContractServiceTest {
         when(geminiAiService.parseContractWithAI(anyString())).thenReturn(aiResult);
 
         // When
-        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser");
+        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser", null);
 
         // Then
         assertNotNull(response);
@@ -111,7 +111,7 @@ class ContractServiceTest {
         when(gemma3AiService.parseContractWithAI(anyString())).thenReturn(aiResult);
 
         // When
-        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser");
+        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser", null);
 
         // Then
         assertNotNull(response);
@@ -139,7 +139,7 @@ class ContractServiceTest {
             .thenThrow(new RuntimeException("AI服务超时"));
 
         // When
-        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser");
+        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser", null);
 
         // Then
         assertNotNull(response);
@@ -164,7 +164,7 @@ class ContractServiceTest {
         when(geminiAiService.isAvailable()).thenReturn(false);
 
         // When
-        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser");
+        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser", null);
 
         // Then
         assertNotNull(response);
@@ -197,7 +197,7 @@ class ContractServiceTest {
         when(gemma3AiService.parseContractWithAI(anyString())).thenReturn(gemma3Result);
 
         // When
-        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser");
+        ContractUploadResponse response = contractService.uploadAndParseContract(testPdfFile, "testuser", null);
 
         // Then
         assertNotNull(response);
@@ -221,7 +221,7 @@ class ContractServiceTest {
 
         // When & Then
         assertThrows(Exception.class, () -> {
-            contractService.uploadAndParseContract(invalidFile, "testuser");
+            contractService.uploadAndParseContract(invalidFile, "testuser", null);
         });
     }
 

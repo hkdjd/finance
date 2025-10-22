@@ -8,6 +8,7 @@ com/ocbc/finance/model/JournalEntry.class
 com/ocbc/finance/repository/AmortizationEntryRepository.class
 com/ocbc/finance/controller/JournalEntryController$1.class
 com/ocbc/finance/dto/ContractAttachmentResponse.class
+com/ocbc/finance/constants/UserConstants.class
 com/ocbc/finance/dto/VendorDistributionResponse$VendorDistributionItem.class
 com/ocbc/finance/dto/PaymentPreviewResponse.class
 com/ocbc/finance/dto/OperationRequest$OperationType.class

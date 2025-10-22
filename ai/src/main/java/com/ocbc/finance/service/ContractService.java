@@ -78,9 +78,10 @@ public class ContractService {
      * 
      * @param file 上传的文件
      * @param createdBy 创建人
+     * @param customFields 自定义字段列表
      * @return 上传响应
      */
-    public ContractUploadResponse uploadAndParseContract(MultipartFile file, String createdBy) {
+    public ContractUploadResponse uploadAndParseContract(MultipartFile file, String createdBy, java.util.List<String> customFields) {
         try {
             // 1. 验证文件格式
             validateFileFormat(file);
@@ -105,7 +106,13 @@ public class ContractService {
                 parseMessage = "使用关键字匹配解析成功";
             }
             
-            // 5. 构建响应对象
+            // 5. 提取自定义字段
+            if (customFields != null && !customFields.isEmpty()) {
+                Map<String, String> customFieldsResult = extractCustomFields(textContent, customFields);
+                extractedInfo.put("customFields", customFieldsResult);
+            }
+            
+            // 6. 构建响应对象
             return ContractUploadResponse.builder()
                     .fileId(originalContract.getId())
                     .fileName(file.getOriginalFilename())
@@ -695,8 +702,8 @@ public class ContractService {
     /**
      * 上传合同文件（Controller适配方法）
      */
-    public ContractUploadResponse uploadContract(MultipartFile file, String createdBy) {
-        return uploadAndParseContract(file, createdBy);
+    public ContractUploadResponse uploadContract(MultipartFile file, String createdBy, java.util.List<String> customFields) {
+        return uploadAndParseContract(file, createdBy, customFields);
     }
 
     /**
@@ -879,5 +886,69 @@ public class ContractService {
         
         // 其他类型，只要不为null就认为有值
         return true;
+    }
+
+    /**
+     * 提取自定义字段
+     * 
+     * @param textContent PDF文本内容
+     * @param customFields 自定义字段列表
+     * @return 自定义字段提取结果
+     */
+    private Map<String, String> extractCustomFields(String textContent, java.util.List<String> customFields) {
+        Map<String, String> result = new java.util.HashMap<>();
+        
+        if (customFields == null || customFields.isEmpty()) {
+            log.debug("没有自定义字段需要提取");
+            return result;
+        }
+        
+        log.info("开始提取自定义字段: {}", customFields);
+        
+        for (String fieldName : customFields) {
+            if (fieldName == null || fieldName.trim().isEmpty()) {
+                continue;
+            }
+            
+            // 使用关键字匹配提取自定义字段值
+            String fieldValue = extractCustomFieldValue(textContent, fieldName.trim());
+            result.put(fieldName.trim(), fieldValue != null ? fieldValue : "");
+        }
+        
+        log.info("自定义字段提取完成: {}", result);
+        return result;
+    }
+
+    /**
+     * 提取单个自定义字段的值
+     * 使用多种模式尝试匹配字段值
+     * 
+     * @param textContent PDF文本内容
+     * @param fieldName 字段名称
+     * @return 字段值
+     */
+    private String extractCustomFieldValue(String textContent, String fieldName) {
+        // 尝试多种匹配模式
+        String[] patterns = {
+            // 模式1: 字段名：值
+            fieldName + "[：:]+\\s*([^\\n\\r]{1,100})",
+            // 模式2: 字段名为 值
+            fieldName + "为\\s*([^\\n\\r]{1,100})",
+            // 模式3: 字段名是 值
+            fieldName + "是\\s*([^\\n\\r]{1,100})",
+            // 模式4: 字段名 值（空格分隔）
+            fieldName + "\\s+([^\\n\\r]{1,100})"
+        };
+        
+        for (String patternStr : patterns) {
+            String value = extractByPattern(textContent, patternStr, 1);
+            if (value != null && !value.trim().isEmpty()) {
+                log.debug("字段 '{}' 提取成功，使用模式: {}", fieldName, patternStr);
+                return value.trim();
+            }
+        }
+        
+        log.debug("字段 '{}' 未找到匹配值", fieldName);
+        return null;
     }
 }
