@@ -26,6 +26,7 @@
 | attachmentPath | String | 合同附件存放路径（服务器文件系统路径） |
 | createdAt | String | 创建时间 (ISO 8601格式) |
 | message | String | 操作消息 |
+| customFields | Map<String, String> | 自定义字段提取结果（可选，key为字段名，value为字段值） |
 
 ## 错误处理
 - 合同不存在: 400 Bad Request

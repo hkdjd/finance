@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import PageA from '../pages/PageA';
 import ContractDetail from '../pages/ContractDetail';
 import ContractPreview from '../pages/ContractPreview';
+import Reports from '../pages/Reports';
 
 
 const AppRouter: React.FC = () => {
@@ -19,6 +20,9 @@ const AppRouter: React.FC = () => {
       
       {/* PageA 路由保留 */}
       <Route path="/page-a" element={<PageA />} />
+      
+      {/* 报表页面 */}
+      <Route path="/reports" element={<Reports />} />
       
       {/* 404 重定向到首页 */}
       <Route path="*" element={<Navigate to="/" replace />} />

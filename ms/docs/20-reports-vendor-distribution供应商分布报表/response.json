@@ -1,0 +1,26 @@
+{
+  "vendors": [
+    {
+      "vendorName": "供应商A",
+      "contractCount": 10,
+      "percentage": 33.33
+    },
+    {
+      "vendorName": "供应商B",
+      "contractCount": 8,
+      "percentage": 26.67
+    },
+    {
+      "vendorName": "供应商C",
+      "contractCount": 7,
+      "percentage": 23.33
+    },
+    {
+      "vendorName": "供应商D",
+      "contractCount": 5,
+      "percentage": 16.67
+    }
+  ],
+  "totalContracts": 30,
+  "generatedAt": "2024-10-22T00:00:00"
+}

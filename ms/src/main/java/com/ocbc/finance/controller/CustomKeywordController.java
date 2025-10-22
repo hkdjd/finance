@@ -1,5 +1,6 @@
 package com.ocbc.finance.controller;
 
+import com.ocbc.finance.constants.UserConstants;
 import com.ocbc.finance.dto.CustomKeywordRequest;
 import com.ocbc.finance.dto.CustomKeywordResponse;
 import com.ocbc.finance.service.CustomKeywordService;
@@ -35,6 +36,11 @@ public class CustomKeywordController {
     @PostMapping
     public ResponseEntity<?> createKeyword(@RequestBody CustomKeywordRequest request) {
         try {
+            // 如果未传入userId，使用默认admin用户ID
+            if (request.getUserId() == null) {
+                request.setUserId(UserConstants.DEFAULT_ADMIN_USER_ID);
+            }
+            
             log.info("接收到创建关键字请求: userId={}, keyword={}", 
                     request.getUserId(), request.getKeyword());
             
@@ -54,12 +60,17 @@ public class CustomKeywordController {
     /**
      * 获取用户的所有自定义关键字
      *
-     * @param userId 用户ID
+     * @param userId 用户ID（可选，默认使用admin用户ID）
      * @return 关键字列表
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getKeywordsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getKeywordsByUserId(@PathVariable(required = false) Long userId) {
         try {
+            // 如果未传入userId，使用默认admin用户ID
+            if (userId == null) {
+                userId = UserConstants.DEFAULT_ADMIN_USER_ID;
+            }
+            
             log.info("查询用户关键字: userId={}", userId);
             List<CustomKeywordResponse> keywords = customKeywordService.getKeywordsByUserId(userId);
             return ResponseEntity.ok(keywords);
@@ -74,12 +85,17 @@ public class CustomKeywordController {
     /**
      * 获取用户的所有自定义关键字（仅返回字符串列表）
      *
-     * @param userId 用户ID
+     * @param userId 用户ID（可选，默认使用admin用户ID）
      * @return 关键字字符串列表
      */
     @GetMapping("/user/{userId}/strings")
-    public ResponseEntity<?> getKeywordStringsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getKeywordStringsByUserId(@PathVariable(required = false) Long userId) {
         try {
+            // 如果未传入userId，使用默认admin用户ID
+            if (userId == null) {
+                userId = UserConstants.DEFAULT_ADMIN_USER_ID;
+            }
+            
             log.info("查询用户关键字字符串列表: userId={}", userId);
             List<String> keywords = customKeywordService.getKeywordStringsByUserId(userId);
             return ResponseEntity.ok(keywords);
@@ -102,6 +118,11 @@ public class CustomKeywordController {
     public ResponseEntity<?> updateKeyword(@PathVariable Long id,
                                            @RequestBody CustomKeywordRequest request) {
         try {
+            // 如果未传入userId，使用默认admin用户ID
+            if (request.getUserId() == null) {
+                request.setUserId(UserConstants.DEFAULT_ADMIN_USER_ID);
+            }
+            
             log.info("接收到更新关键字请求: id={}, keyword={}", id, request.getKeyword());
             
             CustomKeywordResponse response = customKeywordService.updateKeyword(id, request);
@@ -121,13 +142,18 @@ public class CustomKeywordController {
      * 删除自定义关键字
      *
      * @param id     关键字ID
-     * @param userId 用户ID（通过请求参数传递，用于权限校验）
+     * @param userId 用户ID（通过请求参数传递，用于权限校验，可选）
      * @return 删除结果
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteKeyword(@PathVariable Long id,
-                                           @RequestParam Long userId) {
+                                           @RequestParam(required = false) Long userId) {
         try {
+            // 如果未传入userId，使用默认admin用户ID
+            if (userId == null) {
+                userId = UserConstants.DEFAULT_ADMIN_USER_ID;
+            }
+            
             log.info("接收到删除关键字请求: id={}, userId={}", id, userId);
             
             customKeywordService.deleteKeyword(id, userId);
@@ -144,17 +170,22 @@ public class CustomKeywordController {
     }
     
     /**
-     * 批量创建自定义关键字
+     * 批量设置自定义关键字（先删除用户所有关键字，再批量插入）
      *
-     * @param userId   用户ID
+     * @param userId   用户ID（可选，默认使用admin用户ID）
      * @param keywords 关键字列表
      * @return 创建的关键字列表
      */
     @PostMapping("/batch")
-    public ResponseEntity<?> batchCreateKeywords(@RequestParam Long userId,
+    public ResponseEntity<?> batchCreateKeywords(@RequestParam(required = false) Long userId,
                                                   @RequestBody List<String> keywords) {
         try {
-            log.info("接收到批量创建关键字请求: userId={}, count={}", userId, keywords.size());
+            // 如果未传入userId，使用默认admin用户ID
+            if (userId == null) {
+                userId = UserConstants.DEFAULT_ADMIN_USER_ID;
+            }
+            
+            log.info("接收到批量设置关键字请求: userId={}, count={}", userId, keywords.size());
             
             List<CustomKeywordResponse> responses = customKeywordService.batchCreateKeywords(userId, keywords);
             return ResponseEntity.status(HttpStatus.CREATED).body(responses);

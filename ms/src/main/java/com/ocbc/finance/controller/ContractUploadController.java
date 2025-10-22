@@ -1,5 +1,6 @@
 package com.ocbc.finance.controller;
 
+import com.ocbc.finance.constants.UserConstants;
 import com.ocbc.finance.dto.ContractEditRequest;
 import com.ocbc.finance.dto.ContractListResponse;
 import com.ocbc.finance.dto.ContractUploadResponse;
@@ -27,13 +28,17 @@ public class ContractUploadController {
      * 上传合同文件
      * 
      * @param file 合同文件
-     * @param userId 用户ID（可选，用于获取自定义关键字）
+     * @param userId 用户ID（可选，用于获取自定义关键字，默认使用admin用户ID）
      * @return 合同上传响应
      */
     @PostMapping("/upload")
     public ResponseEntity<ContractUploadResponse> uploadContract(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "userId", required = false) Long userId) {
+        // 如果未传入userId，使用默认admin用户ID
+        if (userId == null) {
+            userId = UserConstants.DEFAULT_ADMIN_USER_ID;
+        }
         ContractUploadResponse response = contractService.uploadContract(file, userId);
         return ResponseEntity.ok(response);
     }

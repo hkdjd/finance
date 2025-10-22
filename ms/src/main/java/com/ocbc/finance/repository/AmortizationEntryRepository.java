@@ -19,4 +19,14 @@ public interface AmortizationEntryRepository extends JpaRepository<AmortizationE
      * 根据合同对象查询摊销明细，按摊销期间排序
      */
     List<AmortizationEntry> findByContractOrderByAmortizationPeriodAsc(Contract contract);
+    
+    /**
+     * 根据摊销期间查询摊销明细
+     */
+    List<AmortizationEntry> findByAmortizationPeriod(String amortizationPeriod);
+    
+    /**
+     * 根据付款状态查询摊销明细
+     */
+    List<AmortizationEntry> findByPaymentStatus(AmortizationEntry.PaymentStatus paymentStatus);
 }
