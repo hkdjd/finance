@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PageA from '../pages/PageA';
 import ContractDetail from '../pages/ContractDetail';
+import ContractPreview from '../pages/ContractPreview';
 import Reports from '../pages/Reports';
 
 
@@ -13,6 +14,9 @@ const AppRouter: React.FC = () => {
       
       {/* 合同详情页（带 id 参数） */}
       <Route path="/contract/:id" element={<ContractDetail />} />
+      
+      {/* 合同预览确认页 */}
+      <Route path="/contractPreview" element={<ContractPreview />} />
       
       {/* PageA 路由保留 */}
       <Route path="/page-a" element={<PageA />} />
