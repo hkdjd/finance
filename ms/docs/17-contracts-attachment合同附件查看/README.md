@@ -36,10 +36,11 @@
 }
 ```
 
-### 2. 下载文件 (download=true)
+### 2. 查看/预览文件 (download=true)
 - **Content-Type**: 根据文件类型设置 (如 application/pdf, image/jpeg 等)
-- **Content-Disposition**: attachment; filename="合同_供应商A_20240101.pdf"
+- **Content-Disposition**: inline; filename="合同_供应商A_20240101.pdf"
 - **响应体**: 文件二进制流
+- **说明**: 使用 `inline` 模式，浏览器会直接在新标签页中打开PDF文件，而不是下载
 
 ## 字段说明
 
@@ -58,9 +59,9 @@
 
 ### 业务流程
 1. **合同管理**: 在合同详情页面查看附件信息
-2. **文件下载**: 用户点击下载按钮获取合同文件
-3. **审核流程**: 审核人员查看原始合同文件
-4. **存档管理**: 财务人员下载合同进行存档
+2. **文件预览**: 用户点击链接在浏览器新标签页中直接打开PDF文件
+3. **审核流程**: 审核人员在线查看原始合同文件
+4. **存档管理**: 财务人员可通过浏览器的保存功能下载合同进行存档
 
 ### 前端集成
 ```javascript
@@ -70,17 +71,22 @@ const getAttachmentInfo = async (contractId) => {
   return await response.json();
 };
 
-// 2. 下载附件文件
-const downloadAttachment = (contractId, fileName) => {
-  const link = document.createElement('a');
-  link.href = `/contracts/${contractId}/attachment?download=true`;
-  link.download = fileName;
-  link.click();
+// 2. 在新标签页中打开PDF文件（推荐方式）
+const openAttachment = (contractId) => {
+  window.open(`/contracts/${contractId}/attachment?download=true`, '_blank');
 };
 
-// 3. 在新窗口预览文件
-const previewAttachment = (contractId) => {
-  window.open(`/contracts/${contractId}/attachment?download=true`, '_blank');
+// 3. 如果需要强制下载，可以通过浏览器的保存功能
+// 或者前端可以先获取文件流再触发下载
+const forceDownloadAttachment = async (contractId, fileName) => {
+  const response = await fetch(`/contracts/${contractId}/attachment?download=true`);
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  window.URL.revokeObjectURL(url);
 };
 ```
 

@@ -42,4 +42,11 @@ public class Contract extends BaseAuditable {
     
     @Column(name = "original_file_name", length = 500)
     private String originalFileName; // 原始文件名
+    
+    /**
+     * 自定义字段（以JSON格式存储）
+     * 用于存储AI提取的用户自定义字段，格式：{"法人":"张三","项目名称":"云服务器租赁"}
+     */
+    @Column(name = "custom_fields", columnDefinition = "TEXT")
+    private String customFieldsJson;
 }
