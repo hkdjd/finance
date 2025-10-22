@@ -10,10 +10,10 @@ import { PrepaymentItem } from './types';
 import styles from './styles.module.css';
 import { updateContract } from '../../api/contracts';
 import { operateAmortization } from '../../api/amortization';
+import pdfFile from '../../constants/contract_20251015_200057_504d8439.pdf';
 
 // 配置 PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-import pdfFile from '../../constants/contract_20251015_200057_504d8439.pdf?url';
 // 时间格式化辅助函数
 const formatDateTime = (dateString: string): string => {
   return new Date(dateString).toLocaleString('zh-CN', {
