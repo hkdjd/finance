@@ -209,6 +209,7 @@ public class ContractService {
             response.setVendorName(contract.getVendorName());
             response.setTaxRate(contract.getTaxRate());
             response.setAttachmentName(file.getOriginalFilename());
+            response.setAttachmentPath(contract.getFilePath());
             
             // 如果有自定义字段结果，也返回给前端
             if (parseResponse.getCustomFields() != null && !parseResponse.getCustomFields().isEmpty()) {
