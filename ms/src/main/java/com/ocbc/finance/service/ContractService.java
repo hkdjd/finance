@@ -233,8 +233,8 @@ public class ContractService {
             response.setVendorName(contract.getVendorName());
             response.setTaxRate(contract.getTaxRate());
             response.setAttachmentName(file.getOriginalFilename());
-            // 设置attachmentPath为下载URL而不是文件系统路径
-            String downloadUrl = "/contracts/" + contract.getId() + "/attachment?download=true";
+            // 设置attachmentPath为完整的下载URL
+            String downloadUrl = "http://localhost:8081/contracts/" + contract.getId() + "/attachment?download=true";
             response.setAttachmentPath(downloadUrl);
             
             // 如果有自定义字段结果，也返回给前端
