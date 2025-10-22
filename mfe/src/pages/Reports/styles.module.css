@@ -1,0 +1,154 @@
+.reportsContainer {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+}
+
+.header p {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+  color: white;
+}
+
+.statsRow {
+  margin-bottom: 24px;
+}
+
+.statCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.statCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.chartsRow {
+  margin-bottom: 24px;
+}
+
+.chartCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-height: 480px;
+}
+
+.emptyChart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: #999;
+  font-size: 16px;
+}
+
+.tableRow {
+  margin-bottom: 24px;
+}
+
+.vendorTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vendorTable thead {
+  background-color: #fafafa;
+}
+
+.vendorTable th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #262626;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.vendorTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.vendorTable tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.vendorTable td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #595959;
+}
+
+.vendorTable tfoot {
+  background-color: #fafafa;
+  font-weight: 600;
+}
+
+.vendorTable tfoot td {
+  padding: 12px 16px;
+  border-top: 2px solid #e8e8e8;
+  border-bottom: none;
+}
+
+.rank {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: #1890ff;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.percentage {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .reportsContainer {
+    padding: 16px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .chartCard {
+    min-height: auto;
+  }
+
+  .vendorTable {
+    font-size: 14px;
+  }
+
+  .vendorTable th,
+  .vendorTable td {
+    padding: 8px 12px;
+  }
+}
