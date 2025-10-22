@@ -46,6 +46,7 @@ public class AmortizationListResponse {
         private String startDate;
         private String endDate;
         private String vendorName;
+        private String createdAt;
         
         public ContractInfo() {}
         
@@ -55,6 +56,7 @@ public class AmortizationListResponse {
             this.startDate = contract.getStartDate() != null ? contract.getStartDate().toString() : null;
             this.endDate = contract.getEndDate() != null ? contract.getEndDate().toString() : null;
             this.vendorName = contract.getVendorName();
+            this.createdAt = contract.getCreatedAt() != null ? contract.getCreatedAt().toString() : null;
         }
         
         // Getters and Setters
@@ -97,6 +99,14 @@ public class AmortizationListResponse {
         public void setVendorName(String vendorName) {
             this.vendorName = vendorName;
         }
+        
+        public String getCreatedAt() {
+            return createdAt;
+        }
+        
+        public void setCreatedAt(String createdAt) {
+            this.createdAt = createdAt;
+        }
     }
     
     /**
@@ -109,6 +119,7 @@ public class AmortizationListResponse {
         private Double amount;
         private String periodDate;
         private String paymentStatus;
+        private String paymentDate;
         private String createdAt;
         private String updatedAt;
         private String createdBy;
@@ -123,6 +134,7 @@ public class AmortizationListResponse {
             this.amount = entry.getAmount() != null ? entry.getAmount().doubleValue() : null;
             this.periodDate = entry.getPeriodDate() != null ? entry.getPeriodDate().toString() : null;
             this.paymentStatus = entry.getPaymentStatus() != null ? entry.getPaymentStatus().toString() : null;
+            this.paymentDate = entry.getPaymentDate() != null ? entry.getPaymentDate().toString() : null;
             this.createdAt = entry.getCreatedAt() != null ? entry.getCreatedAt().toString() : null;
             this.updatedAt = entry.getUpdatedAt() != null ? entry.getUpdatedAt().toString() : null;
             this.createdBy = entry.getCreatedBy();
@@ -176,6 +188,14 @@ public class AmortizationListResponse {
         
         public void setPaymentStatus(String paymentStatus) {
             this.paymentStatus = paymentStatus;
+        }
+        
+        public String getPaymentDate() {
+            return paymentDate;
+        }
+        
+        public void setPaymentDate(String paymentDate) {
+            this.paymentDate = paymentDate;
         }
         
         public String getCreatedAt() {

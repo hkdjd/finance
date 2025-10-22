@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
 import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
 const ContractDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [contractData, setContractData] = useState<ContractAmortizationResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('timeline');
   
-  // 支付弹窗相关状态
+  // 支付弹窗相关状态 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentEditRecord, setCurrentEditRecord] = useState<ContractAmortizationEntry | null>(null);
   const [newAmount, setNewAmount] = useState<number | null>(null);
+  const [paymentDate, setPaymentDate] = useState<dayjs.Dayjs | null>(null);
   
   // 批量编辑弹窗相关状态
   const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
   const [batchNewAmount, setBatchNewAmount] = useState<number | null>(null);
+  const [batchPaymentDate, setBatchPaymentDate] = useState<dayjs.Dayjs | null>(null);
   
   // 多选相关状态
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -41,11 +47,21 @@ const ContractDetail: React.FC = () => {
   // 是否为初始加载
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // 占位：后续从路由参数获取真实contractId
-  const contractId = 1;
+  // 从路由参数获取contractId
+  const contractId = id ? parseInt(id, 10) : null;
+
+  // 验证contractId
+  useEffect(() => {
+    if (!contractId || isNaN(contractId)) {
+      message.error('无效的合同ID');
+      navigate('/page-a');
+    }
+  }, [contractId, navigate]);
 
   // 获取合同摊销明细数据
   const fetchContractData = async () => {
+    if (!contractId) return;
+    
     setLoading(true);
     try {
       const response = await getContractAmortizationEntries(contractId);
@@ -61,6 +77,8 @@ const ContractDetail: React.FC = () => {
 
   // 获取预提会计分录预览数据
   const fetchJournalEntriesPreview = async () => {
+    if (!contractId) return;
+    
     setJournalEntriesLoading(true);
     try {
       const response = await getJournalEntriesPreview({
@@ -78,6 +96,8 @@ const ContractDetail: React.FC = () => {
 
   // 获取付款会计分录数据（实际执行后的分录）
   const fetchPaymentJournalEntries = async () => {
+    if (!contractId) return;
+    
     setPaymentJournalEntriesLoading(true);
     try {
       // 使用API客户端调用后端获取合同的实际付款记录及其会计分录
@@ -164,13 +184,21 @@ const ContractDetail: React.FC = () => {
     
     setCurrentEditRecord(record);
     setNewAmount(record.amount);
+    setPaymentDate(dayjs()); // 默认为当天
     setIsModalVisible(true);
   };
 
   // 确认支付
   const handleConfirmEdit = async () => {
+    if (!contractId) return;
+    
     if (!currentEditRecord || newAmount === null) {
       message.warning('请输入有效金额');
+      return;
+    }
+
+    if (!paymentDate) {
+      message.warning('请选择支付时间');
       return;
     }
 
@@ -204,8 +232,8 @@ const ContractDetail: React.FC = () => {
       const paymentRequest: PaymentExecuteRequest = {
         contractId,
         paymentAmount: newAmount,
-        bookingDate: new Date().toISOString().split('T')[0], // 当前日期 YYYY-MM-DD
-        selectedPeriods: [currentEditRecord.id] // 选中的期次
+        selectedPeriods: [currentEditRecord.id], // 选中的期次
+        paymentDate: paymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
       };
 
       // 调用支付接口
@@ -221,6 +249,7 @@ const ContractDetail: React.FC = () => {
       setIsModalVisible(false);
       setCurrentEditRecord(null);
       setNewAmount(null);
+      setPaymentDate(null);
       
       // 添加短暂延迟确保后端数据已更新
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -289,13 +318,21 @@ const ContractDetail: React.FC = () => {
     }
     
     setBatchNewAmount(null);
+    setBatchPaymentDate(dayjs()); // 默认为当天
     setIsBatchModalVisible(true);
   };
 
   // 确认批量支付
   const handleConfirmBatchEdit = async () => {
+    if (!contractId) return;
+    
     if (batchNewAmount === null) {
       message.warning('请输入有效金额');
+      return;
+    }
+
+    if (!batchPaymentDate) {
+      message.warning('请选择支付时间');
       return;
     }
 
@@ -337,8 +374,8 @@ const ContractDetail: React.FC = () => {
       const paymentRequest: PaymentExecuteRequest = {
         contractId,
         paymentAmount: batchNewAmount,
-        bookingDate: new Date().toISOString().split('T')[0], // 当前日期 YYYY-MM-DD
-        selectedPeriods: validRecords.map(record => record.id) // 只提交有效的期次
+        selectedPeriods: validRecords.map(record => record.id), // 只提交有效的期次
+        paymentDate: batchPaymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
       };
 
       // 调用支付接口
@@ -353,6 +390,7 @@ const ContractDetail: React.FC = () => {
       // 关闭弹窗并重置状态
       setIsBatchModalVisible(false);
       setBatchNewAmount(null);
+      setBatchPaymentDate(null);
       setSelectedRowKeys([]); // 清空选择
       
       // 添加短暂延迟确保后端数据已更新
@@ -390,6 +428,7 @@ const ContractDetail: React.FC = () => {
   const handleCancelBatchEdit = () => {
     setIsBatchModalVisible(false);
     setBatchNewAmount(null);
+    setBatchPaymentDate(null);
   };
 
   // 获取选中的记录
@@ -481,12 +520,14 @@ const ContractDetail: React.FC = () => {
       }
     },
     { 
-      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>创建时间</span>, 
-      dataIndex: 'createdAt', 
-      key: 'createdAt', 
+      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>支付时间</span>, 
+      dataIndex: 'paymentDate', 
+      key: 'paymentDate', 
       width: 180,
-      render: (time: string) => (
-        <span style={{ color: '#6B7280', fontSize: '13px' }}>{time}</span>
+      render: (date: string) => (
+        <span style={{ color: '#6B7280', fontSize: '13px' }}>
+          {date ? dayjs(date).format('YYYY-MM-DD HH:mm:ss') : '-'}
+        </span>
       )
     },
     { 
@@ -1279,13 +1320,34 @@ const ContractDetail: React.FC = () => {
                     摊销周期：
                   </Text>
                   <Text style={{ 
-                    color: '#E31E24', 
+                    color: 'rgb(31, 41, 55)', 
                     fontSize: '14px',
                     fontWeight: '400',
                     marginLeft: '4px',
                     fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
                   }}>
                     {calculateAmortizationPeriods()}
+                  </Text>
+                </div>
+
+                {/* 创建时间 */}
+                <div>
+                  <Text style={{ 
+                    color: '#6B7280', 
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    创建时间：
+                  </Text>
+                  <Text style={{ 
+                    color: 'rgb(31, 41, 55)', 
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    marginLeft: '4px',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    {contractData.amortization?.[0]?.createdAt ? dayjs(contractData.amortization[0].createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
                   </Text>
                 </div>
               </div>
@@ -1469,6 +1531,29 @@ const ContractDetail: React.FC = () => {
                 size="large"
               />
             </div>
+            <div>
+              <Text style={{ 
+                display: 'block', 
+                marginBottom: '8px', 
+                color: '#1F2937', 
+                fontWeight: '600',
+                fontSize: '14px'
+              }}>
+                支付时间：
+              </Text>
+              <DatePicker
+                style={{ 
+                  width: '100%',
+                  borderRadius: '6px'
+                }}
+                value={paymentDate}
+                onChange={(date) => setPaymentDate(date)}
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="请选择支付时间"
+                size="large"
+              />
+            </div>
           </Space>
         </div>
       </Modal>
@@ -1518,6 +1603,20 @@ const ContractDetail: React.FC = () => {
                 max={999999999}
                 prefix="¥"
                 placeholder="请输入批量支付金额（将应用到所有选中项）"
+              />
+            </div>
+            <div>
+              <Text style={{ display: 'block', marginBottom: '8px' }}>
+                <strong>支付时间：</strong>
+              </Text>
+              <DatePicker
+                style={{ width: '100%' }}
+                value={batchPaymentDate}
+                onChange={(date) => setBatchPaymentDate(date)}
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="请选择支付时间"
+                size="large"
               />
             </div>
           </Space>

@@ -10,7 +10,7 @@
 | 参数名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
 | file | MultipartFile | 是 | 合同文件 |
-| userId | Long | 否 | 用户ID，用于获取该用户的自定义关键字 |
+| userId | Long | 否 | 用户ID，用于获取该用户的自定义关键字（未传入时默认使用admin用户ID=1） |
 
 ## 支持的文件类型
 - PDF: .pdf
@@ -31,6 +31,21 @@
 
 ## 响应数据
 参考 `response.json` 文件
+
+### 响应字段说明
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| contractId | Long | 合同ID |
+| totalAmount | BigDecimal | 合同总金额 |
+| startDate | String | 合同开始日期 (格式: yyyy-MM-dd) |
+| endDate | String | 合同结束日期 (格式: yyyy-MM-dd) |
+| taxRate | BigDecimal | 税率 |
+| vendorName | String | 供应商名称 |
+| attachmentName | String | 合同附件名称 |
+| attachmentPath | String | 合同附件存放路径（服务器文件系统路径） |
+| createdAt | String | 创建时间 (ISO 8601格式) |
+| message | String | 操作消息 |
+| customFields | Map<String, String> | 自定义字段提取结果（可选） |
 
 ## 错误处理
 - 文件为空: 400 Bad Request
@@ -84,6 +99,7 @@ userId: 1
 - 如果未提供userId或用户没有自定义关键字，customFields为null
 
 ## 注意事项
+- **默认用户ID**: 未传入userId时，默认使用admin用户ID（值为1）
 - 外部接口可通过配置启用/禁用
 - 禁用时使用模拟数据进行开发测试
 - 文件保存路径可通过配置文件修改

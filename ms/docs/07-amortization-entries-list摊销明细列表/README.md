@@ -46,7 +46,21 @@
       "accountingPeriod": "2025-01",
       "amount": 1000.00,
       "periodDate": "2025-01-01",
+      "paymentStatus": "COMPLETED",
+      "paymentDate": "2025-01-15",
+      "createdAt": "2024-12-24T14:30:52.123456",
+      "updatedAt": "2025-01-15T10:20:30.123456",
+      "createdBy": "system",
+      "updatedBy": "admin"
+    },
+    {
+      "id": 2,
+      "amortizationPeriod": "2025-02",
+      "accountingPeriod": "2025-02",
+      "amount": 1000.00,
+      "periodDate": "2025-02-01",
       "paymentStatus": "PENDING",
+      "paymentDate": null,
       "createdAt": "2024-12-24T14:30:52.123456",
       "updatedAt": "2024-12-24T14:30:52.123456",
       "createdBy": "system",
@@ -67,18 +81,48 @@
     "totalAmount": 4000.00,
     "startDate": "2025-01-01",
     "endDate": "2025-04-30",
-    "vendorName": "供应商A"
+    "vendorName": "供应商A",
+    "createdAt": "2024-12-20T09:30:00.123456"
   },
   "amortizationPeriod": "2025-01",
   "accountingPeriod": "2025-01",
   "amount": 1000.00,
   "periodDate": "2025-01-01",
   "paymentStatus": "PENDING",
+  "paymentDate": null,
   "createdAt": "2024-12-24T14:30:52",
   "updatedAt": "2024-12-24T14:30:52",
   "createdBy": "system",
   "updatedBy": "system"
 }
+```
+
+### 合同字段说明
+- **id**: 合同ID
+- **totalAmount**: 合同总金额
+- **startDate**: 合同开始日期（格式 yyyy-MM-dd）
+- **endDate**: 合同结束日期（格式 yyyy-MM-dd）
+- **vendorName**: 供应商名称
+- **createdAt**: 合同创建时间（格式 yyyy-MM-ddTHH:mm:ss.SSSSSS）
+
+### 摊销明细字段说明
+- **id**: 摊销明细ID
+- **amortizationPeriod**: 预提/摊销期间，格式 yyyy-MM
+- **accountingPeriod**: 入账期间，格式 yyyy-MM
+- **amount**: 预提/摊销金额
+- **periodDate**: 期间日期（月份第一天）
+- **paymentStatus**: 付款状态
+  - `PENDING`: 待付款
+  - `COMPLETED`: 已完成
+- **paymentDate**: 支付时间（格式 yyyy-MM-dd）
+  - 当 `paymentStatus` 为 `COMPLETED` 时，该字段有值，表示实际支付日期
+  - 当 `paymentStatus` 为 `PENDING` 时，该字段为 `null`
+- **createdAt**: 创建时间
+- **updatedAt**: 更新时间
+- **createdBy**: 创建人
+- **updatedBy**: 更新人
+
+```
 ```
 
 ## 业务逻辑

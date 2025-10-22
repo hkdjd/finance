@@ -82,6 +82,10 @@ export const getMockContractsListPaginated = (
 export const getMockContractUploadResponse = (fileName: string): ContractUploadResponse => {
   const timestamp = new Date().toISOString();
   const randomId = Math.floor(Math.random() * 10000) + 1;
+  const year = new Date().getFullYear();
+  const month = String(new Date().getMonth() + 1).padStart(2, '0');
+  const fileNameWithoutExt = fileName.split('.')[0];
+  const uniqueFileName = `contract_${Date.now()}_${Math.random().toString(36).substring(7)}.pdf`;
   
   return {
     contractId: randomId,
@@ -89,10 +93,16 @@ export const getMockContractUploadResponse = (fileName: string): ContractUploadR
     startDate: '2024-01-01',
     endDate: '2024-06-30',
     taxRate: 0.06,
-    vendorName: `测试供应商_${fileName.split('.')[0]}`,
-    attachmentName: fileName,
+    vendorName: `测试供应商_${fileNameWithoutExt}`,
+    attachmentName: uniqueFileName,
+    attachmentPath: ``,
     createdAt: timestamp,
     message: '合同上传和解析成功',
+    customFields: {
+      '法人': '张三',
+      '项目名称': '测试项目',
+      '合同编号': `HT-${year}-${String(randomId).padStart(3, '0')}`
+    }
   };
 };
 
@@ -608,6 +618,11 @@ export const getMockUpdateContractResponse = (
   const attachmentName = contract?.attachmentName || `contract_${new Date().getTime()}.pdf`;
   const createdAt = contract?.createdAt || new Date().toISOString();
   
+  // 从附件名生成路径
+  const year = new Date(request.startDate).getFullYear();
+  const month = String(new Date(request.startDate).getMonth() + 1).padStart(2, '0');
+  const attachmentPath = `/uploads/contracts/${year}/${month}/${attachmentName}`;
+  
   return {
     contractId,
     totalAmount: request.totalAmount,
@@ -616,7 +631,9 @@ export const getMockUpdateContractResponse = (
     taxRate: request.taxRate,
     vendorName: request.vendorName,
     attachmentName,
+    attachmentPath,
     createdAt,
     message: '合同信息更新成功',
+    customFields: request.customFields
   };
 };

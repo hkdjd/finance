@@ -1,14 +1,16 @@
 import React from 'react';
 import { Menu } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UnorderedListOutlined } from '@ant-design/icons';
+import { UnorderedListOutlined, BarChartOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import { useNavigationGuard } from '../../contexts/NavigationGuardContext';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
 const AppMenu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { checkNavigation } = useNavigationGuard();
 
   // 检查是否已登录
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -20,14 +22,21 @@ const AppMenu: React.FC = () => {
       icon: <UnorderedListOutlined />,
       label: '合同列表',
     },
+    {
+      key: '/reports',
+      icon: <BarChartOutlined />,
+      label: '财务报表',
+    },
   ];
 
   // 根据当前路径确定选中的菜单项
-  const selectedKey = location.pathname === '/page-a' ? '/page-a' : '';
+  const selectedKey = location.pathname === '/page-a' ? '/page-a' : location.pathname === '/reports' ? '/reports' : '';
 
   // 菜单点击处理
   const handleMenuClick: MenuProps['onClick'] = (e) => {
-    navigate(e.key);
+    checkNavigation(() => {
+      navigate(e.key);
+    });
   };
 
   // 如果未登录，不显示菜单

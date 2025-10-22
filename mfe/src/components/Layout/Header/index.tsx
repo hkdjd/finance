@@ -3,6 +3,7 @@ import { Layout, Typography, Button, Dropdown, Avatar, Space, message } from 'an
 import { useNavigate } from 'react-router-dom';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import AppMenu from '../../Menu';
+import { useNavigationGuard } from '../../../contexts/NavigationGuardContext';
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -14,6 +15,8 @@ const AppHeader: React.FC = () => {
   const username = localStorage.getItem('username') || '用户';
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
+  const { checkNavigation } = useNavigationGuard();
+  
   const headerStyle: React.CSSProperties = {
     backgroundColor: 'rgb(235 235 230 / 50%)',
     display: 'flex',

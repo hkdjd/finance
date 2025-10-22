@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * 合同编辑请求
@@ -28,4 +29,10 @@ public class ContractEditRequest {
     
     @NotBlank(message = "供应商名称不能为空")
     private String vendorName;
+    
+    /**
+     * 自定义字段（可选）
+     * 用于更新合同的自定义字段信息
+     */
+    private Map<String, String> customFields;
 }

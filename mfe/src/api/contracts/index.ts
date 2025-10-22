@@ -23,7 +23,7 @@ import {
 } from './mock';
 
 // 是否使用 Mock 数据 - 生产环境关闭 Mock
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 
 /**
@@ -69,9 +69,13 @@ export const getContractsList = async (
 /**
  * 上传合同文件
  * @param file 合同文件
+ * @param userId 用户ID（可选），用于获取该用户的自定义关键字
  * @returns 合同上传响应
  */
-export const uploadContract = async (file: File): Promise<ContractUploadResponse> => {
+export const uploadContract = async (
+  file: File,
+  userId?: number
+): Promise<ContractUploadResponse> => {
   if (USE_MOCK) {
     // 模拟网络延迟（上传较慢）
     await new Promise((resolve) => setTimeout(resolve, 800));
@@ -81,6 +85,9 @@ export const uploadContract = async (file: File): Promise<ContractUploadResponse
   // 真实 API 调用
   const formData = new FormData();
   formData.append('file', file);
+  if (userId !== undefined) {
+    formData.append('userId', userId.toString());
+  }
 
   const response = await apiPost<ContractUploadResponse>(
     '/contracts/upload',

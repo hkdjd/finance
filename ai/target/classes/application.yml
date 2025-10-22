@@ -1,0 +1,159 @@
+server:
+  port: 8082
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: ocbc-finance-contract
+  
+  # 数据库配置
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  # H2控制台配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+    open-in-view: false
+  
+  # Flyway配置
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    clean-disabled: true
+    schemas: ocbc_finance_contract
+    default-schema: ocbc_finance_contract
+  
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+      enabled: true
+      file-size-threshold: 0
+      resolve-lazily: false
+  
+  # Jackson配置
+  jackson:
+    time-zone: Asia/Singapore
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# 日志配置
+logging:
+  level:
+    com.ocbc.finance: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    # 完全禁用PDFBox和FontBox相关的所有日志
+    org.apache.pdfbox: OFF
+    org.apache.fontbox: OFF
+    org.apache.pdfbox.pdmodel.font: OFF
+    org.apache.pdfbox.pdmodel.font.FileSystemFontProvider: OFF
+    org.apache.pdfbox.pdmodel.font.FontMapperImpl: OFF
+    org.apache.pdfbox.pdmodel.font.PDFontFactory: OFF
+    org.apache.fontbox.ttf: OFF
+    org.apache.fontbox.ttf.CmapSubtable: OFF
+    org.apache.fontbox.ttf.GlyphSubstitutionTable: OFF
+    org.apache.fontbox.ttf.TTFParser: OFF
+    org.apache.fontbox.ttf.TrueTypeFont: OFF
+    org.apache.fontbox.ttf.TrueTypeCollection: OFF
+    org.apache.fontbox.ttf.TTFDataStream: OFF
+    org.apache.fontbox.ttf.GlyphTable: OFF
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/finance-contract.log
+
+# 应用自定义配置
+app:
+  # AI服务配置
+  ai:
+    # 选择使用的AI服务: deepseek, gemini, gemma3, none (none表示只使用正则表达式)
+    provider: deepseek
+    
+  # DeepSeek AI配置（默认）
+  deepseek:
+    api-key: sk-df788d28f7944934a7c34ea1b9ae3796
+    api-url: https://api.deepseek.com/chat/completions
+    model: deepseek-chat
+    timeout: 30000
+    enabled: true
+    
+  # Gemini AI配置
+  gemini:
+    api-key: AIzaSyD1SoQGUi3QFRupm8_E27C3bEJumQX7GSQ
+    api-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    model: gemini-2.0-flash
+    timeout: 30000
+    enabled: false
+    
+  # Gemma3 AI配置
+  gemma3:
+    api-key: AIzaSyD1SoQGUi3QFRupm8_E27C3bEJumQX7GSQ
+    api-url: https://generativelanguage.googleapis.com/v1beta/models/gemma-2-27b-it:generateContent
+    model: gemma-2-27b-it
+    timeout: 30000
+    enabled: false
+  
+  # 文件处理配置
+  file:
+    upload-dir: /tmp/uploads
+    allowed-types: application/pdf
+  
+  # 业务配置
+  business:
+    default-currency: SGD
+    booking-day: 27
+    contract-status-check-interval: 3600000
+    
+  # 线程池配置
+  thread-pool:
+    pdf-processing:
+      core-pool-size: 2
+      max-pool-size: 5
+      queue-capacity: 10
+      keep-alive-seconds: 60
+    async-task:
+      core-pool-size: 4
+      max-pool-size: 10
+      queue-capacity: 20
+      keep-alive-seconds: 60
+    created-by: system

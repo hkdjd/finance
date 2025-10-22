@@ -8,6 +8,9 @@ import com.ocbc.finance.repository.AmortizationEntryRepository;
 import com.ocbc.finance.repository.ContractRepository;
 import com.ocbc.finance.repository.PaymentRepository;
 import com.ocbc.finance.service.calculation.AmortizationCalculationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +35,7 @@ public class ContractService {
     private final FileUploadService fileUploadService;
     private final ExternalContractParseService externalContractParseService;
     private final CustomKeywordService customKeywordService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ContractService(ContractRepository contractRepository,
                            AmortizationEntryRepository amortizationEntryRepository,
@@ -172,22 +176,51 @@ public class ContractService {
             
             // 使用AI解析结果
             if (parseResponse.isSuccess()) {
-                contract.setTotalAmount(parseResponse.getTotalAmount());
-                contract.setStartDate(LocalDate.parse(parseResponse.getStartDate()));
-                contract.setEndDate(LocalDate.parse(parseResponse.getEndDate()));
-                contract.setVendorName(parseResponse.getVendorName());
-                contract.setTaxRate(parseResponse.getTaxRate());
+                contract.setTotalAmount(parseResponse.getTotalAmount() != null ? parseResponse.getTotalAmount() : BigDecimal.ZERO);
+                
+                // 安全解析日期，如果为null则使用默认值
+                if (parseResponse.getStartDate() != null && !parseResponse.getStartDate().trim().isEmpty()) {
+                    try {
+                        contract.setStartDate(LocalDate.parse(parseResponse.getStartDate()));
+                    } catch (Exception e) {
+                        contract.setStartDate(LocalDate.now());
+                    }
+                } else {
+                    contract.setStartDate(LocalDate.now());
+                }
+                
+                if (parseResponse.getEndDate() != null && !parseResponse.getEndDate().trim().isEmpty()) {
+                    try {
+                        contract.setEndDate(LocalDate.parse(parseResponse.getEndDate()));
+                    } catch (Exception e) {
+                        contract.setEndDate(LocalDate.now().plusMonths(12));
+                    }
+                } else {
+                    contract.setEndDate(LocalDate.now().plusMonths(12));
+                }
+                
+                contract.setVendorName(parseResponse.getVendorName() != null ? parseResponse.getVendorName() : "未知供应商");
+                contract.setTaxRate(parseResponse.getTaxRate() != null ? parseResponse.getTaxRate() : BigDecimal.ZERO);
             } else {
                 // 解析失败，使用默认值
                 contract.setTotalAmount(BigDecimal.ZERO);
                 contract.setStartDate(LocalDate.now());
-                contract.setEndDate(LocalDate.now().plusMonths(1));
+                contract.setEndDate(LocalDate.now().plusMonths(12));
                 contract.setVendorName("未知供应商");
                 contract.setTaxRate(BigDecimal.ZERO);
             }
             
             // 在数据库中保存原始文件名，便于显示
             contract.setAttachmentName(file.getOriginalFilename());
+            
+            // 设置文件路径（完整路径）
+            String fullFilePath = fileUploadService.getContractFile(savedFileName).getAbsolutePath();
+            contract.setFilePath(fullFilePath);
+            
+            // 保存自定义字段到数据库
+            if (parseResponse.getCustomFields() != null && !parseResponse.getCustomFields().isEmpty()) {
+                contract.setCustomFieldsJson(mapToJson(parseResponse.getCustomFields()));
+            }
             
             contract = contractRepository.save(contract);
             
@@ -200,6 +233,9 @@ public class ContractService {
             response.setVendorName(contract.getVendorName());
             response.setTaxRate(contract.getTaxRate());
             response.setAttachmentName(file.getOriginalFilename());
+            // 设置attachmentPath为完整的下载URL
+            String downloadUrl = "http://localhost:8081/contracts/" + contract.getId() + "/attachment?download=true";
+            response.setAttachmentPath(downloadUrl);
             
             // 如果有自定义字段结果，也返回给前端
             if (parseResponse.getCustomFields() != null && !parseResponse.getCustomFields().isEmpty()) {
@@ -231,6 +267,11 @@ public class ContractService {
         contract.setVendorName(request.getVendorName());
         contract.setTaxRate(request.getTaxRate());
         
+        // 更新自定义字段
+        if (request.getCustomFields() != null) {
+            contract.setCustomFieldsJson(mapToJson(request.getCustomFields()));
+        }
+        
         contract = contractRepository.save(contract);
         
         // 构建响应
@@ -242,8 +283,14 @@ public class ContractService {
         response.setVendorName(contract.getVendorName());
         response.setTaxRate(contract.getTaxRate());
         response.setAttachmentName(contract.getAttachmentName());
+        response.setAttachmentPath(contract.getFilePath());
         response.setCreatedAt(java.time.OffsetDateTime.now());
         response.setMessage("合同信息更新成功");
+        
+        // 返回自定义字段
+        if (contract.getCustomFieldsJson() != null) {
+            response.setCustomFields(jsonToMap(contract.getCustomFieldsJson()));
+        }
         
         return response;
     }
@@ -263,8 +310,14 @@ public class ContractService {
         response.setVendorName(contract.getVendorName());
         response.setTaxRate(contract.getTaxRate());
         response.setAttachmentName(contract.getAttachmentName());
+        response.setAttachmentPath(contract.getFilePath());
         response.setCreatedAt(java.time.OffsetDateTime.now());
         response.setMessage("查询成功");
+        
+        // 读取并返回自定义字段
+        if (contract.getCustomFieldsJson() != null) {
+            response.setCustomFields(jsonToMap(contract.getCustomFieldsJson()));
+        }
         
         return response;
     }
@@ -320,5 +373,33 @@ public class ContractService {
         System.out.println("转换合同摘要 - ID: " + contract.getId() + ", 供应商: " + contract.getVendorName());
         
         return summary;
+    }
+    
+    /**
+     * 将Map转换为JSON字符串
+     */
+    private String mapToJson(Map<String, String> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("转换自定义字段为JSON失败", e);
+        }
+    }
+    
+    /**
+     * 将JSON字符串转换为Map
+     */
+    private Map<String, String> jsonToMap(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("解析自定义字段JSON失败", e);
+        }
     }
 }

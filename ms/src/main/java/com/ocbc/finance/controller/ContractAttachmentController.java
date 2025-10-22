@@ -48,7 +48,7 @@ public class ContractAttachmentController {
     }
 
     /**
-     * 下载附件文件
+     * 下载附件文件（在浏览器中直接打开）
      */
     private ResponseEntity<Resource> downloadAttachmentFile(Long contractId) throws IOException {
         ContractAttachmentService.AttachmentFile attachmentFile = contractAttachmentService.getAttachmentFile(contractId);
@@ -60,7 +60,8 @@ public class ContractAttachmentController {
         // 设置文件名，支持中文
         String encodedFileName = URLEncoder.encode(attachmentFile.getFileName(), StandardCharsets.UTF_8)
                 .replaceAll("\\+", "%20");
-        headers.setContentDispositionFormData("attachment", encodedFileName);
+        // 使用 inline 而不是 attachment，让浏览器直接打开文件而不是下载
+        headers.setContentDispositionFormData("inline", encodedFileName);
         
         return ResponseEntity.ok()
                 .headers(headers)

@@ -136,7 +136,7 @@ public class CustomKeywordService {
     }
     
     /**
-     * 批量创建自定义关键字
+     * 批量设置自定义关键字（先删除用户所有关键字，再批量插入）
      *
      * @param userId   用户ID
      * @param keywords 关键字列表
@@ -144,14 +144,14 @@ public class CustomKeywordService {
      */
     @Transactional
     public List<CustomKeywordResponse> batchCreateKeywords(Long userId, List<String> keywords) {
-        log.info("批量创建自定义关键字: userId={}, count={}", userId, keywords.size());
+        log.info("批量设置自定义关键字: userId={}, count={}", userId, keywords.size());
         
+        // 1. 先删除该用户的所有关键字
+        customKeywordRepository.deleteByUserId(userId);
+        log.info("已删除用户{}的所有关键字", userId);
+        
+        // 2. 批量插入新的关键字
         List<CustomKeyword> customKeywords = keywords.stream()
-                .filter(keyword -> {
-                    // 过滤已存在的关键字
-                    CustomKeyword existing = customKeywordRepository.findByUserIdAndKeyword(userId, keyword);
-                    return existing == null;
-                })
                 .map(keyword -> {
                     CustomKeyword customKeyword = new CustomKeyword();
                     customKeyword.setUserId(userId);
@@ -161,7 +161,7 @@ public class CustomKeywordService {
                 .collect(Collectors.toList());
         
         List<CustomKeyword> saved = customKeywordRepository.saveAll(customKeywords);
-        log.info("批量创建完成: 成功创建{}个关键字", saved.size());
+        log.info("批量设置完成: 成功创建{}个关键字", saved.size());
         
         return saved.stream()
                 .map(this::convertToResponse)
