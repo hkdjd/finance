@@ -10,7 +10,7 @@ const ContractDetail: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('timeline');
   
-  // 支付弹窗相关状态
+  // 支付弹窗相关状态 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentEditRecord, setCurrentEditRecord] = useState<ContractAmortizationEntry | null>(null);
   const [newAmount, setNewAmount] = useState<number | null>(null);
