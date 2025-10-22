@@ -10,6 +10,9 @@ const AppMenu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 检查是否已登录
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
   // 菜单项配置
   const items: MenuItem[] = [
     {
@@ -26,6 +29,11 @@ const AppMenu: React.FC = () => {
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     navigate(e.key);
   };
+
+  // 如果未登录，不显示菜单
+  if (!isLoggedIn) {
+    return null;
+  }
 
   return (
     <Menu
