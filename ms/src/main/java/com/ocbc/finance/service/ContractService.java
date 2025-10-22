@@ -242,6 +242,7 @@ public class ContractService {
         response.setVendorName(contract.getVendorName());
         response.setTaxRate(contract.getTaxRate());
         response.setAttachmentName(contract.getAttachmentName());
+        response.setAttachmentPath(contract.getFilePath());
         response.setCreatedAt(java.time.OffsetDateTime.now());
         response.setMessage("合同信息更新成功");
         
@@ -263,6 +264,7 @@ public class ContractService {
         response.setVendorName(contract.getVendorName());
         response.setTaxRate(contract.getTaxRate());
         response.setAttachmentName(contract.getAttachmentName());
+        response.setAttachmentPath(contract.getFilePath());
         response.setCreatedAt(java.time.OffsetDateTime.now());
         response.setMessage("查询成功");
         

@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS contracts (
     vendor_name VARCHAR(255) NOT NULL COMMENT '供应商名称',
     tax_rate NUMERIC(5,4) NOT NULL COMMENT '税率',
     attachment_name VARCHAR(500) COMMENT '合同附件名称',
+    file_path VARCHAR(1000) COMMENT '合同附件存放路径',
+    original_file_name VARCHAR(500) COMMENT '原始文件名',
     
     -- 审计字段
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -36,6 +38,8 @@ COMMENT ON COLUMN contracts.end_date IS '合同结束日期';
 COMMENT ON COLUMN contracts.vendor_name IS '供应商名称';
 COMMENT ON COLUMN contracts.tax_rate IS '税率';
 COMMENT ON COLUMN contracts.attachment_name IS '合同附件名称';
+COMMENT ON COLUMN contracts.file_path IS '合同附件存放路径';
+COMMENT ON COLUMN contracts.original_file_name IS '原始文件名';
 COMMENT ON COLUMN contracts.created_at IS '创建时间';
 COMMENT ON COLUMN contracts.updated_at IS '更新时间';
 COMMENT ON COLUMN contracts.created_by IS '创建人';

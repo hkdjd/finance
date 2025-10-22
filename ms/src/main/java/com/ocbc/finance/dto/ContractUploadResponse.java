@@ -33,6 +33,9 @@ public class ContractUploadResponse {
     /** 合同附件名称 */
     private String attachmentName;
     
+    /** 合同附件存放路径 */
+    private String attachmentPath;
+    
     /** 创建时间 */
     private OffsetDateTime createdAt;
     
