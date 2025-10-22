@@ -171,6 +171,8 @@ export interface ContractAmortizationEntry {
   createdBy: string;
   /** 更新人 */
   updatedBy: string;
+  /** 支付时间 */
+  paymentDate?: string;
 }
 
 /**
@@ -211,6 +213,8 @@ export interface PaymentExecuteRequest {
   bookingDate: string;
   /** 选中的账期 */
   selectedPeriods: number[];
+  /** 支付时间 */
+  paymentDate?: string;
 }
 
 /**

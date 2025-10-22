@@ -1,0 +1,60 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ocbc-finance-contract-demo
+  
+  # H2 内存数据库配置
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  
+  # H2 控制台配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+    open-in-view: false
+  
+  # 禁用Flyway
+  flyway:
+    enabled: false
+
+# 日志配置
+logging:
+  level:
+    com.ocbc.finance: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    # 禁用PDFBox日志
+    org.apache.pdfbox: OFF
+    org.apache.fontbox: OFF
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# 应用自定义配置
+app:
+  ai:
+    provider: none
+  file:
+    upload-dir: /tmp/uploads
+    allowed-types: application/pdf
+  business:
+    default-currency: SGD
+    booking-day: 27

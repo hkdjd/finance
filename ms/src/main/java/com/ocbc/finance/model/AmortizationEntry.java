@@ -36,6 +36,9 @@ public class AmortizationEntry extends BaseAuditEntity {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
+    @Column(name = "payment_date")
+    private LocalDate paymentDate; // 支付时间，仅在已支付时有值
+
     public enum PaymentStatus {
         PENDING,    // 待付款
         COMPLETED   // 已完成
@@ -68,6 +71,10 @@ public class AmortizationEntry extends BaseAuditEntity {
             this.paidAmount = (this.paidAmount != null ? this.paidAmount : BigDecimal.ZERO).add(paymentAmount);
             // 任何付款都将状态设置为已完成（包括不足付款）
             this.paymentStatus = PaymentStatus.COMPLETED;
+            // 设置支付时间为当前日期
+            if (this.paymentDate == null) {
+                this.paymentDate = LocalDate.now();
+            }
         }
     }
     
