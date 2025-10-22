@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    
+    <!-- 定义日志输出格式 -->
+    <property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+    
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <!-- 添加PDF日志过滤器 -->
+        <filter class="com.ocbc.finance.config.PDFLogFilter"/>
+    </appender>
+    
+    <!-- 文件输出 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/finance-contract.log</file>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/finance-contract.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <!-- 添加PDF日志过滤器 -->
+        <filter class="com.ocbc.finance.config.PDFLogFilter"/>
+    </appender>
+    
+    <!-- 完全禁用PDFBox和FontBox相关的所有日志 -->
+    <logger name="org.apache.pdfbox" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox" level="OFF" additivity="false"/>
+    <logger name="org.apache.pdfbox.pdmodel.font" level="OFF" additivity="false"/>
+    <logger name="org.apache.pdfbox.pdmodel.font.FileSystemFontProvider" level="OFF" additivity="false"/>
+    <logger name="org.apache.pdfbox.pdmodel.font.FontMapperImpl" level="OFF" additivity="false"/>
+    <logger name="org.apache.pdfbox.pdmodel.font.PDFontFactory" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf.CmapSubtable" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf.GlyphSubstitutionTable" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf.TTFParser" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf.TrueTypeFont" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf.TrueTypeCollection" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf.TTFDataStream" level="OFF" additivity="false"/>
+    <logger name="org.apache.fontbox.ttf.GlyphTable" level="OFF" additivity="false"/>
+    
+    <!-- 应用程序日志级别 -->
+    <logger name="com.ocbc.finance" level="INFO"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+    
+    <!-- 根日志级别 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+    
+</configuration>

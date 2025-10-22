@@ -120,10 +120,20 @@
   color: #999;
 }
 
-/* 区域B - 合同列表区域 */
+/* 区域B - 财务报表概览 */
+.reportsArea {
+  width: 80%;
+  margin: 30px auto 0;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 区域C - 合同列表区域 */
 .contractTableArea {
   width: 80%;
-  margin: 40px auto 0;
+  margin: 20px auto 0;
   padding: 10px;
   background-color: #ffffff;
   border-radius: 8px;
@@ -193,6 +203,7 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
   .uploadArea,
+  .reportsArea,
   .contractTableArea {
     width: 95%;
     margin-left: auto;
