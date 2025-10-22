@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
 import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
@@ -7,6 +8,8 @@ import dayjs from 'dayjs';
 const { Title, Text } = Typography;
 
 const ContractDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [contractData, setContractData] = useState<ContractAmortizationResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('timeline');
@@ -20,6 +23,7 @@ const ContractDetail: React.FC = () => {
   // 批量编辑弹窗相关状态
   const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
   const [batchNewAmount, setBatchNewAmount] = useState<number | null>(null);
+  const [batchPaymentDate, setBatchPaymentDate] = useState<dayjs.Dayjs | null>(null);
   
   // 多选相关状态
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -43,11 +47,21 @@ const ContractDetail: React.FC = () => {
   // 是否为初始加载
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // 占位：后续从路由参数获取真实contractId
-  const contractId = 1;
+  // 从路由参数获取contractId
+  const contractId = id ? parseInt(id, 10) : null;
+
+  // 验证contractId
+  useEffect(() => {
+    if (!contractId || isNaN(contractId)) {
+      message.error('无效的合同ID');
+      navigate('/page-a');
+    }
+  }, [contractId, navigate]);
 
   // 获取合同摊销明细数据
   const fetchContractData = async () => {
+    if (!contractId) return;
+    
     setLoading(true);
     try {
       const response = await getContractAmortizationEntries(contractId);
@@ -63,6 +77,8 @@ const ContractDetail: React.FC = () => {
 
   // 获取预提会计分录预览数据
   const fetchJournalEntriesPreview = async () => {
+    if (!contractId) return;
+    
     setJournalEntriesLoading(true);
     try {
       const response = await getJournalEntriesPreview({
@@ -80,6 +96,8 @@ const ContractDetail: React.FC = () => {
 
   // 获取付款会计分录数据（实际执行后的分录）
   const fetchPaymentJournalEntries = async () => {
+    if (!contractId) return;
+    
     setPaymentJournalEntriesLoading(true);
     try {
       // 使用API客户端调用后端获取合同的实际付款记录及其会计分录
@@ -172,6 +190,8 @@ const ContractDetail: React.FC = () => {
 
   // 确认支付
   const handleConfirmEdit = async () => {
+    if (!contractId) return;
+    
     if (!currentEditRecord || newAmount === null) {
       message.warning('请输入有效金额');
       return;
@@ -298,13 +318,21 @@ const ContractDetail: React.FC = () => {
     }
     
     setBatchNewAmount(null);
+    setBatchPaymentDate(dayjs()); // 默认为当天
     setIsBatchModalVisible(true);
   };
 
   // 确认批量支付
   const handleConfirmBatchEdit = async () => {
+    if (!contractId) return;
+    
     if (batchNewAmount === null) {
       message.warning('请输入有效金额');
+      return;
+    }
+
+    if (!batchPaymentDate) {
+      message.warning('请选择支付时间');
       return;
     }
 
@@ -347,7 +375,7 @@ const ContractDetail: React.FC = () => {
         contractId,
         paymentAmount: batchNewAmount,
         selectedPeriods: validRecords.map(record => record.id), // 只提交有效的期次
-        paymentDate: new Date().toISOString().replace('T', ' ').substring(0, 19) // 当前时间 YYYY-MM-DD HH:mm:ss
+        paymentDate: batchPaymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
       };
 
       // 调用支付接口
@@ -362,6 +390,7 @@ const ContractDetail: React.FC = () => {
       // 关闭弹窗并重置状态
       setIsBatchModalVisible(false);
       setBatchNewAmount(null);
+      setBatchPaymentDate(null);
       setSelectedRowKeys([]); // 清空选择
       
       // 添加短暂延迟确保后端数据已更新
@@ -399,6 +428,7 @@ const ContractDetail: React.FC = () => {
   const handleCancelBatchEdit = () => {
     setIsBatchModalVisible(false);
     setBatchNewAmount(null);
+    setBatchPaymentDate(null);
   };
 
   // 获取选中的记录
@@ -1573,6 +1603,20 @@ const ContractDetail: React.FC = () => {
                 max={999999999}
                 prefix="¥"
                 placeholder="请输入批量支付金额（将应用到所有选中项）"
+              />
+            </div>
+            <div>
+              <Text style={{ display: 'block', marginBottom: '8px' }}>
+                <strong>支付时间：</strong>
+              </Text>
+              <DatePicker
+                style={{ width: '100%' }}
+                value={batchPaymentDate}
+                onChange={(date) => setBatchPaymentDate(date)}
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="请选择支付时间"
+                size="large"
               />
             </div>
           </Space>
