@@ -2,6 +2,7 @@ package com.ocbc.finance.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -14,6 +15,7 @@ public class AmortizationUpdateRequest {
     private Long contractId;
     
     @NotEmpty(message = "摊销明细列表不能为空")
+    @Valid
     private List<AmortizationEntryData> amortization;
     
     public AmortizationUpdateRequest() {}
@@ -95,7 +97,13 @@ public class AmortizationUpdateRequest {
         }
         
         public void setPeriodDate(String periodDate) {
-            this.periodDate = periodDate;
+            // 智能处理日期格式：支持 yyyy-MM 和 yyyy-MM-dd
+            if (periodDate != null && periodDate.length() == 7) {
+                // yyyy-MM 格式，转换为该月的第一天
+                this.periodDate = periodDate + "-01";
+            } else {
+                this.periodDate = periodDate;
+            }
         }
         
         public String getPaymentStatus() {

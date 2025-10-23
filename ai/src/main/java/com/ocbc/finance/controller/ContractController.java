@@ -38,12 +38,13 @@ public class ContractController {
     @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<ContractUploadResponse>> uploadContract(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("createdBy") String createdBy) {
+            @RequestParam("createdBy") String createdBy,
+            @RequestParam(value = "customFields", required = false) java.util.List<String> customFields) {
         
-        log.info("上传合同文件: {}, 创建者: {}", file.getOriginalFilename(), createdBy);
+        log.info("上传合同文件: {}, 创建者: {}, 自定义字段: {}", file.getOriginalFilename(), createdBy, customFields);
         
         try {
-            ContractUploadResponse result = contractService.uploadContract(file, createdBy);
+            ContractUploadResponse result = contractService.uploadContract(file, createdBy, customFields);
             
             // 设置响应头，确保正确的内容类型和编码
             HttpHeaders headers = new HttpHeaders();

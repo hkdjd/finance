@@ -6,7 +6,24 @@
 - **Description**: 摊销明细更新接口，支持增删改操作（根据amortization列表里子项的id来判定每条数据的操作：若request的id为null，则新增；若request的id与数据库中的id一致，则更新；若数据库中存在的id在request中不存在，则删除）
 
 ## 请求参数
-请求格式与列表接口响应格式保持一致，包含合同ID和该合同所有摊销明细的完整信息：
+请求格式与列表接口响应格式保持一致，包含合同ID和该合同所有摊销明细的完整信息。
+
+### 字段说明
+
+| 字段名 | 类型 | 建议格式 | 示例 |
+|--------|------|----------|------|
+| amortizationPeriod | String | yyyy-MM | 2025-01 |
+| accountingPeriod | String | yyyy-MM | 2025-01 |
+| periodDate | String | yyyy-MM 或 yyyy-MM-dd | 2025-01 或 2025-01-01 |
+| createdAt | String | yyyy-MM-ddTHH:mm:ss.SSSSSS | 2024-12-24T14:30:52.123456 |
+| updatedAt | String | yyyy-MM-ddTHH:mm:ss.SSSSSS | 2024-12-24T14:30:52.123456 |
+
+**注意事项：**
+- 日期字段没有格式和长度校验，由业务层处理
+- `periodDate` 字段支持两种格式：yyyy-MM（自动转换为该月第一天）或 yyyy-MM-dd
+- 时间戳字段建议包含微秒部分以保证精度
+
+### 请求示例
 
 ```json
 {
@@ -74,7 +91,11 @@
     "totalAmount": 4000.00,
     "startDate": "2025-01-01",
     "endDate": "2025-04-30",
-    "vendorName": "供应商A"
+    "vendorName": "供应商A",
+    "customFields": {
+      "法定代表人": "张明",
+      "项目经理": "李华"
+    }
   },
   "amortization": [
     {
@@ -122,6 +143,19 @@
 - 摊销明细不存在：400 Bad Request "未找到摊销明细，ID=xxx"
 - 请求格式错误：400 Bad Request
 - 数据验证失败：400 Bad Request
+- 合同ID不能为空：400 Bad Request "合同ID不能为空"
+- 摊销明细列表不能为空：400 Bad Request "摊销明细列表不能为空"
+
+### 错误响应示例
+```json
+{
+  "timestamp": "2024-12-25T10:30:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "未找到合同，ID=123",
+  "path": "/amortization-entries/operate"
+}
+```
 
 ## 前端集成建议
 

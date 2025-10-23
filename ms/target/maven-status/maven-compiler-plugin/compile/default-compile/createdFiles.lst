@@ -8,6 +8,7 @@ com/ocbc/finance/model/JournalEntry.class
 com/ocbc/finance/repository/AmortizationEntryRepository.class
 com/ocbc/finance/controller/JournalEntryController$1.class
 com/ocbc/finance/dto/ContractAttachmentResponse.class
+com/ocbc/finance/constants/UserConstants.class
 com/ocbc/finance/dto/VendorDistributionResponse$VendorDistributionItem.class
 com/ocbc/finance/dto/PaymentPreviewResponse.class
 com/ocbc/finance/dto/OperationRequest$OperationType.class
@@ -54,6 +55,7 @@ com/ocbc/finance/model/AmortizationEntry.class
 com/ocbc/finance/service/AmortizationEntryService$1.class
 com/ocbc/finance/controller/HealthController.class
 com/ocbc/finance/service/FileUploadService.class
+com/ocbc/finance/dto/AmortizationListResponse$ContractInfo$1.class
 com/ocbc/finance/service/JournalEntryService$1.class
 com/ocbc/finance/controller/CustomKeywordController.class
 com/ocbc/finance/dto/AmortizationResponse$AmortizationResponseBuilder.class
