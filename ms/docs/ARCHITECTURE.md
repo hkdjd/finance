@@ -20,13 +20,14 @@ Finance是一个完整的财务应用系统，主要用于合同管理、摊销�
 - **特点**: 响应式设计，现代化UI组件
 
 ### 2. MS后端服务 (Port: 8081)
-- **技术栈**: Spring Boot + JPA + PostgreSQL
+- **技术栈**: Spring Boot + JPA + PostgreSQL + Swagger UI
 - **功能**:
   - RESTful API服务
   - 业务逻辑处理
   - Audit Log记录
   - 数据持久化
-- **特点**: 微服务架构，支持水平扩展
+  - Swagger UI API文档
+- **特点**: 微服务架构，支持水平扩展，完整的API文档
 
 ### 3. AI合同解析 (Port: 8082)
 - **技术栈**: Spring Boot + DeepSeek AI
@@ -99,6 +100,11 @@ Finance是一个完整的财务应用系统，主要用于合同管理、摊销�
 - `POST /amortization-entries/operate` - 摊销明细操作
 - `GET /audit-logs/amortization-entry/{id}` - 查询审计日志
 
+### API文档
+- `GET /swagger-ui.html` - Swagger UI交互式文档界面
+- `GET /api-docs` - OpenAPI 3.0规范JSON文件
+- `GET /api-docs.html` - API文档导航页面
+
 ## 最新功能更新
 
 ### Audit Log审计日志功能
@@ -107,6 +113,13 @@ Finance是一个完整的财务应用系统，主要用于合同管理、摊销�
 - ✅ **前端界面**: 合同详情页显示audit log链接
 - ✅ **操作人记录**: 正确记录登录用户信息(如A5136589)
 - ✅ **历史追踪**: 完整的操作时间、金额、状态变更记录
+
+### Swagger UI API文档功能
+- ✅ **SpringDoc集成**: 使用SpringDoc OpenAPI 2.2.0版本
+- ✅ **交互式文档**: 完整的Swagger UI界面，支持在线测试
+- ✅ **中文支持**: 完整的中文API描述和参数说明
+- ✅ **分类管理**: 按功能模块分组（合同管理、审计日志等）
+- ✅ **标准规范**: 符合OpenAPI 3.0标准
 
 ### 技术特点
 - **自动化**: 付款操作时自动记录audit log

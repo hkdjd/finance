@@ -76,7 +76,7 @@ draw.text((650, 180), 'MS Backend Service', font=header_font, fill=colors['white
 draw.text((650, 210), 'Spring Boot + JPA', font=text_font, fill=colors['white'], anchor='mm')
 draw.text((650, 240), 'Port: 8081', font=small_font, fill=colors['white'], anchor='mm')
 draw.text((650, 270), '• RESTful API', font=small_font, fill=colors['white'], anchor='mm')
-draw.text((650, 290), '• Business Logic', font=small_font, fill=colors['white'], anchor='mm')
+draw.text((650, 290), '• Swagger UI Documentation', font=small_font, fill=colors['white'], anchor='mm')
 draw.text((650, 310), '• Audit Log Recording', font=small_font, fill=colors['white'], anchor='mm')
 
 # === AI模块 ===
@@ -173,7 +173,7 @@ draw.text((100, 990), '• Database: PostgreSQL (Local)', font=small_font, fill=
 
 draw.text((600, 900), 'Technology Stack:', font=text_font, fill=colors['text'], anchor='lm')
 draw.text((600, 930), '• Frontend: React + TypeScript + Ant Design', font=small_font, fill=colors['text'], anchor='lm')
-draw.text((600, 950), '• Backend: Spring Boot + JPA + PostgreSQL', font=small_font, fill=colors['text'], anchor='lm')
+draw.text((600, 950), '• Backend: Spring Boot + JPA + PostgreSQL + Swagger', font=small_font, fill=colors['text'], anchor='lm')
 draw.text((600, 970), '• AI: Spring Boot + External AI APIs', font=small_font, fill=colors['text'], anchor='lm')
 draw.text((600, 990), '• Database: PostgreSQL + Flyway Migration', font=small_font, fill=colors['text'], anchor='lm')
 
@@ -185,8 +185,9 @@ draw.text((1100, 970), '• Gemma3 Model Support', font=small_font, fill=colors[
 # 新增功能说明
 draw.text((100, 1050), 'Latest Features:', font=text_font, fill='#E31E24', anchor='lm')
 draw.text((100, 1080), '• Audit Log functionality implemented', font=small_font, fill='#E31E24', anchor='lm')
-draw.text((100, 1100), '• Payment operation history tracking', font=small_font, fill='#E31E24', anchor='lm')
-draw.text((100, 1120), '• Operator information correctly recorded', font=small_font, fill='#E31E24', anchor='lm')
+draw.text((100, 1100), '• Swagger UI API documentation integrated', font=small_font, fill='#E31E24', anchor='lm')
+draw.text((100, 1120), '• Payment operation history tracking', font=small_font, fill='#E31E24', anchor='lm')
+draw.text((100, 1140), '• Interactive API testing interface', font=small_font, fill='#E31E24', anchor='lm')
 
 # 保存图片
 output_path = '/Users/victor/Develop/code/ocbc/finance/finance-architecture-corrected.png'

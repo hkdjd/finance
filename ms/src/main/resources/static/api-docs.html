@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance API 文档导航</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .link-card {
+            display: block;
+            padding: 20px;
+            margin: 15px 0;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .link-card:hover {
+            background: #0056b3;
+            color: white;
+        }
+        .link-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .link-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 Finance财务应用系统 API文档</h1>
+        
+        <div class="info">
+            <strong>系统版本:</strong> v1.7<br>
+            <strong>服务端口:</strong> 8081<br>
+            <strong>文档更新:</strong> 2025-10-23
+        </div>
+
+        <a href="/swagger-ui.html" class="link-card">
+            <div class="link-title">📚 Swagger UI 接口文档</div>
+            <div class="link-desc">交互式API文档，支持在线测试接口功能</div>
+        </a>
+
+        <a href="/api-docs" class="link-card">
+            <div class="link-title">📄 OpenAPI JSON 规范</div>
+            <div class="link-desc">标准的OpenAPI 3.0格式API规范文件</div>
+        </a>
+
+        <a href="/health" class="link-card">
+            <div class="link-title">💚 系统健康检查</div>
+            <div class="link-desc">检查系统运行状态和服务可用性</div>
+        </a>
+
+        <div style="margin-top: 30px; text-align: center; color: #666;">
+            <p><strong>主要功能模块：</strong></p>
+            <p>合同管理 | 摊销计算 | 付款执行 | 审计日志 | 报表分析</p>
+        </div>
+    </div>
+</body>
+</html>

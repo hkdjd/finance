@@ -116,7 +116,7 @@ const Login: React.FC = () => {
       <Card className={styles.loginCard}>
         <div className={styles.loginHeader}>
           <Title level={2} style={{ color: '#b5120f', marginBottom: 8 }}>
-            会计功能管理系统
+            智合财管
           </Title>
           <Text type="secondary" style={{ fontSize: 16 }}>
             请登录您的账户

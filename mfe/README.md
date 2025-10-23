@@ -1,6 +1,6 @@
-# 会计功能管理系统
+# 智合财管
 
-一个基于 React + TypeScript + Ant Design 的会计功能管理系统，专门用于处理合同相关的会计业务。
+一个基于 React + TypeScript + Ant Design 的智合财管系统，专门用于处理合同相关的会计业务。
 
 ## 功能特性
 
