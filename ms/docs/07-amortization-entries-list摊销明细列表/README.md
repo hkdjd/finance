@@ -38,6 +38,10 @@
     "startDate": "2025-01-01",
     "endDate": "2025-04-30",
     "vendorName": "供应商A",
+    "taxRate": 0.06,
+    "attachmentName": "contract_20240124_143052_a1b2c3d4.pdf",
+    "attachmentPath": "http://localhost:8081/contracts/1/attachment?download=true",
+    "createdAt": "2024-12-20T09:30:00.123456",
     "customFields": {
       "法定代表人": "张明",
       "项目经理": "李华"
@@ -86,6 +90,9 @@
     "startDate": "2025-01-01",
     "endDate": "2025-04-30",
     "vendorName": "供应商A",
+    "taxRate": 0.06,
+    "attachmentName": "contract_20240124_143052_a1b2c3d4.pdf",
+    "attachmentPath": "http://localhost:8081/contracts/1/attachment?download=true",
     "createdAt": "2024-12-20T09:30:00.123456",
     "customFields": {
       "法定代表人": "张明",
@@ -111,6 +118,9 @@
 - **startDate**: 合同开始日期（格式 yyyy-MM-dd）
 - **endDate**: 合同结束日期（格式 yyyy-MM-dd）
 - **vendorName**: 供应商名称
+- **taxRate**: 税率（如：0.06 表示 6%）
+- **attachmentName**: 合同附件名称（如：contract_20240124_143052_a1b2c3d4.pdf）
+- **attachmentPath**: 合同附件下载路径（完整URL，如：http://localhost:8081/contracts/1/attachment?download=true）
 - **createdAt**: 合同创建时间（格式 yyyy-MM-ddTHH:mm:ss.SSSSSS）
 - **customFields**: 自定义字段（Map<String, String> 格式），包含AI提取或用户录入的自定义信息，如：
   ```json

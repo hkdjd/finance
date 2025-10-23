@@ -50,6 +50,9 @@ public class AmortizationListResponse {
         private String startDate;
         private String endDate;
         private String vendorName;
+        private Double taxRate;
+        private String attachmentName;
+        private String attachmentPath;
         private String createdAt;
         private Map<String, String> customFields; // 自定义字段（Map格式）
         
@@ -61,6 +64,11 @@ public class AmortizationListResponse {
             this.startDate = contract.getStartDate() != null ? contract.getStartDate().toString() : null;
             this.endDate = contract.getEndDate() != null ? contract.getEndDate().toString() : null;
             this.vendorName = contract.getVendorName();
+            this.taxRate = contract.getTaxRate() != null ? contract.getTaxRate().doubleValue() : null;
+            this.attachmentName = contract.getAttachmentName();
+            // 构造附件下载路径
+            this.attachmentPath = contract.getId() != null ? 
+                "http://localhost:8081/contracts/" + contract.getId() + "/attachment?download=true" : null;
             this.createdAt = contract.getCreatedAt() != null ? contract.getCreatedAt().toString() : null;
             
             // 解析 JSON 字符串为 Map
@@ -123,6 +131,30 @@ public class AmortizationListResponse {
         
         public void setVendorName(String vendorName) {
             this.vendorName = vendorName;
+        }
+        
+        public Double getTaxRate() {
+            return taxRate;
+        }
+        
+        public void setTaxRate(Double taxRate) {
+            this.taxRate = taxRate;
+        }
+        
+        public String getAttachmentName() {
+            return attachmentName;
+        }
+        
+        public void setAttachmentName(String attachmentName) {
+            this.attachmentName = attachmentName;
+        }
+        
+        public String getAttachmentPath() {
+            return attachmentPath;
+        }
+        
+        public void setAttachmentPath(String attachmentPath) {
+            this.attachmentPath = attachmentPath;
         }
         
         public String getCreatedAt() {
