@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker, Skeleton } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
+import { EyeOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
 import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
 import dayjs from 'dayjs';
@@ -48,6 +48,9 @@ const ContractDetail: React.FC = () => {
   // 预提会计分录筛选和排序状态
   const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>({});
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'entryOrder', order: 'asc' });
+  
+  // 合同基本信息折叠状态
+  const [isContractInfoExpanded, setIsContractInfoExpanded] = useState(true);
   
   // 是否为初始加载
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -1207,7 +1210,15 @@ const ContractDetail: React.FC = () => {
         border: '1px solid #E5E5E5',
         borderLeft: '4px solid #E31E24'
       }}>
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ 
+          marginBottom: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          cursor: 'pointer'
+        }}
+        onClick={() => setIsContractInfoExpanded(!isContractInfoExpanded)}
+        >
           <Text style={{ 
             color: '#1F2937', 
             fontSize: '16px',
@@ -1216,12 +1227,17 @@ const ContractDetail: React.FC = () => {
           }}>
             合同基本信息
           </Text>
+          {isContractInfoExpanded ? 
+            <UpOutlined style={{ color: '#6B7280', fontSize: '14px' }} /> : 
+            <DownOutlined style={{ color: '#6B7280', fontSize: '14px' }} />
+          }
         </div>
-        <Spin 
-          spinning={loading}
-          className="outlook-spin"
-        >
-          {contractData?.contract ? (
+        {isContractInfoExpanded && (
+          <Spin 
+            spinning={loading}
+            className="outlook-spin"
+          >
+            {contractData?.contract ? (
             <>
               {/* 紧凑型网格布局 - 四列横向排列 */}
               <div style={{ 
@@ -1459,7 +1475,8 @@ const ContractDetail: React.FC = () => {
               </Text>
             </div>
           )}
-        </Spin>
+          </Spin>
+        )}
       </div>
 
       {/* Tab页和数据表格 */}
