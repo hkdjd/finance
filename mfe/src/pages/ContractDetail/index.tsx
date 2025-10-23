@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
-import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords } from '../../api/contracts';
+import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
 import dayjs from 'dayjs';
 
@@ -46,6 +46,12 @@ const ContractDetail: React.FC = () => {
   
   // 是否为初始加载
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Audit Log 弹窗相关状态
+  const [isAuditLogModalVisible, setIsAuditLogModalVisible] = useState(false);
+  const [auditLogData, setAuditLogData] = useState<AuditLogResponse | null>(null);
+  const [auditLogLoading, setAuditLogLoading] = useState(false);
+  const [currentAuditEntryId, setCurrentAuditEntryId] = useState<number | null>(null);
 
   // 从路由参数获取contractId
   const contractId = id ? parseInt(id, 10) : null;
@@ -437,6 +443,30 @@ const ContractDetail: React.FC = () => {
     return contractData.amortization.filter(record => selectedRowKeys.includes(record.id));
   };
 
+  // 处理查看审计日志
+  const handleViewAuditLog = async (entryId: number) => {
+    setCurrentAuditEntryId(entryId);
+    setIsAuditLogModalVisible(true);
+    setAuditLogLoading(true);
+    
+    try {
+      const response = await getAuditLogsByAmortizationEntryId(entryId);
+      setAuditLogData(response);
+    } catch (error) {
+      message.error('获取审计日志失败');
+      console.error('获取审计日志失败:', error);
+    } finally {
+      setAuditLogLoading(false);
+    }
+  };
+
+  // 关闭审计日志弹窗
+  const handleCloseAuditLogModal = () => {
+    setIsAuditLogModalVisible(false);
+    setAuditLogData(null);
+    setCurrentAuditEntryId(null);
+  };
+
   // 多选处理
   const rowSelection = {
     selectedRowKeys,
@@ -533,48 +563,65 @@ const ContractDetail: React.FC = () => {
     { 
       title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>操作</span>, 
       key: 'action', 
-      width: 120, 
+      width: 180, 
       render: (_: any, record: ContractAmortizationEntry) => {
         const isCompleted = record.paymentStatus === 'COMPLETED' || record.paymentStatus === 'PAID';
         return (
-          <Button 
-            key={`${record.id}-${record.paymentStatus}-${Date.now()}`}
-            type={isCompleted ? "default" : "primary"}
-            size="small" 
-            disabled={isCompleted}
-            onClick={() => handleEditAmount(record)}
-            style={{
-              backgroundColor: isCompleted ? '#F3F4F6' : '#E31E24',
-              borderColor: isCompleted ? '#D1D5DB' : '#E31E24',
-              color: isCompleted ? '#9CA3AF' : '#FFFFFF',
-              fontWeight: '600',
-              fontSize: '13px',
-              borderRadius: '8px',
-              cursor: isCompleted ? 'not-allowed' : 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              if (!isCompleted) {
-                (e.target as HTMLElement).style.backgroundColor = '#C41E3A';
-                (e.target as HTMLElement).style.borderColor = '#C41E3A';
-              } else {
-                // 已完成状态保持灰色，不改变颜色
-                (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
-                (e.target as HTMLElement).style.borderColor = '#D1D5DB';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isCompleted) {
-                (e.target as HTMLElement).style.backgroundColor = '#E31E24';
-                (e.target as HTMLElement).style.borderColor = '#E31E24';
-              } else {
-                // 已完成状态保持灰色，不改变颜色
-                (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
-                (e.target as HTMLElement).style.borderColor = '#D1D5DB';
-              }
-            }}
-          >
-            {isCompleted ? '已完成' : '支付'}
-          </Button>
+          <Space size="small">
+            <Button 
+              key={`${record.id}-${record.paymentStatus}-${Date.now()}`}
+              type={isCompleted ? "default" : "primary"}
+              size="small" 
+              disabled={isCompleted}
+              onClick={() => handleEditAmount(record)}
+              style={{
+                backgroundColor: isCompleted ? '#F3F4F6' : '#E31E24',
+                borderColor: isCompleted ? '#D1D5DB' : '#E31E24',
+                color: isCompleted ? '#9CA3AF' : '#FFFFFF',
+                fontWeight: '600',
+                fontSize: '13px',
+                borderRadius: '8px',
+                cursor: isCompleted ? 'not-allowed' : 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                if (!isCompleted) {
+                  (e.target as HTMLElement).style.backgroundColor = '#C41E3A';
+                  (e.target as HTMLElement).style.borderColor = '#C41E3A';
+                } else {
+                  // 已完成状态保持灰色，不改变颜色
+                  (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
+                  (e.target as HTMLElement).style.borderColor = '#D1D5DB';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isCompleted) {
+                  (e.target as HTMLElement).style.backgroundColor = '#E31E24';
+                  (e.target as HTMLElement).style.borderColor = '#E31E24';
+                } else {
+                  // 已完成状态保持灰色，不改变颜色
+                  (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
+                  (e.target as HTMLElement).style.borderColor = '#D1D5DB';
+                }
+              }}
+            >
+              {isCompleted ? '已完成' : '支付'}
+            </Button>
+            {isCompleted && (
+              <Button
+                type="link"
+                size="small"
+                onClick={() => handleViewAuditLog(record.id)}
+                style={{
+                  color: '#1890ff',
+                  fontSize: '12px',
+                  padding: '0 4px',
+                  height: 'auto'
+                }}
+              >
+                audit log
+              </Button>
+            )}
+          </Space>
         );
       }
     },
@@ -1621,6 +1668,101 @@ const ContractDetail: React.FC = () => {
             </div>
           </Space>
         </div>
+      </Modal>
+
+      {/* Audit Log 弹窗 */}
+      <Modal
+        title={`审计日志 - 摊销明细 ID: ${currentAuditEntryId}`}
+        open={isAuditLogModalVisible}
+        onCancel={handleCloseAuditLogModal}
+        footer={[
+          <Button key="close" onClick={handleCloseAuditLogModal}>
+            关闭
+          </Button>
+        ]}
+        width={800}
+        style={{ top: 20 }}
+      >
+        <Spin spinning={auditLogLoading}>
+          {auditLogData && auditLogData.auditLogs.length > 0 ? (
+            <Table
+              dataSource={auditLogData.auditLogs}
+              rowKey="id"
+              pagination={false}
+              size="small"
+              scroll={{ x: 700 }}
+              columns={[
+                {
+                  title: '操作时间',
+                  dataIndex: 'operationTime',
+                  key: 'operationTime',
+                  width: 140,
+                  render: (time: string) => (
+                    <span style={{ fontSize: '12px' }}>{time}</span>
+                  )
+                },
+                {
+                  title: '操作类型',
+                  dataIndex: 'operationTypeDesc',
+                  key: 'operationTypeDesc',
+                  width: 80,
+                  render: (desc: string) => (
+                    <span style={{ fontSize: '12px', fontWeight: '500' }}>{desc}</span>
+                  )
+                },
+                {
+                  title: '操作人',
+                  dataIndex: 'operatorId',
+                  key: 'operatorId',
+                  width: 100,
+                  render: (id: string) => (
+                    <span style={{ fontSize: '12px' }}>{id}</span>
+                  )
+                },
+                {
+                  title: '付款金额',
+                  dataIndex: 'paymentAmount',
+                  key: 'paymentAmount',
+                  width: 100,
+                  render: (amount: number) => (
+                    <span style={{ fontSize: '12px', color: '#E31E24', fontWeight: '500' }}>
+                      {amount ? `¥${amount.toFixed(2)}` : '-'}
+                    </span>
+                  )
+                },
+                {
+                  title: '付款状态',
+                  dataIndex: 'paymentStatusDesc',
+                  key: 'paymentStatusDesc',
+                  width: 80,
+                  render: (status: string) => (
+                    <span style={{ 
+                      fontSize: '12px',
+                      color: status === '已付款' ? '#065F46' : '#B45309',
+                      backgroundColor: status === '已付款' ? '#D1FAE5' : '#FEF3C7',
+                      padding: '2px 6px',
+                      borderRadius: '4px'
+                    }}>
+                      {status || '-'}
+                    </span>
+                  )
+                },
+                {
+                  title: '备注',
+                  dataIndex: 'remark',
+                  key: 'remark',
+                  render: (remark: string) => (
+                    <span style={{ fontSize: '12px' }}>{remark || '-'}</span>
+                  )
+                }
+              ]}
+            />
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+              暂无审计日志记录
+            </div>
+          )}
+        </Spin>
       </Modal>
       </div>
     </>

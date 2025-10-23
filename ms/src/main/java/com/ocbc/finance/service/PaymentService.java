@@ -37,17 +37,20 @@ public class PaymentService {
     private final ContractRepository contractRepository;
     private final AmortizationEntryRepository amortizationEntryRepository;
     private final ContractService contractService;
+    private final AuditLogService auditLogService;
 
     public PaymentService(PaymentRepository paymentRepository,
                          JournalEntryRepository journalEntryRepository,
                          ContractRepository contractRepository,
                          AmortizationEntryRepository amortizationEntryRepository,
-                         ContractService contractService) {
+                         ContractService contractService,
+                         AuditLogService auditLogService) {
         this.paymentRepository = paymentRepository;
         this.journalEntryRepository = journalEntryRepository;
         this.contractRepository = contractRepository;
         this.amortizationEntryRepository = amortizationEntryRepository;
         this.contractService = contractService;
+        this.auditLogService = auditLogService;
     }
 
     public PaymentPreviewResponse preview(PaymentRequest req) {
@@ -470,6 +473,11 @@ public class PaymentService {
         for (AmortizationEntry entry : selectedEntries) {
             BigDecimal remainingAmountForEntry = entry.getRemainingAmount().setScale(2, RoundingMode.HALF_UP);
             
+            // 记录修改前的状态用于audit log
+            BigDecimal oldPaidAmount = entry.getPaidAmount();
+            AmortizationEntry.PaymentStatus oldPaymentStatus = entry.getPaymentStatus();
+            LocalDate oldPaymentDate = entry.getPaymentDate();
+            
             System.out.println("处理摊销条目: ID=" + entry.getId() + 
                              ", 期间=" + entry.getAmortizationPeriod() + 
                              ", 总金额=" + entry.getAmount() + 
@@ -489,8 +497,11 @@ public class PaymentService {
                 continue;
             }
             
+            BigDecimal paymentAmountForThisEntry = BigDecimal.ZERO;
+            
             if (remainingPayment.compareTo(remainingAmountForEntry) >= 0) {
                 // 付款金额足够覆盖剩余应付金额
+                paymentAmountForThisEntry = remainingAmountForEntry;
                 entry.addPayment(remainingAmountForEntry, request.getPaymentDate());
                 remainingPayment = remainingPayment.subtract(remainingAmountForEntry);
                 System.out.println("完全付款: ID=" + entry.getId() + 
@@ -499,6 +510,7 @@ public class PaymentService {
                                  ", 剩余付款=" + remainingPayment);
             } else {
                 // 付款金额不足，部分付款
+                paymentAmountForThisEntry = remainingPayment;
                 entry.addPayment(remainingPayment, request.getPaymentDate());
                 System.out.println("部分付款: ID=" + entry.getId() + 
                                  ", 付款金额=" + remainingPayment + 
@@ -508,7 +520,29 @@ public class PaymentService {
                 remainingPayment = BigDecimal.ZERO;
             }
             
+            // 保存摊销明细
             amortizationEntryRepository.save(entry);
+            
+            // 记录audit log - 只有当付款状态发生变化时才记录
+            if (!oldPaymentStatus.equals(entry.getPaymentStatus()) || 
+                paymentAmountForThisEntry.compareTo(BigDecimal.ZERO) > 0) {
+                
+                String operatorId = request.getOperatorId() != null ? request.getOperatorId() : "system";
+                String remark = String.format("付款操作：期间%s，付款金额%.2f", 
+                                            entry.getAmortizationPeriod(), paymentAmountForThisEntry);
+                
+                auditLogService.recordPaymentAuditLog(
+                    entry.getId(),
+                    operatorId,
+                    paymentAmountForThisEntry,
+                    request.getPaymentDate() != null ? request.getPaymentDate().toLocalDate() : LocalDate.now(),
+                    entry.getPaymentStatus(),
+                    remark
+                );
+                
+                log.info("已记录audit log - 摊销明细ID: {}, 操作人: {}, 付款金额: {}", 
+                        entry.getId(), operatorId, paymentAmountForThisEntry);
+            }
         }
 
         // 构建响应

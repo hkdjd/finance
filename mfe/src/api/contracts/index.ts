@@ -9,7 +9,8 @@ import {
   PaymentExecuteResponse,
   ContractPaymentRecordsResponse,
   UpdateContractRequest,
-  UpdateContractResponse
+  UpdateContractResponse,
+  AuditLogResponse
 } from './types';
 import { 
   mockContractsList, 
@@ -19,7 +20,8 @@ import {
   getMockContractAmortizationEntries,
   getMockPaymentExecuteResponse,
   getMockContractPaymentRecords,
-  getMockUpdateContractResponse
+  getMockUpdateContractResponse,
+  getMockAuditLogResponse
 } from './mock';
 
 // 是否使用 Mock 数据 - 生产环境关闭 Mock
@@ -207,6 +209,27 @@ export const updateContract = async (
     request
   );
   return response as unknown as UpdateContractResponse;
+};
+
+/**
+ * 获取摊销明细的审计日志
+ * @param amortizationEntryId 摊销明细ID
+ * @returns 审计日志响应
+ */
+export const getAuditLogsByAmortizationEntryId = async (
+  amortizationEntryId: number
+): Promise<AuditLogResponse> => {
+  if (USE_MOCK) {
+    // 模拟网络延迟
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return Promise.resolve(getMockAuditLogResponse(amortizationEntryId));
+  }
+
+  // 真实 API 调用
+  const response = await apiGet<AuditLogResponse>(
+    `/audit-logs/amortization-entry/${amortizationEntryId}`
+  );
+  return response as unknown as AuditLogResponse;
 };
 
 // 导出类型

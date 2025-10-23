@@ -26,4 +26,6 @@ public class PaymentExecutionRequest {
     
     @NotNull(message = "选择的摊销明细ID不能为空")
     private List<Long> selectedPeriods; // 勾选的摊销明细ID列表
+    
+    private String operatorId; // 操作人ID，用于audit log记录
 }

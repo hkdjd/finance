@@ -12,7 +12,8 @@ import {
   PaymentExecuteResponse,
   ContractPaymentRecordsResponse,
   UpdateContractRequest,
-  UpdateContractResponse
+  UpdateContractResponse,
+  AuditLogResponse
 } from './types';
 
 /**
@@ -635,5 +636,59 @@ export const getMockUpdateContractResponse = (
     createdAt,
     message: '合同信息更新成功',
     customFields: request.customFields
+  };
+};
+
+/**
+ * 生成审计日志 Mock 数据
+ * @param amortizationEntryId 摊销明细ID
+ */
+export const getMockAuditLogResponse = (
+  amortizationEntryId: number
+): AuditLogResponse => {
+  return {
+    auditLogs: [
+      {
+        id: 1,
+        amortizationEntryId,
+        operationType: "PAYMENT",
+        operationTypeDesc: "付款",
+        operatorId: "user001",
+        operationTime: "2024-10-23 10:15:30",
+        paymentAmount: 1000.00,
+        paymentDate: "2024-10-23",
+        paymentStatus: "PAID",
+        paymentStatusDesc: "已付款",
+        oldPaymentAmount: undefined,
+        oldPaymentDate: undefined,
+        oldPaymentStatus: undefined,
+        oldPaymentStatusDesc: undefined,
+        remark: `付款操作：期间2024-10，付款金额1000.00`,
+        createdAt: "2024-10-23 10:15:30",
+        createdBy: "user001"
+      },
+      {
+        id: 2,
+        amortizationEntryId,
+        operationType: "UPDATE",
+        operationTypeDesc: "更新",
+        operatorId: "user002",
+        operationTime: "2024-10-22 14:30:15",
+        paymentAmount: 800.00,
+        paymentDate: "2024-10-22",
+        paymentStatus: "PAID",
+        paymentStatusDesc: "已付款",
+        oldPaymentAmount: 500.00,
+        oldPaymentDate: "2024-10-21",
+        oldPaymentStatus: "PENDING",
+        oldPaymentStatusDesc: "待付款",
+        remark: "更新付款信息：调整付款金额和时间",
+        createdAt: "2024-10-22 14:30:15",
+        createdBy: "user002"
+      }
+    ],
+    totalCount: 2,
+    amortizationEntryId,
+    message: "查询成功"
   };
 };

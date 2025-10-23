@@ -42,6 +42,60 @@ export interface ContractsListResponse {
 }
 
 /**
+ * 审计日志信息
+ */
+export interface AuditLogInfo {
+  /** 审计日志ID */
+  id: number;
+  /** 摊销明细ID */
+  amortizationEntryId: number;
+  /** 操作类型 */
+  operationType: string;
+  /** 操作类型描述 */
+  operationTypeDesc: string;
+  /** 操作人ID */
+  operatorId: string;
+  /** 操作时间 */
+  operationTime: string;
+  /** 支付金额 */
+  paymentAmount?: number;
+  /** 付款时间 */
+  paymentDate?: string;
+  /** 付款状态 */
+  paymentStatus?: string;
+  /** 付款状态描述 */
+  paymentStatusDesc?: string;
+  /** 修改前支付金额 */
+  oldPaymentAmount?: number;
+  /** 修改前付款时间 */
+  oldPaymentDate?: string;
+  /** 修改前付款状态 */
+  oldPaymentStatus?: string;
+  /** 修改前付款状态描述 */
+  oldPaymentStatusDesc?: string;
+  /** 备注 */
+  remark?: string;
+  /** 创建时间 */
+  createdAt: string;
+  /** 创建人 */
+  createdBy: string;
+}
+
+/**
+ * 审计日志响应
+ */
+export interface AuditLogResponse {
+  /** 审计日志列表 */
+  auditLogs: AuditLogInfo[];
+  /** 总记录数 */
+  totalCount: number;
+  /** 摊销明细ID */
+  amortizationEntryId: number;
+  /** 响应消息 */
+  message: string;
+}
+
+/**
  * 分页查询参数
  */
 export interface PaginationParams {
