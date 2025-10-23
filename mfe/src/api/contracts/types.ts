@@ -243,6 +243,8 @@ export interface ContractBasicInfo {
   endDate: string;
   /** 供应商名称 */
   vendorName: string;
+  /** 自定义字段（可选） */
+  customFields?: Record<string, string>;
 }
 
 /**

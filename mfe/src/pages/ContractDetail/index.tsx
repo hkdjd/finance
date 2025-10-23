@@ -1305,6 +1305,71 @@ const ContractDetail: React.FC = () => {
                   </div>
                 </div>
 
+                {/* 动态渲染自定义字段 */}
+                {contractData.contract.customFields && Object.entries(contractData.contract.customFields).map(([key, value]) => (
+                  <div key={key}>
+                    <div style={{ 
+                      color: '#6B7280', 
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      marginBottom: '6px',
+                      fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                    }}>
+                      {key}：
+                    </div>
+                    <div style={{ 
+                      color: '#1F2937', 
+                      fontSize: '14px',
+                      fontWeight: '400',
+                      fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                    }}>
+                      {value}
+                    </div>
+                  </div>
+                ))}
+
+                {/* 创建时间 */}
+                <div>
+                  <div style={{ 
+                    color: '#6B7280', 
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '6px',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    创建时间：
+                  </div>
+                  <div style={{ 
+                    color: '#1F2937', 
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    {contractData.amortization?.[0]?.createdAt ? dayjs(contractData.amortization[0].createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                  </div>
+                </div>
+
+                {/* 摊销周期 */}
+                <div>
+                  <div style={{ 
+                    color: '#6B7280', 
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '6px',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    摊销周期：
+                  </div>
+                  <div style={{ 
+                    color: '#1F2937', 
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    {calculateAmortizationPeriods()}
+                  </div>
+                </div>
+
                 {/* 合同总金额 */}
                 <div>
                   <div style={{ 
@@ -1327,7 +1392,7 @@ const ContractDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* 合同文件与摊销周期 */}
+              {/* 合同文件 */}
               <div style={{ 
                 paddingTop: '16px', 
                 borderTop: '1px solid #E5E5E5',
@@ -1336,7 +1401,6 @@ const ContractDetail: React.FC = () => {
                 flexWrap: 'wrap',
                 gap: '24px'
               }}>
-                {/* 合同文件 */}
                 <div>
                   <Text style={{ 
                     color: '#6B7280', 
@@ -1363,48 +1427,6 @@ const ContractDetail: React.FC = () => {
                     {contractName}.pdf
                   </a>
                 </div>
-
-                {/* 摊销周期 */}
-                <div>
-                  <Text style={{ 
-                    color: '#6B7280', 
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
-                  }}>
-                    摊销周期：
-                  </Text>
-                  <Text style={{ 
-                    color: 'rgb(31, 41, 55)', 
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    marginLeft: '4px',
-                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
-                  }}>
-                    {calculateAmortizationPeriods()}
-                  </Text>
-                </div>
-
-                {/* 创建时间 */}
-                <div>
-                  <Text style={{ 
-                    color: '#6B7280', 
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
-                  }}>
-                    创建时间：
-                  </Text>
-                  <Text style={{ 
-                    color: 'rgb(31, 41, 55)', 
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    marginLeft: '4px',
-                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
-                  }}>
-                    {contractData.amortization?.[0]?.createdAt ? dayjs(contractData.amortization[0].createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
-                  </Text>
-                </div>
               </div>
             </>
           ) : (
@@ -1423,10 +1445,8 @@ const ContractDetail: React.FC = () => {
       {/* Tab页和数据表格 */}
       <div style={{
         backgroundColor: '#FFFFFF',
-        borderRadius: '12px',
         padding: '4px',
-        marginBottom: 24,
-        border: '1px solid #E5E5E5'
+        marginBottom: 24
       }}>
         <Tabs
           activeKey={activeKey}
