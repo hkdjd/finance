@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
+import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker, Skeleton } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
 import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
 import dayjs from 'dayjs';
+import { Document, Page, pdfjs } from 'react-pdf';
+
+// 配置 PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const { Title, Text } = Typography;
 
@@ -53,8 +58,19 @@ const ContractDetail: React.FC = () => {
   const [auditLogLoading, setAuditLogLoading] = useState(false);
   const [currentAuditEntryId, setCurrentAuditEntryId] = useState<number | null>(null);
 
+  // PDF预览相关状态
+  const [isPdfPreviewVisible, setIsPdfPreviewVisible] = useState(false);
+  const [numPages, setNumPages] = useState<number>(0);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
   // 从路由参数获取contractId
   const contractId = id ? parseInt(id, 10) : null;
+
+  // PDF文档加载成功处理
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+    setPdfLoading(false);
+  };
 
   // 验证contractId
   useEffect(() => {
@@ -1165,6 +1181,7 @@ const ContractDetail: React.FC = () => {
   };
 
   const contractName = contractData?.contract?.vendorName || '加载中...';
+  const attachmentName = contractData?.contract?.attachmentName || `${contractName}.pdf`;
 
   return (
     <>
@@ -1328,6 +1345,27 @@ const ContractDetail: React.FC = () => {
                   </div>
                 ))}
 
+                {/* 税率 */}
+                <div>
+                  <div style={{ 
+                    color: '#6B7280', 
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '6px',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    税率：
+                  </div>
+                  <div style={{ 
+                    color: '#1F2937', 
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    {contractData.contract.taxRate ? `${(contractData.contract.taxRate * 100).toFixed(0)}%` : '-'}
+                  </div>
+                </div>
+
                 {/* 创建时间 */}
                 <div>
                   <div style={{ 
@@ -1392,7 +1430,7 @@ const ContractDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* 合同文件 */}
+              {/* 合同附件 */}
               <div style={{ 
                 paddingTop: '16px', 
                 borderTop: '1px solid #E5E5E5',
@@ -1401,31 +1439,41 @@ const ContractDetail: React.FC = () => {
                 flexWrap: 'wrap',
                 gap: '24px'
               }}>
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <Text style={{ 
                     color: '#6B7280', 
                     fontSize: '14px',
                     fontWeight: '600',
                     fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
                   }}>
-                    合同文件：
+                    合同附件：
                   </Text>
                   <a 
-                    href="/index.html" 
-                    download={`${contractName}.pdf`}
+                    href={contractData?.contract?.attachmentPath}
+                    download={attachmentName}
                     style={{ 
                       color: '#4A90E2', 
                       fontWeight: '400',
                       textDecoration: 'none',
                       marginLeft: '4px',
                       fontSize: '14px',
-                      fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                      fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',
+                      cursor: 'pointer'
                     }}
                     onMouseEnter={(e) => (e.target as HTMLElement).style.textDecoration = 'underline'}
                     onMouseLeave={(e) => (e.target as HTMLElement).style.textDecoration = 'none'}
                   >
-                    {contractName}.pdf
+                    {attachmentName}
                   </a>
+                  <EyeOutlined 
+                    onClick={() => setIsPdfPreviewVisible(true)}
+                    style={{ 
+                      color: '#4A90E2',
+                      fontSize: '16px',
+                      marginLeft: '8px',
+                      cursor: 'pointer'
+                    }}
+                  />
                 </div>
               </div>
             </>
@@ -1791,6 +1839,68 @@ const ContractDetail: React.FC = () => {
             </div>
           )}
         </Spin>
+      </Modal>
+
+      {/* PDF预览Modal */}
+      <Modal
+        title="合同预览"
+        open={isPdfPreviewVisible}
+        onCancel={() => setIsPdfPreviewVisible(false)}
+        width="90%"
+        style={{ top: 20 }}
+        footer={null}
+        destroyOnClose
+      >
+        <div style={{ 
+          height: '80vh', 
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: '#f5f5f5',
+          padding: '20px'
+        }}>
+          {numPages > 0 && (
+            <div style={{ 
+              marginBottom: '16px', 
+              fontSize: '14px', 
+              color: '#666',
+              fontWeight: '600'
+            }}>
+              共 {numPages} 页
+            </div>
+          )}
+          <Document
+            file={contractData?.contract?.attachmentPath}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={() => setPdfLoading(false)}
+            loading={(
+              <div style={{ padding: '40px' }}>
+                <Skeleton active paragraph={{ rows: 10 }} />
+                <Skeleton active paragraph={{ rows: 10 }} style={{ marginTop: 20 }} />
+                <Skeleton active paragraph={{ rows: 10 }} style={{ marginTop: 20 }} />
+              </div>
+            )}
+            error={<div style={{ padding: '40px', color: '#ff4d4f', textAlign: 'center' }}>PDF 加载失败</div>}
+          >
+            {Array.from(new Array(numPages), (_, index) => (
+              <div
+                key={`page_${index + 1}`}
+                style={{ 
+                  marginBottom: '20px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                <Page
+                  pageNumber={index + 1}
+                  width={Math.min(window.innerWidth * 0.8, 800)}
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                />
+              </div>
+            ))}
+          </Document>
+        </div>
       </Modal>
       </div>
     </>

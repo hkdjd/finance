@@ -243,6 +243,12 @@ export interface ContractBasicInfo {
   endDate: string;
   /** 供应商名称 */
   vendorName: string;
+  /** 税率 */
+  taxRate?: number;
+  /** 合同附件名称 */
+  attachmentName?: string;
+  /** 合同附件存放路径 */
+  attachmentPath?: string;
   /** 自定义字段（可选） */
   customFields?: Record<string, string>;
 }

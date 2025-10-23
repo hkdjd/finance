@@ -185,6 +185,9 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         startDate: "2025-01-01",
         endDate: "2025-04-30",
         vendorName: "供应商A",
+        taxRate: 0.06,
+        attachmentName: "contract_20250101_001.pdf",
+        attachmentPath: "http://localhost:8081/contracts/1/attachment?download=true",
         customFields: {
           '合同编号': 'HT-2025-001',
           '法人': '张三',
@@ -252,6 +255,9 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         startDate: "2024-02-01",
         endDate: "2024-07-31",
         vendorName: "美的空调租赁有限公司",
+        taxRate: 0.13,
+        attachmentName: "contract_20240201_002.pdf",
+        attachmentPath: "http://localhost:8081/contracts/2/attachment?download=true",
         customFields: {
           '合同编号': 'HT-2024-085',
           '法人': '李四',
@@ -344,6 +350,9 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         startDate: "2024-03-01",
         endDate: "2024-08-31",
         vendorName: "设备供应商C",
+        taxRate: 0.09,
+        attachmentName: "contract_20240301_003.pdf",
+        attachmentPath: "http://localhost:8081/contracts/3/attachment?download=true",
         customFields: {
           '合同编号': 'HT-2024-120',
           '法人': '王五',
