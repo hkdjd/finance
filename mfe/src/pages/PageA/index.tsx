@@ -47,7 +47,6 @@ const PageA: React.FC<PageAProps> = () => {
       try {
         const response = await getAllContracts();
         setContractList(response.contracts);
-        message.success(response.message || '合同列表加载成功');
       } catch (error) {
         console.error('获取合同列表失败:', error);
         message.error('合同列表加载失败，请稍后重试');
