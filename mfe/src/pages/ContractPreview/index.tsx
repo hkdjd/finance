@@ -700,12 +700,13 @@ const ContractPreview: React.FC = () => {
                   record: () => {
                     const tempId = generateTempId();
                     const currentDate = new Date();
-                    const formattedDate = currentDate.toISOString().split('T')[0];
+                    const formattedDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD
+                    const formattedMonth = currentDate.toISOString().slice(0, 7); // YYYY-MM
                     
                     const newRecord: PrepaymentItem = {
                       id: tempId,
                       amortizationPeriod: formattedDate,
-                      accountingPeriod: formattedDate,
+                      accountingPeriod: formattedMonth, // 只保留到月份
                       amount: 0,
                       status: 'PENDING',
                     };
