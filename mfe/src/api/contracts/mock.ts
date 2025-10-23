@@ -184,7 +184,12 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         totalAmount: 4000.00,
         startDate: "2025-01-01",
         endDate: "2025-04-30",
-        vendorName: "供应商A"
+        vendorName: "供应商A",
+        customFields: {
+          '合同编号': 'HT-2025-001',
+          '法人': '张三',
+          '项目名称': '办公设备租赁项目'
+        }
       },
       amortization: [
         {
@@ -246,7 +251,13 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         totalAmount: 7500.00,
         startDate: "2024-02-01",
         endDate: "2024-07-31",
-        vendorName: "美的空调租赁有限公司"
+        vendorName: "美的空调租赁有限公司",
+        customFields: {
+          '合同编号': 'HT-2024-085',
+          '法人': '李四',
+          '项目名称': '空调租赁服务',
+          '部门': '行政部'
+        }
       },
       amortization: [
         {
@@ -332,7 +343,14 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         totalAmount: 8000.00,
         startDate: "2024-03-01",
         endDate: "2024-08-31",
-        vendorName: "海尔冰箱设备租赁公司"
+        vendorName: "设备供应商C",
+        customFields: {
+          '合同编号': 'HT-2024-120',
+          '法人': '王五',
+          '项目名称': '设备采购项目',
+          '部门': '采购部',
+          '联系人': '赵经理'
+        }
       },
       amortization: [
         {
