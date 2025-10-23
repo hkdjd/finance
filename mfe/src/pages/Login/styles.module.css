@@ -1,0 +1,180 @@
+/* 登录页面容器 */
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* 使用固定高度，不是min-height */
+  width: 100vw; /* 使用100vw覆盖整个视口 */
+  padding: 20px;
+  position: fixed; /* 固定定位，覆盖整个视口 */
+  top: 0;
+  left: 0;
+  margin: 0; /* 清除所有外边距 */
+  background-image: url('/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  /* 备用背景色，更贴近银行风格 */
+  background-color: #f8f9fa;
+  box-sizing: border-box; /* 确保padding包含在宽度内 */
+  overflow: hidden; /* 防止滚动 */
+}
+
+/* Logo样式 */
+.logo {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  cursor: pointer;
+}
+
+.logoImage {
+  height: 32px;
+  width: auto;
+}
+
+/* 登录卡片 */
+.loginCard {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0 auto; /* 居中对齐 */
+  box-sizing: border-box; /* 确保border包含在宽度内 */
+}
+
+/* 登录头部 */
+.loginHeader {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 20px 20px 0;
+}
+
+/* 登录表单 */
+.loginForm {
+  padding: 0 20px 20px;
+}
+
+/* 输入框样式 */
+.loginInput {
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  height: 48px;
+  font-size: 16px;
+}
+
+.loginInput:focus,
+.loginInput:hover {
+  border-color: #b5120f;
+  box-shadow: 0 0 0 3px rgba(181, 18, 15, 0.1);
+  background-color: #ffffff;
+}
+
+/* 登录按钮 */
+.loginButton {
+  height: 52px;
+  border-radius: 8px;
+  background-color: #b5120f;
+  border-color: #b5120f;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 16px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.loginButton:hover {
+  background-color: #8b0e0c;
+  border-color: #8b0e0c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(181, 18, 15, 0.4);
+}
+
+/* 版权信息 */
+.copyright {
+  position: absolute;
+  bottom: 10px; /* 减小bottom值，避免超出视口 */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #4A4A4A;
+  z-index: 10;
+  padding: 8px 16px;
+  border-radius: 4px;
+  white-space: nowrap; /* 防止文字换行导致高度增加 */
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .loginContainer {
+    padding: 16px;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  .logo {
+    top: 15px;
+    left: 15px;
+  }
+
+  .logoImage {
+    height: 28px;
+  }
+
+  .loginCard {
+    max-width: 100%;
+    margin: 0 10px; /* 添加边距防止贴边 */
+  }
+
+  .loginHeader {
+    margin-bottom: 24px;
+    padding: 16px 16px 0;
+  }
+
+  .loginForm {
+    padding: 0 16px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 12px;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  .logo {
+    top: 12px;
+    left: 12px;
+  }
+
+  .logoImage {
+    height: 24px;
+  }
+
+  .loginCard {
+    border-radius: 8px; /* 稍微减小圆角 */
+    margin: 0 5px; /* 减小边距 */
+  }
+
+  .loginHeader {
+    margin-bottom: 20px;
+  }
+
+  .loginForm {
+    padding: 0 12px 12px;
+  }
+}

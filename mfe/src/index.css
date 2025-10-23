@@ -7,13 +7,17 @@
 
 html, body {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden; /* 只防止水平滚动 */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
 #root {
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden; /* 只防止水平滚动 */
   background-color: #ffffff;
 }
 
