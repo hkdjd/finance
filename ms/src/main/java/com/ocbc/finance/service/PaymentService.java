@@ -565,6 +565,7 @@ public class PaymentService {
                     Integer.valueOf(i + 1), // child: entryOrder
                     "PAYMENT", // child: entryType
                     dto.getMemo(), // child: description
+                    payment.getBookingDate(), // child: accountingReviewTime（实际支付时间）
                     baseTimestamp.plusNanos((i + 1) * 1000000L), // child: updatedAt
                     amortizationPeriod, // child: amortizationPeriod
                     payment.getId() // child: paymentId
@@ -749,6 +750,7 @@ public class PaymentService {
                             e.getEntryOrder(), // child: entryOrder
                             e.getEntryType().name(), // child: entryType
                             e.getDescription(), // child: description
+                            payment.getBookingDate(), // child: accountingReviewTime（实际支付时间）
                             e.getUpdatedAt(), // child: updatedAt
                             amortizationPeriod, // child: amortizationPeriod
                             payment.getId() // child: paymentId

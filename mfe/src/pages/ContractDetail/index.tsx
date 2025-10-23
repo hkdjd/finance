@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
+import { DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
 import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
+import { JournalEntryImmutable } from './JournalEntryImmutable';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -47,6 +49,9 @@ const ContractDetail: React.FC = () => {
   // 是否为初始加载
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+  // 导出月份选择状态
+  const [selectedExportMonth, setSelectedExportMonth] = useState<dayjs.Dayjs | null>(null);
+
   // Audit Log 弹窗相关状态
   const [isAuditLogModalVisible, setIsAuditLogModalVisible] = useState(false);
   const [auditLogData, setAuditLogData] = useState<AuditLogResponse | null>(null);
@@ -65,7 +70,7 @@ const ContractDetail: React.FC = () => {
   }, [contractId, navigate]);
 
   // 获取合同摊销明细数据
-  const fetchContractData = async () => {
+  const fetchContractData = useCallback(async () => {
     if (!contractId) return;
     
     setLoading(true);
@@ -78,7 +83,7 @@ const ContractDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [contractId]);
 
 
   // 获取预提会计分录预览数据
@@ -141,11 +146,170 @@ const ContractDetail: React.FC = () => {
     }
   };
 
+  // 导出付款分录为Excel
+  const exportPaymentEntriesToExcel = () => {
+    if (!paymentJournalEntriesData || paymentJournalEntriesData.length === 0) {
+      message.warning('暂无数据可导出');
+      return;
+    }
+
+    // 准备Excel数据
+    const headers = [
+      '付款ID',
+      '入账日期', 
+      '科目名称',
+      '借方金额',
+      '贷方金额',
+      '备注',
+      '摊销期间',
+      '分录类型',
+      '会计复核时间'
+    ];
+
+    // 获取基础数据并按月份过滤
+    let filteredEntries = getFilteredAndSortedPaymentEntries();
+    
+    // 如果选择了特定月份，则过滤该月份的数据
+    if (selectedExportMonth) {
+      const selectedMonth = selectedExportMonth.format('YYYY-MM');
+      filteredEntries = filteredEntries.filter(entry => {
+        if (entry.bookingDate) {
+          const entryMonth = dayjs(entry.bookingDate).format('YYYY-MM');
+          return entryMonth === selectedMonth;
+        }
+        return false;
+      });
+      
+      if (filteredEntries.length === 0) {
+        message.warning(`${selectedMonth} 月份暂无付款分录数据`);
+        return;
+      }
+    }
+    
+    const groupedByPayment = filteredEntries.reduce((groups, entry) => {
+      const paymentKey = entry.paymentId ? `payment-${entry.paymentId}` : 'no-payment';
+      if (!groups[paymentKey]) {
+        groups[paymentKey] = [];
+      }
+      groups[paymentKey].push(entry);
+      return groups;
+    }, {});
+
+    // 创建工作表数据
+    const worksheetData = [];
+    
+    // 添加标题行
+    worksheetData.push(headers);
+    
+    // 按付款分组添加数据
+    Object.keys(groupedByPayment).sort((a, b) => {
+      const aId = a.startsWith('payment-') ? parseInt(a.split('-')[1]) : 0;
+      const bId = b.startsWith('payment-') ? parseInt(b.split('-')[1]) : 0;
+      return bId - aId;
+    }).forEach(paymentKey => {
+      const entries = groupedByPayment[paymentKey];
+      const paymentId = paymentKey.startsWith('payment-') ? paymentKey.split('-')[1] : '未知';
+      
+      // 添加付款分组标题
+      worksheetData.push([
+        `付款 ${paymentId}`,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        ''
+      ]);
+      
+      // 添加该付款的所有分录
+      entries.forEach((entry: any) => {
+        worksheetData.push([
+          entry.paymentId || '',
+          entry.bookingDate || '',
+          entry.account || '',
+          entry.debitAmount || '0.00',
+          entry.creditAmount || '0.00',
+          entry.memo || '',
+          entry.amortizationPeriod || '',
+          entry.entryType || '',
+          entry.accountingReviewTime ? new Date(entry.accountingReviewTime).toLocaleString('zh-CN') : ''
+        ]);
+      });
+      
+      // 添加空行分隔
+      worksheetData.push(['', '', '', '', '', '', '', '', '']);
+    });
+
+    // 创建简单的CSV格式（兼容Excel）
+    const csvContent = worksheetData
+      .map(row => row.map(cell => `"${cell}"`).join(','))
+      .join('\n');
+
+    // 添加BOM以支持中文
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // 创建下载链接
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    const monthSuffix = selectedExportMonth ? `_${selectedExportMonth.format('YYYY-MM')}月` : '';
+    link.setAttribute('download', `付款会计分录_合同${contractId}${monthSuffix}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    message.success('导出成功');
+  };
+
+  // 处理付款分录数据的排序和筛选
+  const getFilteredAndSortedPaymentEntries = () => {
+    if (!paymentJournalEntriesData || paymentJournalEntriesData.length === 0) return [];
+    
+    let filteredEntries = [...paymentJournalEntriesData];
+    
+    // 日期范围筛选
+    if (dateRangeFilter.startDate || dateRangeFilter.endDate) {
+      filteredEntries = filteredEntries.filter(entry => {
+        const entryDate = new Date(entry.bookingDate);
+        const startDate = dateRangeFilter.startDate ? new Date(dateRangeFilter.startDate) : null;
+        const endDate = dateRangeFilter.endDate ? new Date(dateRangeFilter.endDate) : null;
+        
+        if (startDate && entryDate < startDate) return false;
+        if (endDate && entryDate > endDate) return false;
+        return true;
+      });
+    }
+    
+    // 排序
+    filteredEntries.sort((a, b) => {
+      const aValue = sortConfig.field === 'entryOrder' ? a.entryOrder : new Date(a.bookingDate).getTime();
+      const bValue = sortConfig.field === 'entryOrder' ? b.entryOrder : new Date(b.bookingDate).getTime();
+      
+      return sortConfig.order === 'asc' ? aValue - bValue : bValue - aValue;
+    });
+    
+    return filteredEntries;
+  };
+
+  // 计算摊销周期
+  const calculateAmortizationPeriods = () => {
+    if (!contractData?.contract) return '';
+    const startDate = new Date(contractData.contract.startDate);
+    const endDate = new Date(contractData.contract.endDate);
+    const monthDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                      (endDate.getMonth() - startDate.getMonth()) + 1;
+    return `共 ${monthDiff} 期，按月摊销`;
+  };
+
   // 组件加载时获取数据
   useEffect(() => {
     fetchContractData();
     setIsInitialLoad(false); // 初始加载完成
-  }, [contractId]);
+  }, [fetchContractData]);
 
   // Tab切换时获取对应数据
   useEffect(() => {
@@ -169,16 +333,6 @@ const ContractDetail: React.FC = () => {
     // 执行Tab切换加载逻辑
     handleTabDataLoading();
   }, [activeKey, isInitialLoad]);
-
-  // 计算摊销周期
-  const calculateAmortizationPeriods = () => {
-    if (!contractData?.contract) return '';
-    const startDate = new Date(contractData.contract.startDate);
-    const endDate = new Date(contractData.contract.endDate);
-    const monthDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
-                      (endDate.getMonth() - startDate.getMonth()) + 1;
-    return `共 ${monthDiff} 期，按月摊销`;
-  };
 
   // 打开支付弹窗
   const handleEditAmount = (record: ContractAmortizationEntry) => {
@@ -980,36 +1134,6 @@ const ContractDetail: React.FC = () => {
     );
   };
 
-  // 处理付款分录数据的排序和筛选
-  const getFilteredAndSortedPaymentEntries = () => {
-    if (!paymentJournalEntriesData || paymentJournalEntriesData.length === 0) return [];
-    
-    let filteredEntries = [...paymentJournalEntriesData];
-    
-    // 日期范围筛选
-    if (dateRangeFilter.startDate || dateRangeFilter.endDate) {
-      filteredEntries = filteredEntries.filter(entry => {
-        const entryDate = new Date(entry.bookingDate);
-        const startDate = dateRangeFilter.startDate ? new Date(dateRangeFilter.startDate) : null;
-        const endDate = dateRangeFilter.endDate ? new Date(dateRangeFilter.endDate) : null;
-        
-        if (startDate && entryDate < startDate) return false;
-        if (endDate && entryDate > endDate) return false;
-        return true;
-      });
-    }
-    
-    // 排序
-    filteredEntries.sort((a, b) => {
-      const aValue = sortConfig.field === 'entryOrder' ? a.entryOrder : new Date(a.bookingDate).getTime();
-      const bValue = sortConfig.field === 'entryOrder' ? b.entryOrder : new Date(b.bookingDate).getTime();
-      
-      return sortConfig.order === 'asc' ? aValue - bValue : bValue - aValue;
-    });
-    
-    return filteredEntries;
-  };
-
   // 付款分录列表表格列定义
   const paymentEntriesColumns = [
     {
@@ -1112,17 +1236,28 @@ const ContractDetail: React.FC = () => {
       render: (memo: string) => (
         <span style={{ color: '#6B7280', fontSize: '13px' }}>{memo}</span>
       )
+    },
+    {
+      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>会计复核时间</span>,
+      dataIndex: 'accountingReviewTime',
+      key: 'accountingReviewTime',
+      width: 180,
+      render: (date: string) => (
+        <span style={{ color: '#1F2937', fontSize: '13px' }}>
+          {date ? dayjs(date).format('YYYY-MM-DD HH:mm:ss') : '-'}
+        </span>
+      )
     }
   ];
 
-  // 渲染付款会计分录页面
+  // 渲染付款会计分录页面 - 按付款ID分组展示
   const renderPaymentRecords = () => {
     if (paymentJournalEntriesLoading) {
       return (
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+        <div style={{ textAlign: "center", padding: "40px 0" }}>
           <Spin size="large" className="outlook-spin" />
           <div style={{ marginTop: 16 }}>
-            <Text style={{ color: '#6B7280', fontSize: '14px' }}>正在加载付款会计分录数据...</Text>
+            <Text style={{ color: "#6B7280", fontSize: "14px" }}>正在加载付款会计分录数据...</Text>
           </div>
         </div>
       );
@@ -1130,36 +1265,136 @@ const ContractDetail: React.FC = () => {
 
     if (!paymentJournalEntriesData || paymentJournalEntriesData.length === 0) {
       return (
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+        <div style={{ textAlign: "center", padding: "40px 0" }}>
           <Text type="secondary">暂无付款会计分录数据，请先执行付款操作</Text>
         </div>
       );
     }
 
     const filteredEntries = getFilteredAndSortedPaymentEntries();
+    
+    // 按付款ID分组分录
+    const groupedByPayment = filteredEntries.reduce((groups, entry) => {
+      // 使用付款ID作为分组依据，如果没有则使用默认分组
+      const paymentKey = entry.paymentId ? `payment-${entry.paymentId}` : 'no-payment';
+      if (!groups[paymentKey]) {
+        groups[paymentKey] = [];
+      }
+      groups[paymentKey].push(entry);
+      return groups;
+    }, {});
+
+    // 按付款ID排序（数字排序）
+    const sortedPaymentKeys = Object.keys(groupedByPayment).sort((a, b) => {
+      const aId = a.startsWith('payment-') ? parseInt(a.split('-')[1]) : 0;
+      const bId = b.startsWith('payment-') ? parseInt(b.split('-')[1]) : 0;
+      return bId - aId; // 降序排列，最新的付款在前
+    });
 
     return (
       <div>
-        <div style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '12px',
-          border: '1px solid #E5E5E5',
-          overflow: 'hidden'
+        {/* 导出控制区域 */}
+        <div style={{ 
+          marginBottom: 16, 
+          display: 'flex', 
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: '12px'
         }}>
-          <Table
-            columns={paymentEntriesColumns}
-            dataSource={filteredEntries}
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
-            }}
-            size="middle"
-            rowKey="entryOrder"
-            scroll={{ x: 1000 }}
-          />
+          <Space>
+            <DatePicker
+              picker="month"
+              placeholder="选择月份（可选）"
+              value={selectedExportMonth}
+              onChange={setSelectedExportMonth}
+              allowClear
+              style={{ width: 160 }}
+              suffixIcon={<CalendarOutlined style={{ color: '#6B7280' }} />}
+            />
+            <Button 
+              type="primary" 
+              icon={<DownloadOutlined />}
+              onClick={exportPaymentEntriesToExcel}
+              style={{
+                backgroundColor: '#E31E24',
+                borderColor: '#E31E24',
+                borderRadius: '6px',
+                fontWeight: '600'
+              }}
+            >
+              {selectedExportMonth ? `导出${selectedExportMonth.format('YYYY年MM月')}分录` : '导出全部分录'}
+            </Button>
+          </Space>
         </div>
+        
+        {sortedPaymentKeys.map((paymentKey, index) => {
+          const paymentId = paymentKey.startsWith('payment-') ? paymentKey.split('-')[1] : '未知';
+          const entries = groupedByPayment[paymentKey];
+          const paymentDate = entries[0]?.accountingReviewTime ? 
+            new Date(entries[0].accountingReviewTime).toLocaleDateString('zh-CN') : 
+            new Date(entries[0]?.bookingDate).toLocaleDateString('zh-CN');
+          
+          return (
+            <div key={paymentKey} style={{ marginBottom: 24 }}>
+              {/* 付款标题 */}
+              <div style={{
+                backgroundColor: "#F8F9FA",
+                padding: "12px 16px",
+                borderRadius: "8px 8px 0 0",
+                borderBottom: "2px solid #E31E24",
+                marginBottom: 0
+              }}>
+                <Text style={{
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  color: "#1F2937"
+                }}>
+                  付款ID：{paymentId} - {paymentDate}
+                </Text>
+                <Text style={{
+                  marginLeft: 16,
+                  fontSize: "14px",
+                  color: "#6B7280"
+                }}>
+                  ({entries.length} 条分录)
+                </Text>
+              </div>
+              
+              {/* 付款分录表格 */}
+              <div style={{
+                backgroundColor: "#FFFFFF",
+                borderRadius: index === sortedPaymentKeys.length - 1 ? "0 0 12px 12px" : "0",
+                border: "1px solid #E5E5E5",
+                borderTop: "none",
+                overflow: "hidden"
+              }}>
+                <Table
+                  columns={paymentEntriesColumns}
+                  dataSource={entries}
+                  pagination={false}
+                  size="middle"
+                  rowKey="entryOrder"
+                  scroll={{ x: 1000 }}
+                />
+              </div>
+            </div>
+          );
+        })}
+        
+        {/* 总计信息 */}
+        <div style={{
+          backgroundColor: "#F8F9FA",
+          padding: "16px",
+          borderRadius: "8px",
+          marginTop: 16
+        }}>
+          <Text style={{ fontSize: "14px", fontWeight: "600", color: "#1F2937" }}>
+            总计：{sortedPaymentKeys.length} 笔付款，共 {filteredEntries.length} 条分录
+          </Text>
+        </div>
+        
+        {/* 借贷平衡总计行 */}
+        {JournalEntryImmutable.renderTotalRow(filteredEntries)}
       </div>
     );
   };

@@ -19,6 +19,7 @@ public class PaymentJournalEntryDto extends JournalEntryDto{
     private Integer entryOrder; // 分录顺序
     private String entryType; // 分录类型
     private String description; // 分录描述
+    private LocalDateTime accountingReviewTime; // 会计复核时间（取实际支付时间）
     private LocalDateTime updatedAt;
     private String amortizationPeriod; // 摊销期间，用于分组显示
     private Long paymentId; // 付款ID，用于按付款分组
@@ -26,13 +27,15 @@ public class PaymentJournalEntryDto extends JournalEntryDto{
     // Custom constructor to match the calling signature
     public PaymentJournalEntryDto(LocalDate bookingDate, String account, BigDecimal dr, BigDecimal cr, 
                                   String memo, LocalDateTime createdAt, LocalDateTime paymentTimestamp, 
-                                  Integer entryOrder, String entryType, String description, 
-                                  LocalDateTime updatedAt, String amortizationPeriod, Long paymentId) {
+                                  Integer entryOrder, String entryType, String description,
+                                  LocalDateTime accountingReviewTime, LocalDateTime updatedAt, 
+                                  String amortizationPeriod, Long paymentId) {
         super(bookingDate, account, dr, cr, memo, createdAt);
         this.paymentTimestamp = paymentTimestamp;
         this.entryOrder = entryOrder;
         this.entryType = entryType;
         this.description = description;
+        this.accountingReviewTime = accountingReviewTime;
         this.updatedAt = updatedAt;
         this.amortizationPeriod = amortizationPeriod;
         this.paymentId = paymentId;
