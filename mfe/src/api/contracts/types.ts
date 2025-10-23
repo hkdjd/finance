@@ -267,6 +267,8 @@ export interface PaymentExecuteRequest {
   paymentDate: string;
   /** 选中的账期 */
   selectedPeriods: number[];
+  /** 操作人ID，用于audit log记录 */
+  operatorId?: string;
 }
 
 /**

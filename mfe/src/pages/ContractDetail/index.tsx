@@ -234,12 +234,16 @@ const ContractDetail: React.FC = () => {
     const hideLoading = message.loading('正在处理付款...', 0);
     
     try {
+      // 获取当前登录用户
+      const currentUser = localStorage.getItem('username') || 'system';
+      
       // 构造支付请求参数
       const paymentRequest: PaymentExecuteRequest = {
         contractId,
         paymentAmount: newAmount,
         selectedPeriods: [currentEditRecord.id], // 选中的期次
-        paymentDate: paymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
+        paymentDate: paymentDate.format('YYYY-MM-DD HH:mm:ss'), // 支付时间
+        operatorId: currentUser // 操作人ID
       };
 
       // 调用支付接口
@@ -376,12 +380,16 @@ const ContractDetail: React.FC = () => {
     const hideLoading = message.loading('正在处理批量付款...', 0);
     
     try {
+      // 获取当前登录用户
+      const currentUser = localStorage.getItem('username') || 'system';
+      
       // 构造批量支付请求参数，只包含有效记录
       const paymentRequest: PaymentExecuteRequest = {
         contractId,
         paymentAmount: batchNewAmount,
         selectedPeriods: validRecords.map(record => record.id), // 只提交有效的期次
-        paymentDate: batchPaymentDate.format('YYYY-MM-DD HH:mm:ss') // 支付时间
+        paymentDate: batchPaymentDate.format('YYYY-MM-DD HH:mm:ss'), // 支付时间
+        operatorId: currentUser // 操作人ID
       };
 
       // 调用支付接口

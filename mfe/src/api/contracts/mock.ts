@@ -473,7 +473,7 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
  * @returns 支付执行响应
  */
 export const getMockPaymentExecuteResponse = (request: PaymentExecuteRequest): PaymentExecuteResponse => {
-  const { contractId, paymentAmount, bookingDate, selectedPeriods } = request;
+  const { contractId, paymentAmount, paymentDate, selectedPeriods, operatorId } = request;
   
   // 生成选中账期的字符串格式
   const selectedPeriodsStr = selectedPeriods.map(period => {

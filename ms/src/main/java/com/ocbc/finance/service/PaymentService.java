@@ -476,7 +476,7 @@ public class PaymentService {
             // 记录修改前的状态用于audit log
             BigDecimal oldPaidAmount = entry.getPaidAmount();
             AmortizationEntry.PaymentStatus oldPaymentStatus = entry.getPaymentStatus();
-            LocalDate oldPaymentDate = entry.getPaymentDate();
+            LocalDateTime oldPaymentDate = entry.getPaymentDate();
             
             System.out.println("处理摊销条目: ID=" + entry.getId() + 
                              ", 期间=" + entry.getAmortizationPeriod() + 

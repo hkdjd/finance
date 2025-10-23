@@ -75,9 +75,11 @@ public class AuditLogService {
                 .paymentDate(paymentDate)
                 .paymentStatus(convertToAuditLogPaymentStatus(paymentStatus))
                 .remark(remark)
-                .createdBy(operatorId)
-                .updatedBy(operatorId)
                 .build();
+        
+        // 设置审计字段
+        auditLog.setCreatedBy(operatorId);
+        auditLog.setUpdatedBy(operatorId);
 
         auditLogRepository.save(auditLog);
         log.info("付款操作审计日志记录成功，ID: {}", auditLog.getId());
@@ -117,9 +119,11 @@ public class AuditLogService {
                 .oldPaymentDate(oldPaymentDate)
                 .oldPaymentStatus(convertToAuditLogPaymentStatus(oldPaymentStatus))
                 .remark(remark)
-                .createdBy(operatorId)
-                .updatedBy(operatorId)
                 .build();
+        
+        // 设置审计字段
+        auditLog.setCreatedBy(operatorId);
+        auditLog.setUpdatedBy(operatorId);
 
         auditLogRepository.save(auditLog);
         log.info("更新操作审计日志记录成功，ID: {}", auditLog.getId());
@@ -145,7 +149,7 @@ public class AuditLogService {
                 .oldPaymentStatus(auditLog.getOldPaymentStatus() != null ? auditLog.getOldPaymentStatus().name() : null)
                 .oldPaymentStatusDesc(auditLog.getOldPaymentStatus() != null ? auditLog.getOldPaymentStatus().getDescription() : null)
                 .remark(auditLog.getRemark())
-                .createdAt(auditLog.getCreatedAt())
+                .createdAt(auditLog.getCreatedAt() != null ? auditLog.getCreatedAt().atOffset(java.time.ZoneOffset.of("+08:00")) : null)
                 .createdBy(auditLog.getCreatedBy())
                 .build();
     }
@@ -161,7 +165,7 @@ public class AuditLogService {
         switch (paymentStatus) {
             case PENDING:
                 return AuditLog.PaymentStatus.PENDING;
-            case PAID:
+            case COMPLETED:
                 return AuditLog.PaymentStatus.PAID;
             default:
                 return AuditLog.PaymentStatus.PENDING;
