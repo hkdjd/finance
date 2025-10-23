@@ -598,35 +598,7 @@ const ContractDetail: React.FC = () => {
               size="small" 
               disabled={isCompleted}
               onClick={() => handleEditAmount(record)}
-              style={{
-                backgroundColor: isCompleted ? '#F3F4F6' : '#E31E24',
-                borderColor: isCompleted ? '#D1D5DB' : '#E31E24',
-                color: isCompleted ? '#9CA3AF' : '#FFFFFF',
-                fontWeight: '600',
-                fontSize: '13px',
-                borderRadius: '8px',
-                cursor: isCompleted ? 'not-allowed' : 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                if (!isCompleted) {
-                  (e.target as HTMLElement).style.backgroundColor = '#C41E3A';
-                  (e.target as HTMLElement).style.borderColor = '#C41E3A';
-                } else {
-                  // 已完成状态保持灰色，不改变颜色
-                  (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
-                  (e.target as HTMLElement).style.borderColor = '#D1D5DB';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isCompleted) {
-                  (e.target as HTMLElement).style.backgroundColor = '#E31E24';
-                  (e.target as HTMLElement).style.borderColor = '#E31E24';
-                } else {
-                  // 已完成状态保持灰色，不改变颜色
-                  (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
-                  (e.target as HTMLElement).style.borderColor = '#D1D5DB';
-                }
-              }}
+              style={{ width: '70px' }}
             >
               {isCompleted ? '已完成' : '支付'}
             </Button>
@@ -1468,7 +1440,7 @@ const ContractDetail: React.FC = () => {
                   <EyeOutlined 
                     onClick={() => setIsPdfPreviewVisible(true)}
                     style={{ 
-                      color: '#4A90E2',
+                      color: '#1890ff',
                       fontSize: '16px',
                       marginLeft: '8px',
                       cursor: 'pointer'
@@ -1572,7 +1544,12 @@ const ContractDetail: React.FC = () => {
             rowKey={(record) => record.id || Math.random()}
             columns={getColumnsByKey(activeKey)}
             dataSource={getDataSourceByKey(activeKey)}
-            pagination={false}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
+            }}
             scroll={{ x: 1000 }}
             size="middle"
             rowSelection={activeKey === 'timeline' ? rowSelection : undefined}
