@@ -597,7 +597,8 @@ const ContractDetail: React.FC = () => {
           <Space size="small">
             <Button 
               key={`${record.id}-${record.paymentStatus}-${Date.now()}`}
-              type={isCompleted ? "default" : "primary"}
+              danger={!isCompleted}
+              type={isCompleted ? "default" : undefined}
               size="small" 
               disabled={isCompleted}
               onClick={() => handleEditAmount(record)}
