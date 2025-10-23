@@ -1,8 +1,12 @@
 package com.ocbc.finance.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.model.Contract;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 摊销明细列表响应DTO
@@ -47,7 +51,7 @@ public class AmortizationListResponse {
         private String endDate;
         private String vendorName;
         private String createdAt;
-        private String customFields; // 自定义字段（JSON字符串）
+        private Map<String, String> customFields; // 自定义字段（Map格式）
         
         public ContractInfo() {}
         
@@ -58,7 +62,26 @@ public class AmortizationListResponse {
             this.endDate = contract.getEndDate() != null ? contract.getEndDate().toString() : null;
             this.vendorName = contract.getVendorName();
             this.createdAt = contract.getCreatedAt() != null ? contract.getCreatedAt().toString() : null;
-            this.customFields = contract.getCustomFieldsJson();
+            
+            // 解析 JSON 字符串为 Map
+            this.customFields = parseCustomFields(contract.getCustomFieldsJson());
+        }
+        
+        /**
+         * 解析 JSON 字符串为 Map
+         */
+        private Map<String, String> parseCustomFields(String jsonString) {
+            if (jsonString == null || jsonString.trim().isEmpty()) {
+                return new HashMap<>();
+            }
+            
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.readValue(jsonString, new TypeReference<Map<String, String>>() {});
+            } catch (Exception e) {
+                // 如果解析失败，返回空 Map
+                return new HashMap<>();
+            }
         }
         
         // Getters and Setters
@@ -110,11 +133,11 @@ public class AmortizationListResponse {
             this.createdAt = createdAt;
         }
         
-        public String getCustomFields() {
+        public Map<String, String> getCustomFields() {
             return customFields;
         }
         
-        public void setCustomFields(String customFields) {
+        public void setCustomFields(Map<String, String> customFields) {
             this.customFields = customFields;
         }
     }

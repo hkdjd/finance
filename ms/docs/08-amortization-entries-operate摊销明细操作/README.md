@@ -91,7 +91,11 @@
     "totalAmount": 4000.00,
     "startDate": "2025-01-01",
     "endDate": "2025-04-30",
-    "vendorName": "供应商A"
+    "vendorName": "供应商A",
+    "customFields": {
+      "法定代表人": "张明",
+      "项目经理": "李华"
+    }
   },
   "amortization": [
     {
