@@ -38,4 +38,9 @@ public class CalculateAmortizationRequest {
      */
     @NotBlank
     private String vendorName;
+
+    /**
+     * 操作人ID，用于操作日志记录
+     */
+    private String operatorId;
 }

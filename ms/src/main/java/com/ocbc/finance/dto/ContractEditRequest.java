@@ -35,4 +35,9 @@ public class ContractEditRequest {
      * 用于更新合同的自定义字段信息
      */
     private Map<String, String> customFields;
+
+    /**
+     * 操作人ID，用于操作日志记录
+     */
+    private String operatorId;
 }

@@ -37,4 +37,7 @@ public class PreviewEntryDto {
     
     /** 分录顺序 */
     private Integer entryOrder;
+    
+    /** 摊销期间，格式：YYYY-MM */
+    private String amortizationPeriod;
 }

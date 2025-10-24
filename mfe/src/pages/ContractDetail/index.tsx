@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
 import { DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
-import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse } from '../../api/contracts';
+import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, updateContractStatus, getOperationLogsByContractId } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
 import { JournalEntryImmutable } from './JournalEntryImmutable';
 import dayjs from 'dayjs';
@@ -52,11 +52,11 @@ const ContractDetail: React.FC = () => {
   // 导出月份选择状态
   const [selectedExportMonth, setSelectedExportMonth] = useState<dayjs.Dayjs | null>(null);
 
-  // Audit Log 弹窗相关状态
-  const [isAuditLogModalVisible, setIsAuditLogModalVisible] = useState(false);
-  const [auditLogData, setAuditLogData] = useState<AuditLogResponse | null>(null);
-  const [auditLogLoading, setAuditLogLoading] = useState(false);
-  const [currentAuditEntryId, setCurrentAuditEntryId] = useState<number | null>(null);
+  // 操作记录相关状态
+  const [operationLogs, setOperationLogs] = useState<any[]>([]);
+  const [operationLogsLoading, setOperationLogsLoading] = useState(false);
+  const hasRecordedContractGenerationRef = useRef(false);
+
 
   // 从路由参数获取contractId
   const contractId = id ? parseInt(id, 10) : null;
@@ -70,13 +70,24 @@ const ContractDetail: React.FC = () => {
   }, [contractId, navigate]);
 
   // 获取合同摊销明细数据
-  const fetchContractData = useCallback(async () => {
+  const fetchContractData = useCallback(async (shouldRecordOperation = false) => {
     if (!contractId) return;
     
     setLoading(true);
     try {
       const response = await getContractAmortizationEntries(contractId);
       setContractData(response);
+      
+      // 记录合同生成操作（仅在初始加载时记录）
+      if (shouldRecordOperation && !hasRecordedContractGenerationRef.current) {
+        const contractCreatedAt = response.contract?.createdAt;
+        addOperationLog(
+          '生成', 
+          `合同摊销明细生成完成，供应商：${response.contract?.vendorName || '未知'}`,
+          contractCreatedAt
+        );
+        hasRecordedContractGenerationRef.current = true;
+      }
     } catch (error) {
       message.error('获取合同摊销明细失败');
       console.error('API调用失败:', error);
@@ -85,6 +96,27 @@ const ContractDetail: React.FC = () => {
     }
   }, [contractId]);
 
+  // 检查所有摊销条目是否已完成，并更新合同状态
+  const checkAndUpdateContractStatus = useCallback(async (amortizationEntries: ContractAmortizationEntry[]) => {
+    if (!contractId || !amortizationEntries || amortizationEntries.length === 0) return;
+    
+    // 检查是否所有摊销条目都已完成付款
+    const allCompleted = amortizationEntries.every(entry => 
+      entry.paymentStatus === 'COMPLETED' || entry.paymentStatus === 'PAID'
+    );
+    
+    if (allCompleted) {
+      try {
+        const response = await updateContractStatus(contractId, 'COMPLETED');
+        console.log('合同状态已更新:', response.message);
+        
+        // 记录合同完成操作
+        addOperationLog('完成', '所有摊销条目已付款完成，合同状态已更新为已完成');
+      } catch (error) {
+        console.error('更新合同状态失败:', error);
+      }
+    }
+  }, [contractId]);
 
   // 获取预提会计分录预览数据
   const fetchJournalEntriesPreview = async () => {
@@ -125,13 +157,15 @@ const ContractDetail: React.FC = () => {
                 paymentId: payment.paymentId,
                 paymentDate: payment.bookingDate,
                 entryOrder: entry.entryOrder || (entryIndex + 1),
-                entryType: 'PAYMENT',
+                entryType: entry.entryType || 'PAYMENT',
                 bookingDate: entry.bookingDate,
                 account: entry.account,
-                debitAmount: entry.dr,
-                creditAmount: entry.cr,
-                memo: entry.memo,
-                paymentAmount: payment.paymentAmount
+                debitAmount: entry.dr || entry.debitAmount || 0,
+                creditAmount: entry.cr || entry.creditAmount || 0,
+                memo: entry.memo || entry.description || '',
+                paymentTimestamp: entry.paymentTimestamp || entry.accountingReviewTime,
+                paymentAmount: payment.paymentAmount,
+                amortizationPeriod: entry.amortizationPeriod || ''
               });
             });
           }
@@ -146,33 +180,39 @@ const ContractDetail: React.FC = () => {
     }
   };
 
-  // 导出付款分录为Excel
+  // 导出付款分录和预提摊销分录为Excel
   const exportPaymentEntriesToExcel = () => {
-    if (!paymentJournalEntriesData || paymentJournalEntriesData.length === 0) {
-      message.warning('暂无数据可导出');
-      return;
+    // 调试：查看预提分录数据结构
+    console.log('预提分录原始数据:', journalEntriesData?.previewEntries);
+    if (journalEntriesData?.previewEntries && journalEntriesData.previewEntries.length > 0) {
+      console.log('第一条预提分录示例:', journalEntriesData.previewEntries[0]);
     }
-
+    
     // 准备Excel数据
     const headers = [
+      '分录类型',
       '付款ID',
       '入账日期', 
       '科目名称',
       '借方金额',
       '贷方金额',
-      '备注',
+      '分录描述',
       '摊销期间',
-      '分录类型',
       '会计复核时间'
     ];
 
-    // 获取基础数据并按月份过滤
-    let filteredEntries = getFilteredAndSortedPaymentEntries();
+    // 获取付款分录数据
+    let filteredPaymentEntries = getFilteredAndSortedPaymentEntries();
+    
+    // 获取预提摊销分录数据
+    let filteredAccrualEntries = journalEntriesData?.previewEntries || [];
     
     // 如果选择了特定月份，则过滤该月份的数据
     if (selectedExportMonth) {
       const selectedMonth = selectedExportMonth.format('YYYY-MM');
-      filteredEntries = filteredEntries.filter(entry => {
+      
+      // 过滤付款分录
+      filteredPaymentEntries = filteredPaymentEntries.filter(entry => {
         if (entry.bookingDate) {
           const entryMonth = dayjs(entry.bookingDate).format('YYYY-MM');
           return entryMonth === selectedMonth;
@@ -180,20 +220,86 @@ const ContractDetail: React.FC = () => {
         return false;
       });
       
-      if (filteredEntries.length === 0) {
-        message.warning(`${selectedMonth} 月份暂无付款分录数据`);
+      // 过滤预提摊销分录
+      filteredAccrualEntries = filteredAccrualEntries.filter(entry => {
+        if (entry.bookingDate) {
+          const entryMonth = dayjs(entry.bookingDate).format('YYYY-MM');
+          return entryMonth === selectedMonth;
+        }
+        return false;
+      });
+      
+      if (filteredPaymentEntries.length === 0 && filteredAccrualEntries.length === 0) {
+        message.warning(`${selectedMonth} 月份暂无分录数据`);
+        return;
+      }
+    } else {
+      // 如果没有选择月份，检查是否有数据
+      if (filteredPaymentEntries.length === 0 && filteredAccrualEntries.length === 0) {
+        message.warning('暂无数据可导出');
         return;
       }
     }
     
-    const groupedByPayment = filteredEntries.reduce((groups, entry) => {
-      const paymentKey = entry.paymentId ? `payment-${entry.paymentId}` : 'no-payment';
-      if (!groups[paymentKey]) {
-        groups[paymentKey] = [];
+    // 合并付款分录和预提摊销分录
+    const allEntries: any[] = [];
+    
+    // 添加付款分录
+    filteredPaymentEntries.forEach(entry => {
+      allEntries.push({
+        type: '付款分录',
+        paymentId: entry.paymentId || '',
+        bookingDate: entry.bookingDate || '',
+        account: entry.account || '',
+        debitAmount: entry.debitAmount || '0.00',
+        creditAmount: entry.creditAmount || '0.00',
+        memo: entry.memo || '',
+        amortizationPeriod: entry.amortizationPeriod || '',
+        reviewTime: entry.paymentTimestamp ? new Date(entry.paymentTimestamp).toLocaleString('zh-CN') : '',
+        sortDate: entry.bookingDate ? new Date(entry.bookingDate).getTime() : 0
+      });
+    });
+    
+    // 添加预提摊销分录（使用已过滤的数据）
+    filteredAccrualEntries.forEach(entry => {
+        allEntries.push({
+          type: '预提摊销分录',
+          paymentId: '',
+          bookingDate: entry.bookingDate || '',
+          account: entry.accountName || entry.account || '',  // 使用accountName字段
+          debitAmount: entry.debitAmount || '0.00',
+          creditAmount: entry.creditAmount || '0.00',
+          memo: entry.memo || '',
+          amortizationPeriod: entry.amortizationPeriod || entry.accountingPeriod || '',  // 尝试多个字段
+          reviewTime: '',
+          sortDate: entry.bookingDate ? new Date(entry.bookingDate).getTime() : 0
+        });
+    });
+    
+    // 按月份分组
+    const groupedByMonth: { [key: string]: any[] } = {};
+    allEntries.forEach(entry => {
+      const month = entry.bookingDate ? dayjs(entry.bookingDate).format('YYYY-MM') : '未知';
+      if (!groupedByMonth[month]) {
+        groupedByMonth[month] = [];
       }
-      groups[paymentKey].push(entry);
-      return groups;
-    }, {});
+      groupedByMonth[month].push(entry);
+    });
+    
+    // 按月份排序（降序）
+    const sortedMonths = Object.keys(groupedByMonth).sort((a, b) => b.localeCompare(a));
+    
+    // 在每个月份内按会计科目排序
+    sortedMonths.forEach(month => {
+      groupedByMonth[month].sort((a, b) => {
+        // 首先按会计科目排序
+        const accountCompare = a.account.localeCompare(b.account, 'zh-CN');
+        if (accountCompare !== 0) return accountCompare;
+        
+        // 相同科目按入账日期排序
+        return a.sortDate - b.sortDate;
+      });
+    });
 
     // 创建工作表数据
     const worksheetData = [];
@@ -201,18 +307,13 @@ const ContractDetail: React.FC = () => {
     // 添加标题行
     worksheetData.push(headers);
     
-    // 按付款分组添加数据
-    Object.keys(groupedByPayment).sort((a, b) => {
-      const aId = a.startsWith('payment-') ? parseInt(a.split('-')[1]) : 0;
-      const bId = b.startsWith('payment-') ? parseInt(b.split('-')[1]) : 0;
-      return bId - aId;
-    }).forEach(paymentKey => {
-      const entries = groupedByPayment[paymentKey];
-      const paymentId = paymentKey.startsWith('payment-') ? paymentKey.split('-')[1] : '未知';
+    // 按月份添加数据
+    sortedMonths.forEach(month => {
+      const entries = groupedByMonth[month];
       
-      // 添加付款分组标题
+      // 添加月份标题
       worksheetData.push([
-        `付款 ${paymentId}`,
+        `${month} 月份分录`,
         '',
         '',
         '',
@@ -223,18 +324,18 @@ const ContractDetail: React.FC = () => {
         ''
       ]);
       
-      // 添加该付款的所有分录
+      // 添加该月份的所有分录（已按科目排序）
       entries.forEach((entry: any) => {
         worksheetData.push([
-          entry.paymentId || '',
-          entry.bookingDate || '',
-          entry.account || '',
-          entry.debitAmount || '0.00',
-          entry.creditAmount || '0.00',
-          entry.memo || '',
-          entry.amortizationPeriod || '',
-          entry.entryType || '',
-          entry.accountingReviewTime ? new Date(entry.accountingReviewTime).toLocaleString('zh-CN') : ''
+          entry.type,
+          entry.paymentId,
+          entry.bookingDate,
+          entry.account,
+          entry.debitAmount,
+          entry.creditAmount,
+          entry.memo,
+          entry.amortizationPeriod,
+          entry.reviewTime
         ]);
       });
       
@@ -256,13 +357,81 @@ const ContractDetail: React.FC = () => {
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     const monthSuffix = selectedExportMonth ? `_${selectedExportMonth.format('YYYY-MM')}月` : '';
-    link.setAttribute('download', `付款会计分录_合同${contractId}${monthSuffix}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `会计分录_合同${contractId}${monthSuffix}_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    message.success('导出成功');
+    // 计算各类型分录数量
+    const paymentCount = allEntries.filter(e => e.type === '付款分录').length;
+    const accrualCount = allEntries.filter(e => e.type === '预提摊销分录').length;
+    const exportedCount = `（付款分录: ${paymentCount}条，预提摊销分录: ${accrualCount}条）`;
+    message.success(`导出成功 ${exportedCount}`);
+    
+    // 记录导出操作
+    addOperationLog('导出', `导出会计分录${monthSuffix} ${exportedCount}`);
+  };
+
+  // 添加操作记录（后端已自动记录，前端只需刷新列表）
+  const addOperationLog = async (operationType: string, description: string, customTimestamp?: string) => {
+    if (!contractId) return;
+    
+    // 后端已经在各个操作中自动记录了操作日志
+    // 前端只需要刷新操作日志列表即可
+    console.log('操作记录已由后端自动生成:', operationType, description);
+    
+    // 延迟一下再刷新，确保后端已经保存
+    setTimeout(async () => {
+      await fetchOperationLogs();
+    }, 500);
+  };
+
+  // 获取操作记录数据
+  const fetchOperationLogs = async () => {
+    if (!contractId) return;
+    
+    setOperationLogsLoading(true);
+    try {
+      const response = await getOperationLogsByContractId(contractId);
+      
+      if (response.success) {
+        // 将后端返回的 operationTime 映射为前端使用的 timestamp
+        const mappedLogs = response.data.map((log: any) => ({
+          ...log,
+          timestamp: log.operationTime || log.createdAt
+        }));
+        setOperationLogs(mappedLogs);
+      } else {
+        // 如果API失败，从localStorage加载
+        const storageKey = `operationLogs_${contractId}`;
+        const storedLogs = localStorage.getItem(storageKey);
+        
+        if (storedLogs) {
+          const logs = JSON.parse(storedLogs);
+          setOperationLogs(logs);
+        } else {
+          setOperationLogs([]);
+        }
+      }
+      
+      setOperationLogsLoading(false);
+    } catch (error) {
+      console.error('获取操作记录失败:', error);
+      
+      // API失败时从localStorage加载
+      const storageKey = `operationLogs_${contractId}`;
+      const storedLogs = localStorage.getItem(storageKey);
+      
+      if (storedLogs) {
+        const logs = JSON.parse(storedLogs);
+        setOperationLogs(logs);
+      } else {
+        setOperationLogs([]);
+      }
+      
+      setOperationLogsLoading(false);
+    }
   };
 
   // 处理付款分录数据的排序和筛选
@@ -307,7 +476,7 @@ const ContractDetail: React.FC = () => {
 
   // 组件加载时获取数据
   useEffect(() => {
-    fetchContractData();
+    fetchContractData(true); // 初始加载时记录操作
     setIsInitialLoad(false); // 初始加载完成
   }, [fetchContractData]);
 
@@ -327,6 +496,9 @@ const ContractDetail: React.FC = () => {
       } else if (activeKey === 'payment') {
         // 付款会计分录页面，获取实际的付款分录
         await fetchPaymentJournalEntries();
+      } else if (activeKey === 'operations') {
+        // 操作记录页面，获取操作记录
+        await fetchOperationLogs();
       }
     };
 
@@ -420,6 +592,16 @@ const ContractDetail: React.FC = () => {
       
       // 重新获取合同数据以更新摊销条目状态
       await fetchContractData();
+      
+      // 重新获取操作记录（后端已自动创建付款记录）
+      await fetchOperationLogs();
+      
+      // 等待状态更新后再检查合同状态
+      setTimeout(async () => {
+        if (contractData?.amortization) {
+          await checkAndUpdateContractStatus(contractData.amortization);
+        }
+      }, 100);
       
       // 清理已完成记录的选中状态
       setSelectedRowKeys(prev => {
@@ -567,6 +749,16 @@ const ContractDetail: React.FC = () => {
       // 重新获取合同数据以更新摊销条目状态
       await fetchContractData();
       
+      // 重新获取操作记录（后端已自动创建付款记录）
+      await fetchOperationLogs();
+      
+      // 等待状态更新后再检查合同状态
+      setTimeout(async () => {
+        if (contractData?.amortization) {
+          await checkAndUpdateContractStatus(contractData.amortization);
+        }
+      }, 100);
+      
       // 强制重新渲染以确保按钮样式更新
       await new Promise(resolve => setTimeout(resolve, 50));
       
@@ -605,29 +797,6 @@ const ContractDetail: React.FC = () => {
     return contractData.amortization.filter(record => selectedRowKeys.includes(record.id));
   };
 
-  // 处理查看审计日志
-  const handleViewAuditLog = async (entryId: number) => {
-    setCurrentAuditEntryId(entryId);
-    setIsAuditLogModalVisible(true);
-    setAuditLogLoading(true);
-    
-    try {
-      const response = await getAuditLogsByAmortizationEntryId(entryId);
-      setAuditLogData(response);
-    } catch (error) {
-      message.error('获取审计日志失败');
-      console.error('获取审计日志失败:', error);
-    } finally {
-      setAuditLogLoading(false);
-    }
-  };
-
-  // 关闭审计日志弹窗
-  const handleCloseAuditLogModal = () => {
-    setIsAuditLogModalVisible(false);
-    setAuditLogData(null);
-    setCurrentAuditEntryId(null);
-  };
 
   // 多选处理
   const rowSelection = {
@@ -650,10 +819,15 @@ const ContractDetail: React.FC = () => {
   // 预提支付表表头（匹配API返回数据）
   const columns = [
     { 
-      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>期次</span>, 
-      dataIndex: 'id', 
-      key: 'id', 
-      width: 80 
+      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>序号</span>, 
+      key: 'index', 
+      width: 80,
+      align: 'center' as const,
+      render: (_: any, __: any, index: number) => (
+        <span style={{ color: '#0F172A', fontWeight: '500', fontSize: '14px' }}>
+          {index + 1}
+        </span>
+      )
     },
     { 
       title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>预提期间</span>, 
@@ -768,21 +942,6 @@ const ContractDetail: React.FC = () => {
             >
               {isCompleted ? '已完成' : '支付'}
             </Button>
-            {isCompleted && (
-              <Button
-                type="link"
-                size="small"
-                onClick={() => handleViewAuditLog(record.id)}
-                style={{
-                  color: '#1890ff',
-                  fontSize: '12px',
-                  padding: '0 4px',
-                  height: 'auto'
-                }}
-              >
-                audit log
-              </Button>
-            )}
           </Space>
         );
       }
@@ -832,7 +991,8 @@ const ContractDetail: React.FC = () => {
       )
     },
     { 
-      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>备注</span>, 
+      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>分录描述
+      </span>, 
       dataIndex: 'memo', 
       key: 'memo', 
       width: 150,
@@ -846,7 +1006,7 @@ const ContractDetail: React.FC = () => {
     { title: '付款日期', dataIndex: 'paymentDate', key: 'paymentDate' },
     { title: '科目', dataIndex: 'account', key: 'account' },
     { title: '金额', dataIndex: 'amount', key: 'amount' },
-    { title: '备注', dataIndex: 'remark', key: 'remark' },
+    { title: '分录描述', dataIndex: 'remark', key: 'remark' },
   ];
 
 
@@ -980,16 +1140,8 @@ const ContractDetail: React.FC = () => {
       )
     },
     {
-      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>分录描述</span>,
-      dataIndex: 'description',
-      key: 'description',
-      width: 150,
-      render: (description: string) => (
-        <span style={{ color: '#1F2937', fontSize: '13px' }}>{description}</span>
-      )
-    },
-    {
-      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>备注</span>,
+      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>分录描述
+      </span>,
       dataIndex: 'memo',
       key: 'memo',
       width: 200,
@@ -1221,15 +1373,6 @@ const ContractDetail: React.FC = () => {
     },
     {
       title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>分录描述</span>,
-      dataIndex: 'description',
-      key: 'description',
-      width: 150,
-      render: (description: string) => (
-        <span style={{ color: '#1F2937', fontSize: '13px' }}>{description}</span>
-      )
-    },
-    {
-      title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>备注</span>,
       dataIndex: 'memo',
       key: 'memo',
       width: 200,
@@ -1239,8 +1382,8 @@ const ContractDetail: React.FC = () => {
     },
     {
       title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>会计复核时间</span>,
-      dataIndex: 'accountingReviewTime',
-      key: 'accountingReviewTime',
+      dataIndex: 'paymentTimestamp',
+      key: 'paymentTimestamp',
       width: 180,
       render: (date: string) => (
         <span style={{ color: '#1F2937', fontSize: '13px' }}>
@@ -1273,22 +1416,30 @@ const ContractDetail: React.FC = () => {
 
     const filteredEntries = getFilteredAndSortedPaymentEntries();
     
-    // 按付款ID分组分录
-    const groupedByPayment = filteredEntries.reduce((groups, entry) => {
-      // 使用付款ID作为分组依据，如果没有则使用默认分组
+    // 按付款ID分组
+    const groupedByPayment: { [key: string]: any[] } = {};
+    filteredEntries.forEach(entry => {
       const paymentKey = entry.paymentId ? `payment-${entry.paymentId}` : 'no-payment';
-      if (!groups[paymentKey]) {
-        groups[paymentKey] = [];
+      if (!groupedByPayment[paymentKey]) {
+        groupedByPayment[paymentKey] = [];
       }
-      groups[paymentKey].push(entry);
-      return groups;
-    }, {});
-
-    // 按付款ID排序（数字排序）
+      groupedByPayment[paymentKey].push(entry);
+    });
+    
+    // 按付款ID排序（数字降序，最新的付款在前）
     const sortedPaymentKeys = Object.keys(groupedByPayment).sort((a, b) => {
       const aId = a.startsWith('payment-') ? parseInt(a.split('-')[1]) : 0;
       const bId = b.startsWith('payment-') ? parseInt(b.split('-')[1]) : 0;
-      return bId - aId; // 降序排列，最新的付款在前
+      return bId - aId;
+    });
+    
+    // 在每个付款组内按入账日期排序
+    sortedPaymentKeys.forEach(paymentKey => {
+      groupedByPayment[paymentKey].sort((a, b) => {
+        const dateA = a.bookingDate ? new Date(a.bookingDate).getTime() : 0;
+        const dateB = b.bookingDate ? new Date(b.bookingDate).getTime() : 0;
+        return dateA - dateB; // 升序，早的在前
+      });
     });
 
     return (
@@ -1330,8 +1481,8 @@ const ContractDetail: React.FC = () => {
         {sortedPaymentKeys.map((paymentKey, index) => {
           const paymentId = paymentKey.startsWith('payment-') ? paymentKey.split('-')[1] : '未知';
           const entries = groupedByPayment[paymentKey];
-          const paymentDate = entries[0]?.accountingReviewTime ? 
-            new Date(entries[0].accountingReviewTime).toLocaleDateString('zh-CN') : 
+          const paymentDate = entries[0]?.paymentTimestamp ? 
+            new Date(entries[0].paymentTimestamp).toLocaleDateString('zh-CN') : 
             new Date(entries[0]?.bookingDate).toLocaleDateString('zh-CN');
           
           return (
@@ -1395,6 +1546,105 @@ const ContractDetail: React.FC = () => {
         
         {/* 借贷平衡总计行 */}
         {JournalEntryImmutable.renderTotalRow(filteredEntries)}
+      </div>
+    );
+  };
+
+  // 渲染操作记录页面
+  const renderOperationLogs = () => {
+    const operationColumns = [
+      {
+        title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>操作时间</span>,
+        dataIndex: 'timestamp',
+        key: 'timestamp',
+        width: 180,
+        render: (timestamp: string) => (
+          <span style={{ color: '#1F2937', fontSize: '13px' }}>
+            {dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        )
+      },
+      {
+        title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>操作类型</span>,
+        dataIndex: 'operationType',
+        key: 'operationType',
+        width: 120,
+        render: (type: string) => {
+          const colors = {
+            '生成': '#52C41A',
+            '付款': '#1890FF', 
+            '导出': '#722ED1'
+          };
+          return (
+            <span style={{ 
+              color: colors[type as keyof typeof colors] || '#666',
+              fontSize: '13px',
+              fontWeight: '500'
+            }}>
+              {type}
+            </span>
+          );
+        }
+      },
+      {
+        title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>操作描述</span>,
+        dataIndex: 'description',
+        key: 'description',
+        render: (description: string) => (
+          <span style={{ color: '#1F2937', fontSize: '13px' }}>{description}</span>
+        )
+      },
+      {
+        title: <span style={{ color: '#0F172A', fontWeight: '600', fontSize: '14px' }}>操作人</span>,
+        dataIndex: 'operator',
+        key: 'operator',
+        width: 120,
+        render: (operator: string) => (
+          <span style={{ color: '#6B7280', fontSize: '13px' }}>{operator}</span>
+        )
+      }
+    ];
+
+    if (operationLogsLoading) {
+      return (
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <Spin size="large" className="outlook-spin" />
+          <div style={{ marginTop: 16 }}>
+            <Text style={{ color: '#6B7280', fontSize: '14px' }}>正在加载操作记录...</Text>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '12px',
+          border: '1px solid #E5E5E5',
+          overflow: 'hidden'
+        }}>
+          <Table
+            columns={operationColumns}
+            dataSource={operationLogs}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
+            }}
+            size="middle"
+            rowKey="id"
+            scroll={{ x: 800 }}
+            locale={{
+              emptyText: (
+                <div style={{ padding: '40px 0' }}>
+                  <Text type="secondary">暂无操作记录</Text>
+                </div>
+              )
+            }}
+          />
+        </div>
       </div>
     );
   };
@@ -1711,6 +1961,14 @@ const ContractDetail: React.FC = () => {
                 fontSize: '14px'
               }}>付款会计分录</span>
             },
+            { 
+              key: 'operations', 
+              label: <span style={{ 
+                color: activeKey === 'operations' ? '#E31E24' : '#6B7280', 
+                fontWeight: activeKey === 'operations' ? '600' : '500',
+                fontSize: '14px'
+              }}>操作记录</span>
+            },
           ]}
           style={{ marginBottom: 0 }}
         />
@@ -1750,6 +2008,8 @@ const ContractDetail: React.FC = () => {
         renderAccrualRecords()
       ) : activeKey === 'payment' ? (
         renderPaymentRecords()
+      ) : activeKey === 'operations' ? (
+        renderOperationLogs()
       ) : (
         <Spin 
           spinning={loading}
@@ -1933,100 +2193,6 @@ const ContractDetail: React.FC = () => {
         </div>
       </Modal>
 
-      {/* Audit Log 弹窗 */}
-      <Modal
-        title={`审计日志 - 摊销明细 ID: ${currentAuditEntryId}`}
-        open={isAuditLogModalVisible}
-        onCancel={handleCloseAuditLogModal}
-        footer={[
-          <Button key="close" onClick={handleCloseAuditLogModal}>
-            关闭
-          </Button>
-        ]}
-        width={800}
-        style={{ top: 20 }}
-      >
-        <Spin spinning={auditLogLoading}>
-          {auditLogData && auditLogData.auditLogs.length > 0 ? (
-            <Table
-              dataSource={auditLogData.auditLogs}
-              rowKey="id"
-              pagination={false}
-              size="small"
-              scroll={{ x: 700 }}
-              columns={[
-                {
-                  title: '操作时间',
-                  dataIndex: 'operationTime',
-                  key: 'operationTime',
-                  width: 140,
-                  render: (time: string) => (
-                    <span style={{ fontSize: '12px' }}>{time}</span>
-                  )
-                },
-                {
-                  title: '操作类型',
-                  dataIndex: 'operationTypeDesc',
-                  key: 'operationTypeDesc',
-                  width: 80,
-                  render: (desc: string) => (
-                    <span style={{ fontSize: '12px', fontWeight: '500' }}>{desc}</span>
-                  )
-                },
-                {
-                  title: '操作人',
-                  dataIndex: 'operatorId',
-                  key: 'operatorId',
-                  width: 100,
-                  render: (id: string) => (
-                    <span style={{ fontSize: '12px' }}>{id}</span>
-                  )
-                },
-                {
-                  title: '付款金额',
-                  dataIndex: 'paymentAmount',
-                  key: 'paymentAmount',
-                  width: 100,
-                  render: (amount: number) => (
-                    <span style={{ fontSize: '12px', color: '#E31E24', fontWeight: '500' }}>
-                      {amount ? `¥${amount.toFixed(2)}` : '-'}
-                    </span>
-                  )
-                },
-                {
-                  title: '付款状态',
-                  dataIndex: 'paymentStatusDesc',
-                  key: 'paymentStatusDesc',
-                  width: 80,
-                  render: (status: string) => (
-                    <span style={{ 
-                      fontSize: '12px',
-                      color: status === '已付款' ? '#065F46' : '#B45309',
-                      backgroundColor: status === '已付款' ? '#D1FAE5' : '#FEF3C7',
-                      padding: '2px 6px',
-                      borderRadius: '4px'
-                    }}>
-                      {status || '-'}
-                    </span>
-                  )
-                },
-                {
-                  title: '备注',
-                  dataIndex: 'remark',
-                  key: 'remark',
-                  render: (remark: string) => (
-                    <span style={{ fontSize: '12px' }}>{remark || '-'}</span>
-                  )
-                }
-              ]}
-            />
-          ) : (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-              暂无审计日志记录
-            </div>
-          )}
-        </Spin>
-      </Modal>
       </div>
     </>
   );

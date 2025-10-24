@@ -85,6 +85,7 @@ const Login: React.FC = () => {
       // 登录成功
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('username', username);
+      localStorage.setItem('userId', username); // 使用username作为userId
       message.success(`欢迎回来，${username}！`);
 
       // 跳转到首页

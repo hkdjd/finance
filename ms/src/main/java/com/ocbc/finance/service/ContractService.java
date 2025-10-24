@@ -1,6 +1,7 @@
 package com.ocbc.finance.service;
 
 import com.ocbc.finance.dto.*;
+import com.ocbc.finance.dto.CreateOperationLogRequest;
 import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.model.Contract;
 import com.ocbc.finance.model.Payment;
@@ -35,6 +36,7 @@ public class ContractService {
     private final FileUploadService fileUploadService;
     private final ExternalContractParseService externalContractParseService;
     private final CustomKeywordService customKeywordService;
+    private final OperationLogService operationLogService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public ContractService(ContractRepository contractRepository,
@@ -43,7 +45,8 @@ public class ContractService {
                            AmortizationCalculationService calculationService,
                            FileUploadService fileUploadService,
                            ExternalContractParseService externalContractParseService,
-                           CustomKeywordService customKeywordService) {
+                           CustomKeywordService customKeywordService,
+                           OperationLogService operationLogService) {
         this.contractRepository = contractRepository;
         this.amortizationEntryRepository = amortizationEntryRepository;
         this.paymentRepository = paymentRepository;
@@ -51,6 +54,7 @@ public class ContractService {
         this.fileUploadService = fileUploadService;
         this.externalContractParseService = externalContractParseService;
         this.customKeywordService = customKeywordService;
+        this.operationLogService = operationLogService;
     }
 
     @Transactional
@@ -86,6 +90,26 @@ public class ContractService {
             entry.setAmount(e.getAmount());
             entry.setPeriodDate(LocalDate.parse(e.getAmortizationPeriod() + "-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             amortizationEntryRepository.save(entry);
+        }
+
+        // 创建操作日志：合同生成
+        try {
+            String desc = String.format("合同生成：供应商=%s，总金额=¥%s，期间=%s 至 %s",
+                    contract.getVendorName(),
+                    contract.getTotalAmount() != null ? contract.getTotalAmount().toPlainString() : "0",
+                    req.getStartDate(),
+                    req.getEndDate());
+            CreateOperationLogRequest logReq = new CreateOperationLogRequest(
+                    contract.getId(),
+                    "生成",
+                    desc,
+                    req.getOperatorId() != null ? req.getOperatorId() : "system",
+                    java.time.LocalDateTime.now()
+            );
+            operationLogService.createOperationLog(logReq);
+        } catch (Exception ex) {
+            // 保底不中断主流程
+            System.out.println("记录合同生成操作日志失败: " + ex.getMessage());
         }
         return buildResponseForContract(contract.getId());
     }
@@ -129,9 +153,12 @@ public class ContractService {
                 })
                 .collect(Collectors.toList());
         return AmortizationResponse.builder()
+                .contractId(contract.getId())
                 .totalAmount(contract.getTotalAmount())
                 .startDate(contract.getStartDate().getYear() + "-" + String.format("%02d", contract.getStartDate().getMonthValue()))
                 .endDate(contract.getEndDate().getYear() + "-" + String.format("%02d", contract.getEndDate().getMonthValue()))
+                .vendorName(contract.getVendorName())
+                .taxRate(contract.getTaxRate())
                 .scenario(null)
                 .generatedAt(java.time.OffsetDateTime.now())
                 .entries(dtoList)
@@ -150,13 +177,66 @@ public class ContractService {
     }
 
     /**
+     * 仅解析合同文件，不保存到数据库
+     * @param file 上传的合同文件
+     * @param userId 用户ID（用于获取自定义关键字）
+     * @return 合同解析响应（不包含contractId）
+     */
+    public ContractUploadResponse parseContractOnly(MultipartFile file, Long userId) {
+        try {
+            // 1. 上传文件到指定目录
+            String savedFileName = fileUploadService.uploadContractFile(file);
+            
+            // 2. 获取用户的自定义关键字
+            List<String> customKeywords = null;
+            if (userId != null) {
+                customKeywords = customKeywordService.getKeywordStringsByUserId(userId);
+            }
+            
+            // 3. 调用AI模块解析合同（传递自定义关键字）
+            File contractFile = fileUploadService.getContractFile(savedFileName);
+            ExternalContractParseResponse parseResponse = externalContractParseService.parseContract(contractFile, customKeywords);
+            
+            // 4. 构建响应（不保存到数据库）
+            ContractUploadResponse response = new ContractUploadResponse();
+            response.setContractId(null); // 没有contractId，因为还未保存
+            response.setTotalAmount(parseResponse.getTotalAmount() != null ? parseResponse.getTotalAmount() : BigDecimal.ZERO);
+            response.setStartDate(parseResponse.getStartDate() != null && !parseResponse.getStartDate().trim().isEmpty() 
+                    ? parseResponse.getStartDate() : LocalDate.now().toString());
+            response.setEndDate(parseResponse.getEndDate() != null && !parseResponse.getEndDate().trim().isEmpty() 
+                    ? parseResponse.getEndDate() : LocalDate.now().plusMonths(12).toString());
+            response.setVendorName(parseResponse.getVendorName() != null ? parseResponse.getVendorName() : "未知供应商");
+            response.setTaxRate(parseResponse.getTaxRate() != null ? parseResponse.getTaxRate() : BigDecimal.ZERO);
+            response.setAttachmentName(file.getOriginalFilename());
+            
+            // 设置attachmentPath为可访问的URL（用于PDF预览）
+            String tempFileUrl = "http://localhost:8081/contracts/temp/" + savedFileName;
+            response.setAttachmentPath(tempFileUrl);
+            
+            // 如果有自定义字段结果，也返回给前端
+            if (parseResponse.getCustomFields() != null && !parseResponse.getCustomFields().isEmpty()) {
+                response.setCustomFields(parseResponse.getCustomFields());
+            }
+            
+            response.setCreatedAt(java.time.OffsetDateTime.now());
+            response.setMessage(parseResponse.isSuccess() ? "合同解析成功" : "合同解析失败：" + parseResponse.getErrorMessage());
+            
+            return response;
+            
+        } catch (Exception e) {
+            throw new RuntimeException("合同解析失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * 上传合同文件并解析
      * @param file 上传的合同文件
      * @param userId 用户ID（用于获取自定义关键字）
+     * @param operatorId 操作人ID，用于操作日志记录
      * @return 合同上传响应
      */
     @Transactional
-    public ContractUploadResponse uploadContract(MultipartFile file, Long userId) {
+    public ContractUploadResponse uploadContract(MultipartFile file, Long userId, String operatorId) {
         try {
             // 1.1 上传文件到指定目录
             String savedFileName = fileUploadService.uploadContractFile(file);
@@ -224,6 +304,27 @@ public class ContractService {
             
             contract = contractRepository.save(contract);
             
+            // 创建操作日志：合同上传
+            try {
+                String desc = String.format("合同上传：供应商=%s，总金额=¥%s，期间=%s 至 %s，附件=%s",
+                        contract.getVendorName(),
+                        contract.getTotalAmount() != null ? contract.getTotalAmount().toPlainString() : "0",
+                        contract.getStartDate(),
+                        contract.getEndDate(),
+                        file.getOriginalFilename());
+                CreateOperationLogRequest logReq = new CreateOperationLogRequest(
+                        contract.getId(),
+                        "上传",
+                        desc,
+                        operatorId != null ? operatorId : "system",
+                        java.time.LocalDateTime.now()
+                );
+                operationLogService.createOperationLog(logReq);
+            } catch (Exception ex) {
+                // 保底不中断主流程
+                System.out.println("记录合同上传操作日志失败: " + ex.getMessage());
+            }
+            
             // 构建响应
             ContractUploadResponse response = new ContractUploadResponse();
             response.setContractId(contract.getId());
@@ -273,6 +374,26 @@ public class ContractService {
         }
         
         contract = contractRepository.save(contract);
+        
+        // 创建操作日志：合同编辑
+        try {
+            String desc = String.format("合同编辑：供应商=%s，总金额=¥%s，期间=%s 至 %s",
+                    contract.getVendorName(),
+                    contract.getTotalAmount() != null ? contract.getTotalAmount().toPlainString() : "0",
+                    contract.getStartDate(),
+                    contract.getEndDate());
+            CreateOperationLogRequest logReq = new CreateOperationLogRequest(
+                    contract.getId(),
+                    "编辑",
+                    desc,
+                    "system",
+                    java.time.LocalDateTime.now()
+            );
+            operationLogService.createOperationLog(logReq);
+        } catch (Exception ex) {
+            // 保底不中断主流程
+            System.out.println("记录合同编辑操作日志失败: " + ex.getMessage());
+        }
         
         // 构建响应
         ContractUploadResponse response = new ContractUploadResponse();
@@ -400,6 +521,20 @@ public class ContractService {
             return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {});
         } catch (JsonProcessingException e) {
             throw new RuntimeException("解析自定义字段JSON失败", e);
+        }
+    }
+
+    /**
+     * 获取临时上传文件的Resource
+     * @param fileName 文件名
+     * @return Resource
+     */
+    public org.springframework.core.io.Resource getTempFileResource(String fileName) {
+        try {
+            File file = fileUploadService.getContractFile(fileName);
+            return new org.springframework.core.io.FileSystemResource(file);
+        } catch (Exception e) {
+            throw new RuntimeException("获取临时文件失败: " + e.getMessage(), e);
         }
     }
 }

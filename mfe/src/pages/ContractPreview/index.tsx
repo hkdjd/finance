@@ -8,7 +8,7 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { PrepaymentItem } from './types';
 import styles from './styles.module.css';
-import { updateContract } from '../../api/contracts';
+import { updateContract, createContract } from '../../api/contracts';
 import { operateAmortization } from '../../api/amortization';
 import pdfFile from '../../constants/contract_20251015_200057_504d8439.pdf';
 
@@ -27,13 +27,18 @@ const formatDateTime = (dateString: string): string => {
   });
 };
 
+// 获取当前登录用户ID
+const getCurrentUserId = (): string => {
+  return localStorage.getItem('userId') || localStorage.getItem('username') || 'guest';
+};
+
 const ContractPreview: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setGuard } = useNavigationGuard();
   
   // 从路由状态中获取合同信息和摘销数据
-  const { contractInfo, prepaymentData } = location.state || {};
+  const { contractInfo, prepaymentData, isNewContract } = location.state || {};
   
   // 获取 PDF 预览地址（优先使用 attachmentPath）
   const pdfUrl = contractInfo?.attachmentPath || '';
@@ -346,25 +351,49 @@ const ContractPreview: React.FC = () => {
   const handleSubmitData = useCallback(async () => {
     setSubmitting(true);
     try {
-      // 1. 调用 updateContract 接口更新合同信息
-      message.loading({ content: '正在更新合同信息...', key: 'update' });
-      const updateContractRequest = {
-        totalAmount: editableContractInfo.totalAmount,
-        startDate: editableContractInfo.startDate,
-        endDate: editableContractInfo.endDate,
-        taxRate: editableContractInfo.taxRate,
-        vendorName: editableContractInfo.vendorName,
-        customFields: editableContractInfo.customFields
-      };
-      await updateContract(editableContractInfo.contractId, updateContractRequest);
-      message.success({ content: '合同信息更新成功', key: 'update' });
+      let contractId = editableContractInfo.contractId;
+
+      // 获取当前登录用户ID
+      const currentUserId = getCurrentUserId();
+
+      // 如果是新合同，先创建合同
+      if (isNewContract) {
+        message.loading({ content: '正在创建合同...', key: 'create' });
+        const createContractRequest = {
+          totalAmount: editableContractInfo.totalAmount,
+          startDate: editableContractInfo.startDate,
+          endDate: editableContractInfo.endDate,
+          taxRate: editableContractInfo.taxRate,
+          vendorName: editableContractInfo.vendorName,
+          operatorId: currentUserId
+        };
+        const createResponse = await createContract(createContractRequest);
+        contractId = createResponse.contractId!; // 从响应中获取contractId
+        message.success({ content: '合同创建成功', key: 'create' });
+        
+        // 注意：后端已经创建了摊销明细，但我们还是使用用户编辑后的数据
+      } else {
+        // 如果是编辑现有合同，更新合同信息
+        message.loading({ content: '正在更新合同信息...', key: 'update' });
+        const updateContractRequest = {
+          totalAmount: editableContractInfo.totalAmount,
+          startDate: editableContractInfo.startDate,
+          endDate: editableContractInfo.endDate,
+          taxRate: editableContractInfo.taxRate,
+          vendorName: editableContractInfo.vendorName,
+          customFields: editableContractInfo.customFields,
+          operatorId: currentUserId
+        };
+        await updateContract(contractId, updateContractRequest);
+        message.success({ content: '合同信息更新成功', key: 'update' });
+      }
 
       // 2. 调用 operateAmortization 接口更新摘销明细
       message.loading({ content: '正在更新摘销明细...', key: 'amortization' });
       const operateAmortizationRequest = {
-        contractId: editableContractInfo.contractId,
+        contractId: contractId,
         amortization: dataSource.map(item => ({
-          id: typeof item.id === 'string' ? null : item.id, // 字符串ID表示新建，转为null
+          id: typeof item.id === 'string' || typeof item.id === 'number' && item.id < 1000 ? null : item.id, // 小ID表示新建，转为null
           amortizationPeriod: item.amortizationPeriod,
           accountingPeriod: item.accountingPeriod,
           amount: item.amount,
@@ -378,14 +407,14 @@ const ContractPreview: React.FC = () => {
       // 3. 两个接口都成功后，移除守卫并跳转到合同详情页
       setGuard(null);
       message.success('合同信息提交成功！');
-      navigate(`/contract/${editableContractInfo.contractId}`);
+      navigate(`/contract/${contractId}`);
     } catch (error) {
       console.error('提交失败:', error);
       message.error('提交失败，请重试');
     } finally {
       setSubmitting(false);
     }
-  }, [editableContractInfo, dataSource, navigate, setGuard]);
+  }, [editableContractInfo, dataSource, navigate, setGuard, isNewContract]);
 
   // 监听浏览器返回/刷新操作
   useEffect(() => {

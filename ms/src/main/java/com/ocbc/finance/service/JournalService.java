@@ -102,7 +102,8 @@ public class JournalService {
                 BigDecimal.ZERO,
                 "摊销费用预览",
                 "摊销费用预览 - " + period,
-                entryOrder++
+                entryOrder++,
+                period  // amortizationPeriod
             ));
             
             // 贷方：应付
@@ -114,7 +115,8 @@ public class JournalService {
                 monthlyAmount,
                 "摊销应付预览",
                 "摊销应付预览 - " + period,
-                entryOrder++
+                entryOrder++,
+                period  // amortizationPeriod
             ));
         }
         
@@ -138,7 +140,8 @@ public class JournalService {
             BigDecimal.ZERO,
             "付款预览",
             "付款预览 - " + contract.getVendorName(),
-            1
+            1,
+            ""
         ));
         
         previewEntries.add(new PreviewEntryDto(

@@ -5,6 +5,7 @@ export enum ContractStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   EXPIRED = 'EXPIRED',
+  COMPLETED = 'COMPLETED',
 }
 
 /**
@@ -243,6 +244,8 @@ export interface ContractBasicInfo {
   endDate: string;
   /** 供应商名称 */
   vendorName: string;
+  /** 创建时间 */
+  createdAt?: string;
   /** 自定义字段（可选） */
   customFields?: Record<string, string>;
 }

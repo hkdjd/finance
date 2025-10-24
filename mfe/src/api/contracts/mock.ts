@@ -185,6 +185,7 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         startDate: "2025-01-01",
         endDate: "2025-04-30",
         vendorName: "供应商A",
+        createdAt: "2024-01-24T14:30:52.123456+08:00",
         customFields: {
           '合同编号': 'HT-2025-001',
           '法人': '张三',
@@ -252,6 +253,7 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         startDate: "2024-02-01",
         endDate: "2024-07-31",
         vendorName: "美的空调租赁有限公司",
+        createdAt: "2024-02-24T14:30:52.789012+08:00",
         customFields: {
           '合同编号': 'HT-2024-085',
           '法人': '李四',
@@ -344,6 +346,7 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         startDate: "2024-03-01",
         endDate: "2024-08-31",
         vendorName: "设备供应商C",
+        createdAt: "2024-03-24T15:02:30.123456+08:00",
         customFields: {
           '合同编号': 'HT-2024-120',
           '法人': '王五',
@@ -466,7 +469,8 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         totalAmount: contract.totalAmount,
         startDate: contract.startDate,
         endDate: contract.endDate,
-        vendorName: contract.vendorName
+        vendorName: contract.vendorName,
+        createdAt: contract.createdAt
       },
       amortization
     };
@@ -479,7 +483,8 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
       totalAmount: 0,
       startDate: "",
       endDate: "",
-      vendorName: "未知供应商"
+      vendorName: "未知供应商",
+      createdAt: new Date().toISOString()
     },
     amortization: []
   };

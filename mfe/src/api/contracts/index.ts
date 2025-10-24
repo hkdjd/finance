@@ -69,6 +69,43 @@ export const getContractsList = async (
 };
 
 /**
+ * 解析合同文件（不保存到数据库）
+ * @param file 合同文件
+ * @param userId 用户ID（可选），用于获取该用户的自定义关键字
+ * @returns 合同解析响应（不包含contractId）
+ */
+export const parseContract = async (
+  file: File,
+  userId?: number
+): Promise<ContractUploadResponse> => {
+  if (USE_MOCK) {
+    // 模拟网络延迟（上传较慢）
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    const mockResponse = getMockContractUploadResponse(file.name);
+    mockResponse.contractId = null; // 解析接口不返回contractId
+    return Promise.resolve(mockResponse);
+  }
+
+  // 真实 API 调用
+  const formData = new FormData();
+  formData.append('file', file);
+  if (userId !== undefined) {
+    formData.append('userId', userId.toString());
+  }
+
+  const response = await apiPost<ContractUploadResponse>(
+    '/contracts/parse',
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+  return response as unknown as ContractUploadResponse;
+};
+
+/**
  * 上传合同文件
  * @param file 合同文件
  * @param userId 用户ID（可选），用于获取该用户的自定义关键字
@@ -101,6 +138,43 @@ export const uploadContract = async (
     }
   );
   return response as unknown as ContractUploadResponse;
+};
+
+/**
+ * 创建合同并初始化摊销明细
+ * @param request 创建合同请求参数
+ * @returns 合同创建响应（包含合同信息和摊销明细）
+ */
+export const createContract = async (
+  request: {
+    totalAmount: number;
+    startDate: string;
+    endDate: string;
+    vendorName: string;
+    taxRate: number;
+    operatorId?: string;
+  }
+): Promise<AmortizationCalculateResponse> => {
+  if (USE_MOCK) {
+    // 模拟网络延迟
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return Promise.resolve({
+      contractId: Date.now(),
+      totalAmount: request.totalAmount,
+      startDate: request.startDate,
+      endDate: request.endDate,
+      vendorName: request.vendorName,
+      taxRate: request.taxRate,
+      entries: []
+    });
+  }
+
+  // 真实 API 调用
+  const response = await apiPost<AmortizationCalculateResponse>(
+    '/contracts',
+    request
+  );
+  return response as unknown as AmortizationCalculateResponse;
 };
 
 /**
@@ -230,6 +304,100 @@ export const getAuditLogsByAmortizationEntryId = async (
     `/audit-logs/amortization-entry/${amortizationEntryId}`
   );
   return response as unknown as AuditLogResponse;
+};
+
+/**
+ * 更新合同状态
+ * @param contractId 合同ID
+ * @param status 新的合同状态
+ * @returns 更新结果
+ */
+export const updateContractStatus = async (
+  contractId: number,
+  status: string
+): Promise<{ message: string; status: string }> => {
+  if (USE_MOCK) {
+    // 模拟网络延迟
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return Promise.resolve({
+      message: `合同状态已更新为${status === 'COMPLETED' ? '已完成' : status}`,
+      status
+    });
+  }
+
+  // 真实 API 调用
+  const response = await apiPut<{ message: string; status: string }>(
+    `/contracts/${contractId}/status`,
+    { status }
+  );
+  return response as unknown as { message: string; status: string };
+};
+
+/**
+ * 创建操作记录
+ * @param operationLog 操作记录数据
+ * @returns 创建结果
+ */
+export const createOperationLog = async (operationLog: {
+  contractId: number;
+  operationType: string;
+  description: string;
+  operator: string;
+  operationTime?: string;
+}): Promise<{ success: boolean; message: string; data: any }> => {
+  if (USE_MOCK) {
+    // 模拟网络延迟
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    return Promise.resolve({
+      success: true,
+      message: '操作记录创建成功',
+      data: {
+        id: Date.now(),
+        ...operationLog,
+        operationTime: operationLog.operationTime || new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      }
+    });
+  }
+
+  // 真实 API 调用
+  const response = await apiPost<{ success: boolean; message: string; data: any }>(
+    '/api/operation-logs',
+    operationLog
+  );
+  return response as unknown as { success: boolean; message: string; data: any };
+};
+
+/**
+ * 获取合同的操作记录列表
+ * @param contractId 合同ID
+ * @returns 操作记录列表
+ */
+export const getOperationLogsByContractId = async (
+  contractId: number
+): Promise<{ success: boolean; message: string; data: any[]; total: number }> => {
+  if (USE_MOCK) {
+    // 模拟网络延迟
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    
+    // 从localStorage获取操作记录
+    const storageKey = `operationLogs_${contractId}`;
+    const storedLogs = localStorage.getItem(storageKey);
+    const logs = storedLogs ? JSON.parse(storedLogs) : [];
+    
+    return Promise.resolve({
+      success: true,
+      message: '查询成功',
+      data: logs,
+      total: logs.length
+    });
+  }
+
+  // 真实 API 调用
+  const response = await apiGet<{ success: boolean; message: string; data: any[]; total: number }>(
+    `/api/operation-logs/contract/${contractId}`
+  );
+  return response as unknown as { success: boolean; message: string; data: any[]; total: number };
 };
 
 // 导出类型

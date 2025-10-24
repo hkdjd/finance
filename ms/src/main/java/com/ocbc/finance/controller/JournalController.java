@@ -43,11 +43,24 @@ public class JournalController {
             
             // 检查是否包含contractId字段（前端格式）
             if (requestMap.containsKey("contractId")) {
-                Integer contractId = (Integer) requestMap.get("contractId");
+                Object contractIdObj = requestMap.get("contractId");
+                Long contractId;
+                
+                // 处理不同类型的contractId
+                if (contractIdObj instanceof Integer) {
+                    contractId = ((Integer) contractIdObj).longValue();
+                } else if (contractIdObj instanceof Long) {
+                    contractId = (Long) contractIdObj;
+                } else if (contractIdObj instanceof String) {
+                    contractId = Long.parseLong((String) contractIdObj);
+                } else {
+                    throw new IllegalArgumentException("无效的contractId类型: " + contractIdObj.getClass());
+                }
+                
                 String previewType = (String) requestMap.get("previewType");
                 
                 // 获取合同信息
-                Contract contract = contractRepository.findById(contractId.longValue())
+                Contract contract = contractRepository.findById(contractId)
                         .orElseThrow(() -> new IllegalArgumentException("未找到合同，ID=" + contractId));
                 
                 // 根据预览类型生成符合规范的响应
