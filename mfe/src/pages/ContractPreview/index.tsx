@@ -340,7 +340,7 @@ const ContractPreview: React.FC = () => {
     // 打印修改后的合同信息和摘销明细表数据
     console.log('=== 修改后的合同信息 ===');
     console.log(editableContractInfo);
-    console.log('=== 摘销明细表数据 ===');
+    console.log('=== 摊销明细表数据 ===');
     console.log(dataSource);
 
     // 调用接口提交数据
@@ -356,6 +356,17 @@ const ContractPreview: React.FC = () => {
       // 获取当前登录用户ID
       const currentUserId = getCurrentUserId();
 
+      // 构造合同数据
+      const contractData = {
+        ...editableContractInfo,
+        attachmentName: editableContractInfo.attachmentName, // 添加附件名称
+        customFields: dataSource.reduce((acc: Record<string, any>, item) => {
+          acc[item.fieldName] = item.fieldValue;
+          return acc;
+        }, {}),
+        operatorId: currentUserId
+      };
+
       // 如果是新合同，先创建合同
       if (isNewContract) {
         message.loading({ content: '正在创建合同...', key: 'create' });
@@ -365,6 +376,8 @@ const ContractPreview: React.FC = () => {
           endDate: editableContractInfo.endDate,
           taxRate: editableContractInfo.taxRate,
           vendorName: editableContractInfo.vendorName,
+          attachmentName: editableContractInfo.attachmentName, // 添加附件名称
+          customFields: editableContractInfo.customFields, // 添加自定义字段
           operatorId: currentUserId
         };
         const createResponse = await createContract(createContractRequest);

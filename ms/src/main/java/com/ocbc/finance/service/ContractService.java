@@ -12,6 +12,8 @@ import com.ocbc.finance.service.calculation.AmortizationCalculationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,12 +24,15 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class ContractService {
+
+    private static final Logger log = LoggerFactory.getLogger(ContractService.class);
 
     private final ContractRepository contractRepository;
     private final AmortizationEntryRepository amortizationEntryRepository;
@@ -78,6 +83,22 @@ public class ContractService {
         contract.setTaxRate(req.getTaxRate());
         contract.setStartDate(startYm.atDay(1));
         contract.setEndDate(endYm.atEndOfMonth());
+        contract.setOriginalFileName(req.getAttachmentName());
+        
+        //保存自定义字段
+        Object customFieldsObj = req.getCustomFields();
+        String customFieldsJson = null;
+        if (customFieldsObj != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                customFieldsJson = objectMapper.writeValueAsString(customFieldsObj);
+            } catch (JsonProcessingException e) {
+                log.error("Failed to serialize customFields to JSON", e);
+                customFieldsJson = "{}";
+            }
+        }
+        contract.setCustomFieldsJson(customFieldsJson);
+        
         contract = contractRepository.save(contract);
 
         // 计算摊销表并落库
@@ -104,7 +125,7 @@ public class ContractService {
                     "生成",
                     desc,
                     req.getOperatorId() != null ? req.getOperatorId() : "system",
-                    java.time.LocalDateTime.now()
+                    LocalDateTime.now()
             );
             operationLogService.createOperationLog(logReq);
         } catch (Exception ex) {
@@ -291,7 +312,7 @@ public class ContractService {
             }
             
             // 在数据库中保存原始文件名，便于显示
-            contract.setAttachmentName(file.getOriginalFilename());
+            contract.setOriginalFileName(file.getOriginalFilename());
             
             // 设置文件路径（完整路径）
             String fullFilePath = fileUploadService.getContractFile(savedFileName).getAbsolutePath();
@@ -317,7 +338,7 @@ public class ContractService {
                         "上传",
                         desc,
                         operatorId != null ? operatorId : "system",
-                        java.time.LocalDateTime.now()
+                        LocalDateTime.now()
                 );
                 operationLogService.createOperationLog(logReq);
             } catch (Exception ex) {
@@ -387,7 +408,7 @@ public class ContractService {
                     "编辑",
                     desc,
                     "system",
-                    java.time.LocalDateTime.now()
+                    LocalDateTime.now()
             );
             operationLogService.createOperationLog(logReq);
         } catch (Exception ex) {
@@ -403,7 +424,7 @@ public class ContractService {
         response.setEndDate(contract.getEndDate().toString());
         response.setVendorName(contract.getVendorName());
         response.setTaxRate(contract.getTaxRate());
-        response.setAttachmentName(contract.getAttachmentName());
+        response.setAttachmentName(contract.getOriginalFileName());
         response.setAttachmentPath(contract.getFilePath());
         response.setCreatedAt(java.time.OffsetDateTime.now());
         response.setMessage("合同信息更新成功");
@@ -430,7 +451,7 @@ public class ContractService {
         response.setEndDate(contract.getEndDate().toString());
         response.setVendorName(contract.getVendorName());
         response.setTaxRate(contract.getTaxRate());
-        response.setAttachmentName(contract.getAttachmentName());
+        response.setAttachmentName(contract.getOriginalFileName());
         response.setAttachmentPath(contract.getFilePath());
         response.setCreatedAt(java.time.OffsetDateTime.now());
         response.setMessage("查询成功");
@@ -481,7 +502,7 @@ public class ContractService {
         summary.setStartDate(contract.getStartDate().toString());
         summary.setEndDate(contract.getEndDate().toString());
         summary.setVendorName(contract.getVendorName());
-        summary.setAttachmentName(contract.getAttachmentName());
+        summary.setAttachmentName(contract.getOriginalFileName()); // 添加附件名称
         // 使用实际的创建时间，转换为OffsetDateTime
         if (contract.getCreatedAt() != null) {
             summary.setCreatedAt(contract.getCreatedAt().atOffset(java.time.ZoneOffset.of("+08:00")));

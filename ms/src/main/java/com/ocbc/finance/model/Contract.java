@@ -34,9 +34,6 @@ public class Contract extends BaseAuditable {
     @Column(name = "tax_rate", nullable = false, precision = 5, scale = 4)
     private BigDecimal taxRate;
 
-    @Column(name = "attachment_name", length = 500)
-    private String attachmentName; // 合同附件名称
-    
     @Column(name = "file_path", length = 1000)
     private String filePath; // 文件存储路径
     

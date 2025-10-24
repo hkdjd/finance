@@ -7,12 +7,32 @@ import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilte
 import { JournalEntryImmutable } from './JournalEntryImmutable';
 import dayjs from 'dayjs';
 
+// 扩展类型以包含附件名称
+type LocalContractAmortizationResponse = ContractAmortizationResponse & {
+  contract?: {
+    attachmentName: string;
+  };
+};
+
+interface ContractAmortizationResponse {
+  contract?: {
+    id: string;
+    vendorName: string;
+    startDate: string;
+    endDate: string;
+    totalAmount: number;
+    createdAt: string;
+    attachmentName: string;
+  };
+  amortization?: ContractAmortizationEntry[];
+}
+
 const { Title, Text } = Typography;
 
 const ContractDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [contractData, setContractData] = useState<ContractAmortizationResponse | null>(null);
+  const [contractData, setContractData] = useState<LocalContractAmortizationResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('timeline');
   
@@ -1873,6 +1893,26 @@ const ContractDetail: React.FC = () => {
                     fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
                   }}>
                     ¥{contractData.contract.totalAmount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 元
+                  </div>
+                </div>
+
+                {/* 合同附件名称 */}
+                <div>
+                  <div style={{ 
+                    color: '#6B7280', 
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    marginBottom: '4px'
+                  }}>
+                    合同附件名称
+                  </div>
+                  <div style={{ 
+                    color: '#0F172A', 
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    {contractData?.contract?.['attachmentName'] || '无'}
                   </div>
                 </div>
               </div>

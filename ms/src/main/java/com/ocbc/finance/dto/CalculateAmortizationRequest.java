@@ -43,4 +43,13 @@ public class CalculateAmortizationRequest {
      * 操作人ID，用于操作日志记录
      */
     private String operatorId;
+
+    /**
+     * 附件名称
+     */
+    private String attachmentName;
+    /*
+     * 自定义字段
+     */
+    private Object customFields;
 }
