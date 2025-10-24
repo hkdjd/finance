@@ -22,7 +22,7 @@ import type { UploadProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { PageAProps, ContractData } from './types';
-import { getAllContracts, uploadContract, calculateAmortization } from '../../api';
+import { getAllContracts, parseContract } from '../../api';
 import { getUserKeywords, batchCreateKeywords } from '../../api/customKeywords';
 import styles from './styles.module.css';
 import type { PrepaymentItem } from '../../components/ContractConfirmModal/types';
@@ -39,9 +39,12 @@ const PageA: React.FC<PageAProps> = () => {
   const [loading, setLoading] = useState(false);
   const [customFields, setCustomFields] = useState<string[]>([]);
   const [customFieldInput, setCustomFieldInput] = useState<string>('');
+  const [hasInitialized, setHasInitialized] = useState(false);
   
   // 加载合同列表和自定义关键字
   useEffect(() => {
+    // 防止React.StrictMode导致的重复调用
+    if (hasInitialized) return;
     const fetchContracts = async () => {
       setLoading(true);
       try {
@@ -69,7 +72,8 @@ const PageA: React.FC<PageAProps> = () => {
 
     fetchContracts();
     fetchCustomKeywords();
-  }, []);
+    setHasInitialized(true);
+  }, [hasInitialized]);
   
 
   // 处理文件上传
@@ -84,38 +88,47 @@ const PageA: React.FC<PageAProps> = () => {
         message.success({ content: '自定义关键字保存成功', key: 'keywords', duration: 1 });
       }
 
-      // 步骤2：调用上传合同文件接口
-      message.loading({ content: '正在上传合同文件...', key: 'upload' });
-      console.log('开始上传文件:', file.name);
-      const uploadResponse = await uploadContract(file);
-      console.log('上传响应:', uploadResponse);
-      message.success({ content: uploadResponse.message || '合同上传成功', key: 'upload' });
+      // 步骤2：调用解析合同文件接口（不保存到数据库）
+      message.loading({ content: '正在解析合同文件...', key: 'parse' });
+      console.log('开始解析文件:', file.name);
+      const parseResponse = await parseContract(file);
+      console.log('解析响应:', parseResponse);
+      message.success({ content: parseResponse.message || '合同解析成功', key: 'parse' });
 
-      // 步骤3：根据 contractId 调用计算合同摘销明细接口
-      message.loading({ content: '正在计算摘销明细...', key: 'calculate' });
-      console.log('开始计算摘销明细, contractId:', uploadResponse.contractId);
-      const amortizationResponse = await calculateAmortization(uploadResponse.contractId);
-      console.log('摘销计算响应:', amortizationResponse);
-      message.success({ content: '摘销明细计算完成', key: 'calculate' });
+      // 步骤3：生成初始摊销明细（基于解析结果）
+      const startDate = parseResponse.startDate;
+      const endDate = parseResponse.endDate;
+      const totalAmount = parseResponse.totalAmount;
+      
+      // 计算月份数
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
+      
+      // 生成摊销明细
+      const monthlyAmount = totalAmount / months;
+      const formattedEntries: PrepaymentItem[] = [];
+      for (let i = 0; i < months; i++) {
+        const periodDate = new Date(start.getFullYear(), start.getMonth() + i, 1);
+        const period = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}`;
+        formattedEntries.push({
+          id: i,
+          amortizationPeriod: period,
+          accountingPeriod: period,
+          amount: Number(monthlyAmount.toFixed(2)),
+          paymentStatus: 'PENDING'
+        });
+      }
+      console.log('生成的摊销明细:', formattedEntries);
 
-      // 步骤4：将摊销明细设置到弹窗中
-      const formattedEntries = amortizationResponse.entries.map((entry, index) => ({
-        ...entry,
-        id: entry.id ?? index,
-      })) as PrepaymentItem[];
-      console.log('格式化后的摘销明细:', formattedEntries);
-
-      // 跳转到合同预览页面
+      // 跳转到合同预览页面（此时还未保存到数据库）
       navigate('/contractPreview', {
         state: {
-          contractInfo: uploadResponse,
+          contractInfo: parseResponse,
           prepaymentData: formattedEntries,
+          isNewContract: true, // 标记这是新合同，需要保存
         },
       });
-
-      // 刷新合同列表
-      const listResponse = await getAllContracts();
-      setContractList(listResponse.contracts);
     } catch (error) {
       console.error('上传失败:', error);
       message.error('合同上传失败，请重试');
@@ -178,7 +191,7 @@ const PageA: React.FC<PageAProps> = () => {
       width: '10%',
       render: (status: string) => (
         <span style={{ color: status === 'ACTIVE' ? '#52c41a' : '#999' }}>
-          {status === 'ACTIVE' ? '激活' : '非激活'}
+          {status === 'ACTIVE' ? '进行中' : '未生效'}
         </span>
       ),
     },

@@ -4,6 +4,8 @@ import com.ocbc.finance.model.Contract;
 import com.ocbc.finance.model.AmortizationEntry;
 import com.ocbc.finance.repository.ContractRepository;
 import com.ocbc.finance.repository.AmortizationEntryRepository;
+import com.ocbc.finance.entity.OperationLog;
+import com.ocbc.finance.repository.OperationLogRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import jakarta.persistence.PersistenceContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +28,17 @@ public class MockDataInitializer implements CommandLineRunner {
 
     private final ContractRepository contractRepository;
     private final AmortizationEntryRepository amortizationEntryRepository;
+    private final OperationLogRepository operationLogRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
 
     public MockDataInitializer(ContractRepository contractRepository,
-                              AmortizationEntryRepository amortizationEntryRepository) {
+                              AmortizationEntryRepository amortizationEntryRepository,
+                              OperationLogRepository operationLogRepository) {
         this.contractRepository = contractRepository;
         this.amortizationEntryRepository = amortizationEntryRepository;
+        this.operationLogRepository = operationLogRepository;
     }
 
     @Override
@@ -48,13 +54,28 @@ public class MockDataInitializer implements CommandLineRunner {
         System.out.println("开始初始化Mock合同数据...");
 
         // 创建第一组合同：2025年9月至2026年2月，每月800元
-        createContract1();
+        Contract contract1 = createContract1();
         
         // 创建第二组合同：随机期间，每月300元
-        createContract2();
+        Contract contract2 = createContract2();
         
         // 创建第三组合同：随机期间，每月500元
-        createContract3();
+        Contract contract3 = createContract3();
+
+        // 为每个合同创建操作日志记录
+        List<Contract> contracts = new ArrayList<>();
+        contracts.add(contract1);
+        contracts.add(contract2);
+        contracts.add(contract3);
+        for (Contract contract : contracts) {
+            OperationLog log = new OperationLog();
+            log.setOperator("系统管理员"); 
+            log.setOperationType("生成");
+            log.setContractId(contract.getId());
+            log.setOperationTime(contract.getCreatedAt()); // 使用合同创建时间
+            log.setDescription("测试合同数据生成"); 
+            operationLogRepository.save(log);
+        }
 
         System.out.println("Mock合同数据初始化完成！");
     }
@@ -63,11 +84,11 @@ public class MockDataInitializer implements CommandLineRunner {
     /**
      * 创建第一组合同：2025年9月至2026年2月，每月800元
      */
-    private void createContract1() {
+    private Contract createContract1() {
         Contract contract = new Contract();
         contract.setVendorName("史密斯净水器租赁公司");
         contract.setOriginalFileName("史密斯净水器租赁合同.pdf");
-        contract.setAttachmentName("contract_20250901_smith_water_purifier.pdf");
+        contract.setOriginalFileName("contract_20250901_smith_water_purifier.pdf");
         contract.setFilePath("/uploads/contracts/contract_20250901_smith_water_purifier.pdf");
         contract.setStartDate(LocalDate.of(2025, 9, 1));
         contract.setEndDate(LocalDate.of(2026, 2, 28));
@@ -75,6 +96,7 @@ public class MockDataInitializer implements CommandLineRunner {
         contract.setTaxRate(new BigDecimal("0.13"));
         contract.setCreatedBy("system");
         contract.setUpdatedBy("system");
+        contract.setCreatedAt(LocalDateTime.now()); // 新增：设置创建时间
         
         Contract savedContract1 = contractRepository.save(contract);
         System.out.println("创建合同1，ID: " + savedContract1.getId());
@@ -103,16 +125,17 @@ public class MockDataInitializer implements CommandLineRunner {
         
         amortizationEntryRepository.saveAll(entries1);
         System.out.println("创建合同1：史密斯净水器租赁合同，摊销期间2025-09至2026-02，每月800元");
+        return savedContract1;
     }
 
     /**
      * 创建第二组合同：2025年10月至2026年3月，每月300元
      */
-    private void createContract2() {
+    private Contract createContract2() {
         Contract contract = new Contract();
         contract.setVendorName("美的空调租赁有限公司");
         contract.setOriginalFileName("美的空调租赁协议.pdf");
-        contract.setAttachmentName("contract_20251001_midea_airconditioner.pdf");
+        contract.setOriginalFileName("contract_20251001_midea_airconditioner.pdf");
         contract.setFilePath("/uploads/contracts/contract_20251001_midea_airconditioner.pdf");
         contract.setStartDate(LocalDate.of(2025, 10, 1));
         contract.setEndDate(LocalDate.of(2026, 3, 31));
@@ -120,6 +143,7 @@ public class MockDataInitializer implements CommandLineRunner {
         contract.setTaxRate(new BigDecimal("0.13"));
         contract.setCreatedBy("system");
         contract.setUpdatedBy("system");
+        contract.setCreatedAt(LocalDateTime.now()); // 新增
         
         Contract savedContract2 = contractRepository.save(contract);
         System.out.println("创建合同2，ID: " + savedContract2.getId());
@@ -148,16 +172,17 @@ public class MockDataInitializer implements CommandLineRunner {
         
         amortizationEntryRepository.saveAll(entries2);
         System.out.println("创建合同2：美的空调租赁协议，摊销期间2025-10至2026-03，每月300元");
+        return savedContract2;
     }
 
     /**
      * 创建第三组合同：2025年11月至2026年4月，每月500元
      */
-    private void createContract3() {
+    private Contract createContract3() {
         Contract contract = new Contract();
         contract.setVendorName("海尔冰箱设备租赁公司");
         contract.setOriginalFileName("海尔冰箱设备租赁合同.pdf");
-        contract.setAttachmentName("contract_20251101_haier_refrigerator.pdf");
+        contract.setOriginalFileName("contract_20251101_haier_refrigerator.pdf");
         contract.setFilePath("/uploads/contracts/contract_20251101_haier_refrigerator.pdf");
         contract.setStartDate(LocalDate.of(2025, 11, 1));
         contract.setEndDate(LocalDate.of(2026, 4, 30));
@@ -165,6 +190,7 @@ public class MockDataInitializer implements CommandLineRunner {
         contract.setTaxRate(new BigDecimal("0.13"));
         contract.setCreatedBy("system");
         contract.setUpdatedBy("system");
+        contract.setCreatedAt(LocalDateTime.now()); // 新增
         
         Contract savedContract3 = contractRepository.save(contract);
         System.out.println("创建合同3，ID: " + savedContract3.getId());
@@ -193,5 +219,6 @@ public class MockDataInitializer implements CommandLineRunner {
         
         amortizationEntryRepository.saveAll(entries3);
         System.out.println("创建合同3：海尔冰箱设备租赁合同，摊销期间2025-11至2026-04，每月500元");
+        return savedContract3;
     }
 }

@@ -65,7 +65,7 @@ public class AmortizationListResponse {
             this.endDate = contract.getEndDate() != null ? contract.getEndDate().toString() : null;
             this.vendorName = contract.getVendorName();
             this.taxRate = contract.getTaxRate() != null ? contract.getTaxRate().doubleValue() : null;
-            this.attachmentName = contract.getAttachmentName();
+            this.attachmentName = contract.getOriginalFileName();
             // 构造附件下载路径
             this.attachmentPath = contract.getId() != null ? 
                 "http://localhost:8081/contracts/" + contract.getId() + "/attachment?download=true" : null;

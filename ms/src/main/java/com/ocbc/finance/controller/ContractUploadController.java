@@ -25,6 +25,25 @@ public class ContractUploadController {
     }
 
     /**
+     * 解析合同文件（不保存到数据库）
+     * 
+     * @param file 合同文件
+     * @param userId 用户ID（可选，用于获取自定义关键字，默认使用admin用户ID）
+     * @return 合同解析响应（不包含contractId）
+     */
+    @PostMapping("/parse")
+    public ResponseEntity<ContractUploadResponse> parseContract(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "userId", required = false) Long userId) {
+        // 如果未传入userId，使用默认admin用户ID
+        if (userId == null) {
+            userId = UserConstants.DEFAULT_ADMIN_USER_ID;
+        }
+        ContractUploadResponse response = contractService.parseContractOnly(file, userId);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * 上传合同文件
      * 
      * @param file 合同文件
@@ -34,12 +53,13 @@ public class ContractUploadController {
     @PostMapping("/upload")
     public ResponseEntity<ContractUploadResponse> uploadContract(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "userId", required = false) Long userId) {
+            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam(value = "operatorId", required = false) String operatorId) {
         // 如果未传入userId，使用默认admin用户ID
         if (userId == null) {
             userId = UserConstants.DEFAULT_ADMIN_USER_ID;
         }
-        ContractUploadResponse response = contractService.uploadContract(file, userId);
+        ContractUploadResponse response = contractService.uploadContract(file, userId, operatorId);
         return ResponseEntity.ok(response);
     }
 
@@ -81,5 +101,25 @@ public class ContractUploadController {
             @RequestParam(defaultValue = "10") int size) {
         ContractListResponse response = contractService.getContractsPaged(page, size);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 访问临时上传的文件（用于PDF预览）
+     * @param fileName 文件名
+     * @return 文件流
+     */
+    @GetMapping("/temp/{fileName}")
+    public ResponseEntity<org.springframework.core.io.Resource> getTempFile(
+            @PathVariable String fileName) {
+        try {
+            org.springframework.core.io.Resource resource = contractService.getTempFileResource(fileName);
+            
+            return ResponseEntity.ok()
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

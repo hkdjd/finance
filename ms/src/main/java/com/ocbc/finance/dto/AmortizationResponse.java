@@ -14,9 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AmortizationResponse {
+    private Long contractId;
     private BigDecimal totalAmount;
     private String startDate;
     private String endDate;
+    private String vendorName;
+    private BigDecimal taxRate;
     /** 计算场景：SCENARIO_1 / SCENARIO_2 / SCENARIO_3 */
     private String scenario;
     private OffsetDateTime generatedAt;

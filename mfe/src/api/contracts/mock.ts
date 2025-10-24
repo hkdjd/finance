@@ -188,6 +188,7 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         taxRate: 0.06,
         attachmentName: "contract_20250101_001.pdf",
         attachmentPath: "http://localhost:8081/contracts/1/attachment?download=true",
+        createdAt: "2024-01-24T14:30:52.123456+08:00",
         customFields: {
           '合同编号': 'HT-2025-001',
           '法人': '张三',
@@ -258,6 +259,7 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         taxRate: 0.13,
         attachmentName: "contract_20240201_002.pdf",
         attachmentPath: "http://localhost:8081/contracts/2/attachment?download=true",
+        createdAt: "2024-02-24T14:30:52.789012+08:00",
         customFields: {
           '合同编号': 'HT-2024-085',
           '法人': '李四',
@@ -353,6 +355,7 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         taxRate: 0.09,
         attachmentName: "contract_20240301_003.pdf",
         attachmentPath: "http://localhost:8081/contracts/3/attachment?download=true",
+        createdAt: "2024-03-24T15:02:30.123456+08:00",
         customFields: {
           '合同编号': 'HT-2024-120',
           '法人': '王五',
@@ -475,7 +478,8 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
         totalAmount: contract.totalAmount,
         startDate: contract.startDate,
         endDate: contract.endDate,
-        vendorName: contract.vendorName
+        vendorName: contract.vendorName,
+        createdAt: contract.createdAt
       },
       amortization
     };
@@ -488,7 +492,8 @@ export const getMockContractAmortizationEntries = (contractId: number): Contract
       totalAmount: 0,
       startDate: "",
       endDate: "",
-      vendorName: "未知供应商"
+      vendorName: "未知供应商",
+      createdAt: new Date().toISOString()
     },
     amortization: []
   };

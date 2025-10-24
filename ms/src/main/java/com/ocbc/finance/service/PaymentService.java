@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,19 +39,22 @@ public class PaymentService {
     private final AmortizationEntryRepository amortizationEntryRepository;
     private final ContractService contractService;
     private final AuditLogService auditLogService;
+    private final OperationLogService operationLogService;
 
     public PaymentService(PaymentRepository paymentRepository,
                          JournalEntryRepository journalEntryRepository,
                          ContractRepository contractRepository,
                          AmortizationEntryRepository amortizationEntryRepository,
                          ContractService contractService,
-                         AuditLogService auditLogService) {
+                         AuditLogService auditLogService,
+                         OperationLogService operationLogService) {
         this.paymentRepository = paymentRepository;
         this.journalEntryRepository = journalEntryRepository;
         this.contractRepository = contractRepository;
         this.amortizationEntryRepository = amortizationEntryRepository;
         this.contractService = contractService;
         this.auditLogService = auditLogService;
+        this.operationLogService = operationLogService;
     }
 
     public PaymentPreviewResponse preview(PaymentRequest req) {
@@ -146,6 +150,11 @@ public class PaymentService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
         
+        // 贷方：活期存款（实际付款金额）
+        // 活期存款的入账日期始终为付款日期
+        entries.add(new JournalEntryDto(paymentDate, "活期存款", BigDecimal.ZERO, paymentAmount, 
+                "银行存款", LocalDateTime.now()));
+        
         // 处理过去付款：借方应付 + 贷方活期存款，差异费用调整
         if (!pastPeriods.isEmpty()) {
             generatePastPaymentEntries(entries, pastPeriods, paymentAmount, paymentDate, pastPeriodsAmount);
@@ -205,8 +214,9 @@ public class PaymentService {
     
     /**
      * 处理过去付款：借方应付 + 贷方活期存款，差异费用调整
-     * 根据新需求第184行：根据付款时间与摊销入账时间判断过去付款的处理逻辑
-     * 入账日期规则：付款日期晚于摊销入账时间，则入账日期为付款日期
+     * 根据新需求第187-188行：
+     * - 付款日期晚于摊销入账日期，则入账日期均为付款日期
+     * - 付款日期早于摊销入账日期，则活期存款的分录入账日期为付款日期，其余分录（应付、费用）入账日期为该笔摊销的初始入账日期
      */
     private void generatePastPaymentEntries(List<JournalEntryDto> entries, 
                                           List<AmortizationEntryDto> pastPeriods,
@@ -216,10 +226,6 @@ public class PaymentService {
         log.debug("开始处理过去付款 - 过去期间数量: {}, 过去期间金额: {}, 付款金额: {}", 
                 pastPeriods.size(), pastPeriodsAmount, paymentAmount);
         
-        // 贷方：活期存款（实际付款金额）
-        entries.add(new JournalEntryDto(paymentDate, "活期存款", BigDecimal.ZERO, paymentAmount, 
-                "付款 - 过去期间", LocalDateTime.now()));
-        
         // 借方：应付（对应预提费用）
         for (AmortizationEntryDto entry : pastPeriods) {
             AmortizationEntry actualEntry = amortizationEntryRepository.findById(Long.valueOf(entry.getId())).orElse(null);
@@ -227,7 +233,9 @@ public class PaymentService {
             entryAmount = entryAmount.setScale(2, RoundingMode.HALF_UP);
             
             LocalDate amortizationBookingDate = bookingDateForPeriod(entry.getAccountingPeriod(), paymentDate);
-            // 入账日期规则：付款日期晚于摊销入账时间，则入账日期为付款日期
+            // 入账日期规则（新）：
+            // - 付款日期晚于摊销入账日期，则入账日期均为付款日期
+            // - 付款日期早于摊销入账日期，则应付分录入账日期为该笔摊销的初始入账日期
             LocalDate actualBookingDate = paymentDate.isAfter(amortizationBookingDate) ? paymentDate : amortizationBookingDate;
             
             entries.add(new JournalEntryDto(actualBookingDate, "应付", entryAmount, BigDecimal.ZERO,
@@ -237,13 +245,21 @@ public class PaymentService {
         // 差异调整：不足或超额以费用调整
         BigDecimal difference = paymentAmount.subtract(pastPeriodsAmount);
         if (difference.compareTo(BigDecimal.ZERO) != 0) {
+            // 费用调整的入账日期：根据付款日期与摊销入账日期的关系确定
+            // 如果付款日期晚于所有摊销入账日期，则使用付款日期
+            // 否则使用第一个摊销期间的初始入账日期
+            LocalDate firstAmortizationBookingDate = pastPeriods.isEmpty() ? paymentDate : 
+                    bookingDateForPeriod(pastPeriods.get(0).getAccountingPeriod(), paymentDate);
+            LocalDate feeBookingDate = paymentDate.isAfter(firstAmortizationBookingDate) ? 
+                    paymentDate : firstAmortizationBookingDate;
+            
             if (difference.compareTo(BigDecimal.ZERO) > 0) {
                 // 超额支付：借方费用
-                entries.add(new JournalEntryDto(paymentDate, "费用", difference, BigDecimal.ZERO,
+                entries.add(new JournalEntryDto(feeBookingDate, "费用", difference, BigDecimal.ZERO,
                         "超额付款调整", LocalDateTime.now()));
             } else {
                 // 不足支付：贷方费用
-                entries.add(new JournalEntryDto(paymentDate, "费用", BigDecimal.ZERO, difference.abs(),
+                entries.add(new JournalEntryDto(feeBookingDate, "费用", BigDecimal.ZERO, difference.abs(),
                         "不足付款调整", LocalDateTime.now()));
             }
         }
@@ -253,9 +269,10 @@ public class PaymentService {
     
     /**
      * 处理未来付款：借方应付 + 贷方预付，按摊销期间顺序逐月转预付
-     * 根据新需求第184行：根据付款时间与摊销入账时间判断未来付款的处理逻辑
+     * 根据新需求第187-188行：
+     * - 付款日期晚于摊销入账日期，则入账日期均为付款日期
+     * - 付款日期早于摊销入账日期，则预付科目的分录入账日期为付款日期，其余分录（应付、费用）入账日期为该笔摊销的初始入账日期
      * 超额支付增加贷方预付科目以及借方费用科目以平衡借贷，不足金额以贷方费用科目调整
-     * 入账日期规则：付款日期早于摊销入账时间，则分录的入账日期均为该笔摊销的初始入账日期
      */
     private void generateFuturePaymentEntries(List<JournalEntryDto> entries,
                                             List<AmortizationEntryDto> futurePeriods,
@@ -265,12 +282,15 @@ public class PaymentService {
                                             BigDecimal pastPeriodsAmount) {
         log.debug("开始处理未来付款 - 未来期间数量: {}, 未来期间金额: {}", 
                 futurePeriods.size(), futurePeriodsAmount);
-        
         // 按期间排序
         futurePeriods.sort(Comparator.comparing(AmortizationEntryDto::getAmortizationPeriod));
-        
+
         // 计算可用于未来期间的付款金额
         BigDecimal availableForFuture = paymentAmount.subtract(pastPeriodsAmount);
+                //借方预付
+        entries.add(new JournalEntryDto(paymentDate, "预付", availableForFuture, BigDecimal.ZERO, 
+                "预付 - " + futurePeriods.get(0).getAmortizationPeriod(), LocalDateTime.now()));
+
         
         // 借方：应付（对应预提费用）
         for (AmortizationEntryDto entry : futurePeriods) {
@@ -279,8 +299,10 @@ public class PaymentService {
             entryAmount = entryAmount.setScale(2, RoundingMode.HALF_UP);
             
             LocalDate amortizationBookingDate = bookingDateForPeriod(entry.getAccountingPeriod(), paymentDate);
-            // 入账日期规则：付款日期早于摊销入账时间，则分录的入账日期均为该笔摊销的初始入账日期
-            LocalDate actualBookingDate = paymentDate.isBefore(amortizationBookingDate) ? paymentDate : amortizationBookingDate;
+            // 入账日期规则（新）：
+            // - 付款日期晚于摊销入账日期，则入账日期均为付款日期
+            // - 付款日期早于摊销入账日期，则应付分录入账日期为该笔摊销的初始入账日期
+            LocalDate actualBookingDate = paymentDate.isAfter(amortizationBookingDate) ? paymentDate : amortizationBookingDate;
             
             entries.add(new JournalEntryDto(actualBookingDate, "应付", entryAmount, BigDecimal.ZERO,
                     "应付款项 - " + entry.getAmortizationPeriod(), LocalDateTime.now()));
@@ -296,27 +318,30 @@ public class PaymentService {
             entryAmount = entryAmount.setScale(2, RoundingMode.HALF_UP);
             
             LocalDate amortizationBookingDate = bookingDateForPeriod(entry.getAccountingPeriod(), paymentDate);
-            LocalDate actualBookingDate = paymentDate.isBefore(amortizationBookingDate) ? paymentDate : amortizationBookingDate;
-            
+            // 入账日期规则（新）：
+            // - 付款日期晚于摊销入账日期，则入账日期均为付款日期
+            // - 付款日期早于摊销入账日期，则预付分录入账日期为付款日期
+            LocalDate prepaidBookingDate = paymentDate.isAfter(amortizationBookingDate) ? paymentDate : amortizationBookingDate;
+ 
             if (remainingPrePaid.compareTo(entryAmount) >= 0) {
                 // 预付金额足够抵扣整个摊销金额
-                entries.add(new JournalEntryDto(actualBookingDate, "预付", BigDecimal.ZERO, entryAmount,
+                entries.add(new JournalEntryDto(prepaidBookingDate, "预付", BigDecimal.ZERO, entryAmount,
                         "预付转应付 - " + entry.getAmortizationPeriod(), LocalDateTime.now()));
                 remainingPrePaid = remainingPrePaid.subtract(entryAmount);
             } else if (remainingPrePaid.compareTo(BigDecimal.ZERO) > 0) {
                 // 预付金额不足，部分抵扣
-                entries.add(new JournalEntryDto(actualBookingDate, "预付", BigDecimal.ZERO, remainingPrePaid,
+                entries.add(new JournalEntryDto(prepaidBookingDate, "预付", BigDecimal.ZERO, remainingPrePaid,
                         "预付转应付（部分） - " + entry.getAmortizationPeriod(), LocalDateTime.now()));
                 
                 // 不足金额，计入贷方费用科目
                 BigDecimal shortfall = entryAmount.subtract(remainingPrePaid);
-                entries.add(new JournalEntryDto(actualBookingDate, "费用", BigDecimal.ZERO, shortfall,
+                entries.add(new JournalEntryDto(prepaidBookingDate, "费用", BigDecimal.ZERO, shortfall,
                         "预付不足补偿 - " + entry.getAmortizationPeriod(), LocalDateTime.now()));
                 
                 remainingPrePaid = BigDecimal.ZERO;
             } else {
                 // 无预付金额，全部计入贷方费用
-                entries.add(new JournalEntryDto(actualBookingDate, "费用", BigDecimal.ZERO, entryAmount,
+                entries.add(new JournalEntryDto(prepaidBookingDate, "费用", BigDecimal.ZERO, entryAmount,
                         "无预付补偿 - " + entry.getAmortizationPeriod(), LocalDateTime.now()));
             }
         }
@@ -325,14 +350,14 @@ public class PaymentService {
         if (remainingPrePaid.compareTo(BigDecimal.ZERO) > 0) {
             String lastPeriod = futurePeriods.get(futurePeriods.size() - 1).getAmortizationPeriod();
             LocalDate amortizationBookingDate = bookingDateForPeriod(lastPeriod, paymentDate);
-            LocalDate actualBookingDate = paymentDate.isBefore(amortizationBookingDate) ? paymentDate : amortizationBookingDate;
-            
+            // 预付科目的入账日期：付款日期早于摊销入账日期时，使用付款日期
+            LocalDate prepaidBookingDate = paymentDate.isAfter(amortizationBookingDate) ? paymentDate : amortizationBookingDate; 
             // 贷方预付科目（记录超额的预付款）
-            entries.add(new JournalEntryDto(actualBookingDate, "预付", BigDecimal.ZERO, remainingPrePaid,
+            entries.add(new JournalEntryDto(prepaidBookingDate, "预付", BigDecimal.ZERO, remainingPrePaid,
                     "超额预付 - " + lastPeriod, LocalDateTime.now()));
             
             // 借方费用科目（用于平衡借贷）
-            entries.add(new JournalEntryDto(actualBookingDate, "费用", remainingPrePaid, BigDecimal.ZERO,
+            entries.add(new JournalEntryDto(prepaidBookingDate, "费用", remainingPrePaid, BigDecimal.ZERO,
                     "超额预付平衡调整 - " + lastPeriod, LocalDateTime.now()));
         }
         
@@ -565,6 +590,7 @@ public class PaymentService {
                     Integer.valueOf(i + 1), // child: entryOrder
                     "PAYMENT", // child: entryType
                     dto.getMemo(), // child: description
+                    payment.getBookingDate(), // child: accountingReviewTime（实际支付时间）
                     baseTimestamp.plusNanos((i + 1) * 1000000L), // child: updatedAt
                     amortizationPeriod, // child: amortizationPeriod
                     payment.getId() // child: paymentId
@@ -582,6 +608,24 @@ public class PaymentService {
                     .journalEntries(paymentEntryDtos)
                     .message("付款执行成功")
                     .build();
+
+            // 记录操作日志：付款执行完成
+            try {
+                String operator = request.getOperatorId() != null ? request.getOperatorId() : "system";
+                String desc = String.format("付款执行成功：付款金额：¥%s，摊销期间：%s",
+                        payment.getPaymentAmount() != null ? payment.getPaymentAmount().toPlainString() : "0",
+                        payment.getSelectedPeriods());
+                CreateOperationLogRequest logReq = new CreateOperationLogRequest(
+                        request.getContractId(),
+                        "付款",
+                        desc,
+                        operator,
+                        request.getPaymentDate() != null ? request.getPaymentDate() : LocalDateTime.now()
+                );
+                operationLogService.createOperationLog(logReq);
+            } catch (Exception ex) {
+                log.warn("记录操作日志失败（executePayment）", ex);
+            }
             
             log.info("付款执行完成 - paymentId: {}, 生成分录数量: {}", payment.getId(), paymentEntryDtos.size());
             return response;
@@ -657,6 +701,24 @@ public class PaymentService {
                     .status(payment.getStatus().name())
                     .message("付款已取消")
                     .build();
+
+            // 记录操作日志：取消付款
+            try {
+                String operator = "system";
+                String desc = String.format("取消付款：付款金额：¥%s，摊销期间：%s",
+                        payment.getPaymentAmount() != null ? payment.getPaymentAmount().toPlainString() : "0",
+                        payment.getSelectedPeriods());
+                CreateOperationLogRequest logReq = new CreateOperationLogRequest(
+                        payment.getContract().getId(),
+                        "付款取消",
+                        desc,
+                        operator,
+                        LocalDateTime.now()
+                );
+                operationLogService.createOperationLog(logReq);
+            } catch (Exception ex) {
+                log.warn("记录操作日志失败（cancelPayment）", ex);
+            }
             
             log.info("付款取消完成 - paymentId: {}", paymentId);
             return response;
@@ -703,7 +765,7 @@ public class PaymentService {
                 // 如果有多个期间，预付通常对应未来期间
                 return selectedPeriods.size() > 1 ? selectedPeriods.get(selectedPeriods.size() - 1) : selectedPeriods.get(0);
             }
-            // 费用调整：使用最后一个期间
+            // 费用调整：使用最后一个期间，若为将来期间则会计科目为预付，若为过去期间则会计科目为费用
             else if (account.contains("费用") || account.contains("Expense")) {
                 return selectedPeriods.get(selectedPeriods.size() - 1);
             }
@@ -749,6 +811,7 @@ public class PaymentService {
                             e.getEntryOrder(), // child: entryOrder
                             e.getEntryType().name(), // child: entryType
                             e.getDescription(), // child: description
+                            payment.getBookingDate(), // child: accountingReviewTime（实际支付时间）
                             e.getUpdatedAt(), // child: updatedAt
                             amortizationPeriod, // child: amortizationPeriod
                             payment.getId() // child: paymentId
