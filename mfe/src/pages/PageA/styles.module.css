@@ -2,12 +2,16 @@
 .pageContainer {
   padding: 20px;
   min-height: calc(100vh - 15vh); /* 减去 Header 高度 */
+  min-width: 1000px;
+  overflow: auto;
 }
 
 /* 区域A - 文件上传区域 */
 .uploadArea {
   width: 80%;
+  min-width: 900px;
   height: 40vh;
+  min-height: 300px;
   margin: 0 auto;
   border: 1px solid #000000;
   padding: 0;
@@ -21,6 +25,7 @@
 /* 左侧区域 - 合同分析字段选择 */
 .leftSection {
   width: 50%;
+  min-width: 400px;
   height: 100%;
   border-right: 1px solid #e8e8e8;
   padding: 20px;
@@ -28,6 +33,7 @@
   flex-direction: column;
   background-color: #ffffff;
   border-radius: 8px 0 0 8px;
+  overflow: auto;
 }
 
 .sectionHeader {
@@ -74,6 +80,7 @@
 /* 右侧区域 - 文件上传功能 */
 .rightSection {
   width: 50%;
+  min-width: 400px;
   height: 100%;
   padding: 10px;
   display: flex;
@@ -123,6 +130,7 @@
 /* 区域B - 财务报表概览 */
 .reportsArea {
   width: 80%;
+  min-width: 900px;
   margin: 30px auto 0;
   padding: 20px;
   background-color: #ffffff;
@@ -133,12 +141,13 @@
 /* 区域C - 合同列表区域 */
 .contractTableArea {
   width: 80%;
+  min-width: 900px;
   margin: 20px auto 0;
   padding: 10px;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow: auto;
 }
 
 /* 表格标题 */

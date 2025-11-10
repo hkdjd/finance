@@ -1,11 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker, Skeleton } from 'antd';
+import { EyeOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
+import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse } from '../../api/contracts';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
 import { DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
 import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, updateContractStatus, getOperationLogsByContractId } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
 import { JournalEntryImmutable } from './JournalEntryImmutable';
 import dayjs from 'dayjs';
+import { Document, Page, pdfjs } from 'react-pdf';
+
+// 配置 PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // 扩展类型以包含附件名称
 type LocalContractAmortizationResponse = ContractAmortizationResponse & {
@@ -66,6 +73,9 @@ const ContractDetail: React.FC = () => {
   const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>({});
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'entryOrder', order: 'asc' });
   
+  // 合同基本信息折叠状态
+  const [isContractInfoExpanded, setIsContractInfoExpanded] = useState(true);
+  
   // 是否为初始加载
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
@@ -78,8 +88,19 @@ const ContractDetail: React.FC = () => {
   const hasRecordedContractGenerationRef = useRef(false);
 
 
+  // PDF预览相关状态
+  const [isPdfPreviewVisible, setIsPdfPreviewVisible] = useState(false);
+  const [numPages, setNumPages] = useState<number>(0);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
   // 从路由参数获取contractId
   const contractId = id ? parseInt(id, 10) : null;
+
+  // PDF文档加载成功处理
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+    setPdfLoading(false);
+  };
 
   // 验证contractId
   useEffect(() => {
@@ -926,39 +947,12 @@ const ContractDetail: React.FC = () => {
           <Space size="small">
             <Button 
               key={`${record.id}-${record.paymentStatus}-${Date.now()}`}
-              type={isCompleted ? "default" : "primary"}
+              danger={!isCompleted}
+              type={isCompleted ? "default" : undefined}
               size="small" 
               disabled={isCompleted}
               onClick={() => handleEditAmount(record)}
-              style={{
-                backgroundColor: isCompleted ? '#F3F4F6' : '#E31E24',
-                borderColor: isCompleted ? '#D1D5DB' : '#E31E24',
-                color: isCompleted ? '#9CA3AF' : '#FFFFFF',
-                fontWeight: '600',
-                fontSize: '13px',
-                borderRadius: '8px',
-                cursor: isCompleted ? 'not-allowed' : 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                if (!isCompleted) {
-                  (e.target as HTMLElement).style.backgroundColor = '#C41E3A';
-                  (e.target as HTMLElement).style.borderColor = '#C41E3A';
-                } else {
-                  // 已完成状态保持灰色，不改变颜色
-                  (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
-                  (e.target as HTMLElement).style.borderColor = '#D1D5DB';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isCompleted) {
-                  (e.target as HTMLElement).style.backgroundColor = '#E31E24';
-                  (e.target as HTMLElement).style.borderColor = '#E31E24';
-                } else {
-                  // 已完成状态保持灰色，不改变颜色
-                  (e.target as HTMLElement).style.backgroundColor = '#F3F4F6';
-                  (e.target as HTMLElement).style.borderColor = '#D1D5DB';
-                }
-              }}
+              style={{ width: '70px' }}
             >
               {isCompleted ? '已完成' : '支付'}
             </Button>
@@ -1670,6 +1664,7 @@ const ContractDetail: React.FC = () => {
   };
 
   const contractName = contractData?.contract?.vendorName || '加载中...';
+  const attachmentName = contractData?.contract?.attachmentName || `${contractName}.pdf`;
 
   return (
     <>
@@ -1723,7 +1718,15 @@ const ContractDetail: React.FC = () => {
         border: '1px solid #E5E5E5',
         borderLeft: '4px solid #E31E24'
       }}>
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ 
+          marginBottom: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          cursor: 'pointer'
+        }}
+        onClick={() => setIsContractInfoExpanded(!isContractInfoExpanded)}
+        >
           <Text style={{ 
             color: '#1F2937', 
             fontSize: '16px',
@@ -1732,12 +1735,17 @@ const ContractDetail: React.FC = () => {
           }}>
             合同基本信息
           </Text>
+          {isContractInfoExpanded ? 
+            <UpOutlined style={{ color: '#6B7280', fontSize: '14px' }} /> : 
+            <DownOutlined style={{ color: '#6B7280', fontSize: '14px' }} />
+          }
         </div>
-        <Spin 
-          spinning={loading}
-          className="outlook-spin"
-        >
-          {contractData?.contract ? (
+        {isContractInfoExpanded && (
+          <Spin 
+            spinning={loading}
+            className="outlook-spin"
+          >
+            {contractData?.contract ? (
             <>
               {/* 紧凑型网格布局 - 四列横向排列 */}
               <div style={{ 
@@ -1833,6 +1841,27 @@ const ContractDetail: React.FC = () => {
                   </div>
                 ))}
 
+                {/* 税率 */}
+                <div>
+                  <div style={{ 
+                    color: '#6B7280', 
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '6px',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    税率：
+                  </div>
+                  <div style={{ 
+                    color: '#1F2937', 
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                  }}>
+                    {contractData.contract.taxRate ? `${(contractData.contract.taxRate * 100).toFixed(0)}%` : '-'}
+                  </div>
+                </div>
+
                 {/* 创建时间 */}
                 <div>
                   <div style={{ 
@@ -1917,7 +1946,7 @@ const ContractDetail: React.FC = () => {
                 </div>
               </div>
 
-              {/* 合同文件 */}
+              {/* 合同附件 */}
               <div style={{ 
                 paddingTop: '16px', 
                 borderTop: '1px solid #E5E5E5',
@@ -1926,31 +1955,41 @@ const ContractDetail: React.FC = () => {
                 flexWrap: 'wrap',
                 gap: '24px'
               }}>
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <Text style={{ 
                     color: '#6B7280', 
                     fontSize: '14px',
                     fontWeight: '600',
                     fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
                   }}>
-                    合同文件：
+                    合同附件：
                   </Text>
                   <a 
-                    href="/index.html" 
-                    download={`${contractName}.pdf`}
+                    href={contractData?.contract?.attachmentPath}
+                    download={attachmentName}
                     style={{ 
                       color: '#4A90E2', 
                       fontWeight: '400',
                       textDecoration: 'none',
                       marginLeft: '4px',
                       fontSize: '14px',
-                      fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+                      fontFamily: 'Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif',
+                      cursor: 'pointer'
                     }}
                     onMouseEnter={(e) => (e.target as HTMLElement).style.textDecoration = 'underline'}
                     onMouseLeave={(e) => (e.target as HTMLElement).style.textDecoration = 'none'}
                   >
-                    {contractName}.pdf
+                    {attachmentName}
                   </a>
+                  <EyeOutlined 
+                    onClick={() => setIsPdfPreviewVisible(true)}
+                    style={{ 
+                      color: '#1890ff',
+                      fontSize: '16px',
+                      marginLeft: '8px',
+                      cursor: 'pointer'
+                    }}
+                  />
                 </div>
               </div>
             </>
@@ -1964,7 +2003,8 @@ const ContractDetail: React.FC = () => {
               </Text>
             </div>
           )}
-        </Spin>
+          </Spin>
+        )}
       </div>
 
       {/* Tab页和数据表格 */}
@@ -2059,7 +2099,12 @@ const ContractDetail: React.FC = () => {
             rowKey={(record) => record.id || Math.random()}
             columns={getColumnsByKey(activeKey)}
             dataSource={getDataSourceByKey(activeKey)}
-            pagination={false}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
+            }}
             scroll={{ x: 1000 }}
             size="middle"
             rowSelection={activeKey === 'timeline' ? rowSelection : undefined}
@@ -2233,6 +2278,162 @@ const ContractDetail: React.FC = () => {
         </div>
       </Modal>
 
+      {/* Audit Log 弹窗 */}
+      <Modal
+        title={`审计日志 - 摊销明细 ID: ${currentAuditEntryId}`}
+        open={isAuditLogModalVisible}
+        onCancel={handleCloseAuditLogModal}
+        footer={[
+          <Button key="close" onClick={handleCloseAuditLogModal}>
+            关闭
+          </Button>
+        ]}
+        width={800}
+        style={{ top: 20 }}
+      >
+        <Spin spinning={auditLogLoading}>
+          {auditLogData && auditLogData.auditLogs.length > 0 ? (
+            <Table
+              dataSource={auditLogData.auditLogs}
+              rowKey="id"
+              pagination={false}
+              size="small"
+              scroll={{ x: 700 }}
+              columns={[
+                {
+                  title: '操作时间',
+                  dataIndex: 'operationTime',
+                  key: 'operationTime',
+                  width: 140,
+                  render: (time: string) => (
+                    <span style={{ fontSize: '12px' }}>{time}</span>
+                  )
+                },
+                {
+                  title: '操作类型',
+                  dataIndex: 'operationTypeDesc',
+                  key: 'operationTypeDesc',
+                  width: 80,
+                  render: (desc: string) => (
+                    <span style={{ fontSize: '12px', fontWeight: '500' }}>{desc}</span>
+                  )
+                },
+                {
+                  title: '操作人',
+                  dataIndex: 'operatorId',
+                  key: 'operatorId',
+                  width: 100,
+                  render: (id: string) => (
+                    <span style={{ fontSize: '12px' }}>{id}</span>
+                  )
+                },
+                {
+                  title: '付款金额',
+                  dataIndex: 'paymentAmount',
+                  key: 'paymentAmount',
+                  width: 100,
+                  render: (amount: number) => (
+                    <span style={{ fontSize: '12px', color: '#E31E24', fontWeight: '500' }}>
+                      {amount ? `¥${amount.toFixed(2)}` : '-'}
+                    </span>
+                  )
+                },
+                {
+                  title: '付款状态',
+                  dataIndex: 'paymentStatusDesc',
+                  key: 'paymentStatusDesc',
+                  width: 80,
+                  render: (status: string) => (
+                    <span style={{ 
+                      fontSize: '12px',
+                      color: status === '已付款' ? '#065F46' : '#B45309',
+                      backgroundColor: status === '已付款' ? '#D1FAE5' : '#FEF3C7',
+                      padding: '2px 6px',
+                      borderRadius: '4px'
+                    }}>
+                      {status || '-'}
+                    </span>
+                  )
+                },
+                {
+                  title: '备注',
+                  dataIndex: 'remark',
+                  key: 'remark',
+                  render: (remark: string) => (
+                    <span style={{ fontSize: '12px' }}>{remark || '-'}</span>
+                  )
+                }
+              ]}
+            />
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+              暂无审计日志记录
+            </div>
+          )}
+        </Spin>
+      </Modal>
+
+      {/* PDF预览Modal */}
+      <Modal
+        title="合同预览"
+        open={isPdfPreviewVisible}
+        onCancel={() => setIsPdfPreviewVisible(false)}
+        width="90%"
+        style={{ top: 20 }}
+        footer={null}
+        destroyOnClose
+      >
+        <div style={{ 
+          height: '80vh', 
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: '#f5f5f5',
+          padding: '20px'
+        }}>
+          {numPages > 0 && (
+            <div style={{ 
+              marginBottom: '16px', 
+              fontSize: '14px', 
+              color: '#666',
+              fontWeight: '600'
+            }}>
+              共 {numPages} 页
+            </div>
+          )}
+          <Document
+            file={contractData?.contract?.attachmentPath}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={() => setPdfLoading(false)}
+            loading={(
+              <div style={{ padding: '40px' }}>
+                <Skeleton active paragraph={{ rows: 10 }} />
+                <Skeleton active paragraph={{ rows: 10 }} style={{ marginTop: 20 }} />
+                <Skeleton active paragraph={{ rows: 10 }} style={{ marginTop: 20 }} />
+              </div>
+            )}
+            error={<div style={{ padding: '40px', color: '#ff4d4f', textAlign: 'center' }}>PDF 加载失败</div>}
+          >
+            {Array.from(new Array(numPages), (_, index) => (
+              <div
+                key={`page_${index + 1}`}
+                style={{ 
+                  marginBottom: '20px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                <Page
+                  pageNumber={index + 1}
+                  width={Math.min(window.innerWidth * 0.8, 800)}
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
+                />
+              </div>
+            ))}
+          </Document>
+        </div>
+      </Modal>
       </div>
     </>
   );
