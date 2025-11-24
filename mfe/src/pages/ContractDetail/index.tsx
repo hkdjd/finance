@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker, Skeleton } from 'antd';
-import { EyeOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
-import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse } from '../../api/contracts';
-import { Typography, Table, Tabs, Spin, message, Button, Modal, InputNumber, Space, DatePicker } from 'antd';
-import { DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
-import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, updateContractStatus, getOperationLogsByContractId } from '../../api/contracts';
+import { EyeOutlined, UpOutlined, DownOutlined, DownloadOutlined, CalendarOutlined } from '@ant-design/icons';
+import { getContractAmortizationEntries, ContractAmortizationResponse, ContractAmortizationEntry, executePayment, PaymentExecuteRequest, getContractPaymentRecords, getAuditLogsByAmortizationEntryId, AuditLogResponse, updateContractStatus, getOperationLogsByContractId } from '../../api/contracts';
 import { getJournalEntriesPreview, JournalEntriesPreviewResponse, DateRangeFilter, SortConfig } from '../../api/journalEntries';
 import { JournalEntryImmutable } from './JournalEntryImmutable';
 import dayjs from 'dayjs';
@@ -16,30 +13,17 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.vers
 
 // 扩展类型以包含附件名称
 type LocalContractAmortizationResponse = ContractAmortizationResponse & {
-  contract?: {
+  contract?: ContractAmortizationResponse['contract'] & {
     attachmentName: string;
   };
 };
-
-interface ContractAmortizationResponse {
-  contract?: {
-    id: string;
-    vendorName: string;
-    startDate: string;
-    endDate: string;
-    totalAmount: number;
-    createdAt: string;
-    attachmentName: string;
-  };
-  amortization?: ContractAmortizationEntry[];
-}
 
 const { Title, Text } = Typography;
 
 const ContractDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [contractData, setContractData] = useState<LocalContractAmortizationResponse | null>(null);
+  const [contractData, setContractData] = useState<ContractAmortizationResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeKey, setActiveKey] = useState('timeline');
   
@@ -86,6 +70,12 @@ const ContractDetail: React.FC = () => {
   const [operationLogs, setOperationLogs] = useState<any[]>([]);
   const [operationLogsLoading, setOperationLogsLoading] = useState(false);
   const hasRecordedContractGenerationRef = useRef(false);
+
+  // 审计日志相关状态
+  const [currentAuditEntryId, setCurrentAuditEntryId] = useState<number | null>(null);
+  const [isAuditLogModalVisible, setIsAuditLogModalVisible] = useState(false);
+  const [auditLogLoading, setAuditLogLoading] = useState(false);
+  const [auditLogData, setAuditLogData] = useState<any>(null);
 
 
   // PDF预览相关状态
@@ -307,11 +297,11 @@ const ContractDetail: React.FC = () => {
           type: '预提摊销分录',
           paymentId: '',
           bookingDate: entry.bookingDate || '',
-          account: entry.accountName || entry.account || '',  // 使用accountName字段
+          account: entry.accountName || '',  // 使用accountName字段
           debitAmount: entry.debitAmount || '0.00',
           creditAmount: entry.creditAmount || '0.00',
           memo: entry.memo || '',
-          amortizationPeriod: entry.amortizationPeriod || entry.accountingPeriod || '',  // 尝试多个字段
+          amortizationPeriod: '',  // 预提分录暂不显示摊销期间
           reviewTime: '',
           sortDate: entry.bookingDate ? new Date(entry.bookingDate).getTime() : 0
         });
@@ -836,6 +826,13 @@ const ContractDetail: React.FC = () => {
   const getSelectedRecords = (): ContractAmortizationEntry[] => {
     if (!contractData?.amortization) return [];
     return contractData.amortization.filter(record => selectedRowKeys.includes(record.id));
+  };
+
+  // 关闭审计日志弹窗
+  const handleCloseAuditLogModal = () => {
+    setIsAuditLogModalVisible(false);
+    setCurrentAuditEntryId(null);
+    setAuditLogData(null);
   };
 
 

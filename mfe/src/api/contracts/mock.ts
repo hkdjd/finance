@@ -96,7 +96,7 @@ export const getMockContractUploadResponse = (fileName: string): ContractUploadR
     taxRate: 0.06,
     vendorName: `测试供应商_${fileNameWithoutExt}`,
     attachmentName: uniqueFileName,
-    attachmentPath: ``,
+    attachmentPath: `/uploads/contracts/${uniqueFileName}`,
     createdAt: timestamp,
     message: '合同上传和解析成功',
     customFields: {

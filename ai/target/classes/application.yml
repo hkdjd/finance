@@ -111,7 +111,7 @@ app:
     
   # DeepSeek AI配置（默认）
   deepseek:
-    api-key: sk-df788d28f7944934a7c34ea1b9ae3796
+    api-key: sk-df788d28f7944934a7c34ea1b9ae3796 
     api-url: https://api.deepseek.com/chat/completions
     model: deepseek-chat
     timeout: 30000

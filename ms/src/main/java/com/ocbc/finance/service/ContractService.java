@@ -230,8 +230,8 @@ public class ContractService {
             response.setTaxRate(parseResponse.getTaxRate() != null ? parseResponse.getTaxRate() : BigDecimal.ZERO);
             response.setAttachmentName(file.getOriginalFilename());
             
-            // 设置attachmentPath为可访问的URL（用于PDF预览）
-            String tempFileUrl = "http://localhost:8081/contracts/temp/" + savedFileName;
+            // 设置attachmentPath为临时文件下载接口路径
+            String tempFileUrl = "/contracts/temp/" + savedFileName;
             response.setAttachmentPath(tempFileUrl);
             
             // 如果有自定义字段结果，也返回给前端
@@ -355,8 +355,8 @@ public class ContractService {
             response.setVendorName(contract.getVendorName());
             response.setTaxRate(contract.getTaxRate());
             response.setAttachmentName(file.getOriginalFilename());
-            // 设置attachmentPath为完整的下载URL
-            String downloadUrl = "http://localhost:8081/contracts/" + contract.getId() + "/attachment?download=true";
+            // 设置attachmentPath为相对路径的下载接口
+            String downloadUrl = "/contracts/" + contract.getId() + "/attachment?download=true";
             response.setAttachmentPath(downloadUrl);
             
             // 如果有自定义字段结果，也返回给前端

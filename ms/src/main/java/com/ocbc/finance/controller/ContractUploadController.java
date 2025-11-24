@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
  */
 @RestController
 @RequestMapping("/contracts")
+@CrossOrigin(origins = "*")
 public class ContractUploadController {
 
     private final ContractService contractService;

@@ -13,9 +13,27 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/contracts': {
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+        secure: false,
+      }
+    },
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
   },
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  },
+  define: {
+    global: 'globalThis',
+  }
 })

@@ -10,7 +10,6 @@ import { PrepaymentItem } from './types';
 import styles from './styles.module.css';
 import { updateContract, createContract } from '../../api/contracts';
 import { operateAmortization } from '../../api/amortization';
-import pdfFile from '../../constants/contract_20251015_200057_504d8439.pdf';
 
 // 配置 PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -40,8 +39,19 @@ const ContractPreview: React.FC = () => {
   // 从路由状态中获取合同信息和摘销数据
   const { contractInfo, prepaymentData, isNewContract } = location.state || {};
   
-  // 获取 PDF 预览地址（优先使用 attachmentPath）
-  const pdfUrl = contractInfo?.attachmentPath || '';
+  // PDF文件状态管理
+  const [currentPdfUrl, setCurrentPdfUrl] = useState<string>('');
+  const [pdfLoadAttempts, setPdfLoadAttempts] = useState<number>(0);
+  
+  // 初始化PDF URL
+  useEffect(() => {
+    // 使用合同的attachmentPath
+    const initialPdfUrl = contractInfo?.attachmentPath && contractInfo.attachmentPath.trim() !== '' 
+      ? contractInfo.attachmentPath 
+      : '';
+    setCurrentPdfUrl(initialPdfUrl);
+    setPdfLoadAttempts(0);
+  }, [contractInfo]);
   
   // 表格数据状态管理
   const [dataSource, setDataSource] = useState<PrepaymentItem[]>(prepaymentData || []);
@@ -83,8 +93,16 @@ const ContractPreview: React.FC = () => {
     if (!contractInfo) {
       message.warning('未找到合同信息');
       navigate('/page-a');
+    } else {
+      // 添加调试信息
+      console.log('=== ContractPreview 接收到的数据 ===');
+      console.log('contractInfo:', contractInfo);
+      console.log('prepaymentData:', prepaymentData);
+      console.log('isNewContract:', isNewContract);
+      console.log('原始attachmentPath:', contractInfo?.attachmentPath);
+      console.log('实际使用的pdfUrl:', currentPdfUrl);
     }
-  }, [contractInfo, navigate]);
+  }, [contractInfo, navigate, prepaymentData, isNewContract]);
 
   // 生成新的临时ID（用于前端标识，后端会分配真实ID）
   const generateTempId = useCallback(() => {
@@ -360,10 +378,7 @@ const ContractPreview: React.FC = () => {
       const contractData = {
         ...editableContractInfo,
         attachmentName: editableContractInfo.attachmentName, // 添加附件名称
-        customFields: dataSource.reduce((acc: Record<string, any>, item) => {
-          acc[item.fieldName] = item.fieldValue;
-          return acc;
-        }, {}),
+        customFields: editableContractInfo.customFields || {},
         operatorId: currentUserId
       };
 
@@ -371,28 +386,33 @@ const ContractPreview: React.FC = () => {
       if (isNewContract) {
         message.loading({ content: '正在创建合同...', key: 'create' });
         const createContractRequest = {
-          totalAmount: editableContractInfo.totalAmount,
+          totalAmount: Number(editableContractInfo.totalAmount), // 确保是数字类型
           startDate: editableContractInfo.startDate,
           endDate: editableContractInfo.endDate,
-          taxRate: editableContractInfo.taxRate,
+          taxRate: Number(editableContractInfo.taxRate), // 确保是数字类型
           vendorName: editableContractInfo.vendorName,
           attachmentName: editableContractInfo.attachmentName, // 添加附件名称
           customFields: editableContractInfo.customFields, // 添加自定义字段
           operatorId: currentUserId
         };
         const createResponse = await createContract(createContractRequest);
-        contractId = createResponse.contractId!; // 从响应中获取contractId
+        contractId = createResponse.id; // 从响应中获取id作为contractId
         message.success({ content: '合同创建成功', key: 'create' });
+        
+        // 更新PDF路径为正式的下载接口
+        const newPdfUrl = `/contracts/${contractId}/attachment?download=true`;
+        setCurrentPdfUrl(newPdfUrl);
+        console.log('合同创建成功，更新PDF路径为:', newPdfUrl);
         
         // 注意：后端已经创建了摊销明细，但我们还是使用用户编辑后的数据
       } else {
         // 如果是编辑现有合同，更新合同信息
         message.loading({ content: '正在更新合同信息...', key: 'update' });
         const updateContractRequest = {
-          totalAmount: editableContractInfo.totalAmount,
+          totalAmount: Number(editableContractInfo.totalAmount), // 确保是数字类型
           startDate: editableContractInfo.startDate,
           endDate: editableContractInfo.endDate,
-          taxRate: editableContractInfo.taxRate,
+          taxRate: Number(editableContractInfo.taxRate), // 确保是数字类型
           vendorName: editableContractInfo.vendorName,
           customFields: editableContractInfo.customFields,
           operatorId: currentUserId
@@ -406,14 +426,18 @@ const ContractPreview: React.FC = () => {
       const operateAmortizationRequest = {
         contractId: contractId,
         amortization: dataSource.map(item => ({
-          id: typeof item.id === 'string' || typeof item.id === 'number' && item.id < 1000 ? null : item.id, // 小ID表示新建，转为null
+          id: typeof item.id === 'string' || (typeof item.id === 'number' && item.id < 1000) ? null : item.id, // 小ID表示新建，转为null
           amortizationPeriod: item.amortizationPeriod,
           accountingPeriod: item.accountingPeriod,
-          amount: item.amount,
+          amount: Number(item.amount), // 确保金额是数字类型
           periodDate: item.amortizationPeriod, // 使用摊销期间作为期间日期
           paymentStatus: 'PENDING' // 默认状态为待处理
         }))
       };
+      
+      console.log('=== 摊销明细操作请求数据 ===');
+      console.log('operateAmortizationRequest:', operateAmortizationRequest);
+      
       await operateAmortization(operateAmortizationRequest);
       message.success({ content: '摘销明细更新成功', key: 'amortization' });
 
@@ -423,7 +447,16 @@ const ContractPreview: React.FC = () => {
       navigate(`/contract/${contractId}`);
     } catch (error) {
       console.error('提交失败:', error);
-      message.error('提交失败，请重试');
+      
+      // 更详细的错误信息
+      let errorMessage = '提交失败，请重试';
+      if (error?.response?.data?.message) {
+        errorMessage = `提交失败：${error.response.data.message}`;
+      } else if (error?.message) {
+        errorMessage = `提交失败：${error.message}`;
+      }
+      
+      message.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -534,9 +567,13 @@ const ContractPreview: React.FC = () => {
         </div>
         <div className={styles.pdfViewer}>
           <Document
-            file={pdfUrl || pdfFile}
+            file={currentPdfUrl}
             onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={() => setPdfLoading(false)}
+            onLoadError={(error) => {
+              console.error('PDF加载失败:', error);
+              console.log('尝试加载的PDF路径:', currentPdfUrl);
+              setPdfLoading(false);
+            }}
             loading={(
               <div className={styles.pdfLoadingSkeleton}>
                 <Skeleton active paragraph={{ rows: 10 }} />
@@ -544,7 +581,17 @@ const ContractPreview: React.FC = () => {
                 <Skeleton active paragraph={{ rows: 10 }} style={{ marginTop: 20 }} />
               </div>
             )}
-            error={<div className={styles.pdfError}>PDF 加载失败</div>}
+            error={
+              <div className={styles.pdfError}>
+                <div>PDF 加载失败</div>
+                <div style={{ fontSize: '12px', color: '#999', marginTop: '8px' }}>
+                  文件路径: {currentPdfUrl}
+                </div>
+                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  请检查文件是否存在或网络连接
+                </div>
+              </div>
+            }
           >
             {Array.from(new Array(numPages), (_, index) => (
               <Page

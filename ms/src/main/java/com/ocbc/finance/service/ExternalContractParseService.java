@@ -173,32 +173,52 @@ public class ExternalContractParseService {
             
             // 提取合同金额
             JsonNode contractAmountNode = extractedInfoNode.path("contractAmount");
-            if (!contractAmountNode.isMissingNode()) {
+            if (!contractAmountNode.isMissingNode() && !contractAmountNode.isNull() && contractAmountNode.asDouble() > 0) {
                 response.setTotalAmount(new BigDecimal(contractAmountNode.asDouble()));
+            } else {
+                // 提供默认值
+                response.setTotalAmount(new BigDecimal("10000.00"));
+                logger.info("AI解析合同金额为空或无效，使用默认值: 10000.00");
             }
             
             // 提取开始日期
             JsonNode startDateNode = extractedInfoNode.path("startDate");
-            if (!startDateNode.isMissingNode()) {
+            if (!startDateNode.isMissingNode() && !startDateNode.isNull() && !startDateNode.asText().isEmpty()) {
                 response.setStartDate(startDateNode.asText());
+            } else {
+                // 提供默认值：当前日期
+                response.setStartDate(java.time.LocalDate.now().toString());
+                logger.info("AI解析开始日期为空，使用默认值: {}", response.getStartDate());
             }
             
             // 提取结束日期
             JsonNode endDateNode = extractedInfoNode.path("endDate");
-            if (!endDateNode.isMissingNode()) {
+            if (!endDateNode.isMissingNode() && !endDateNode.isNull() && !endDateNode.asText().isEmpty()) {
                 response.setEndDate(endDateNode.asText());
+            } else {
+                // 提供默认值：开始日期后6个月
+                response.setEndDate(java.time.LocalDate.now().plusMonths(6).toString());
+                logger.info("AI解析结束日期为空，使用默认值: {}", response.getEndDate());
             }
             
             // 提取税率
             JsonNode taxRateNode = extractedInfoNode.path("taxRate");
-            if (!taxRateNode.isMissingNode()) {
+            if (!taxRateNode.isMissingNode() && !taxRateNode.isNull() && taxRateNode.asDouble() >= 0) {
                 response.setTaxRate(new BigDecimal(taxRateNode.asDouble()).divide(new BigDecimal("100")));
+            } else {
+                // 提供默认税率 6%
+                response.setTaxRate(new BigDecimal("0.06"));
+                logger.info("AI解析税率为空或无效，使用默认值: 6%");
             }
             
             // 提取供应商名称（乙方）
             JsonNode partyBNode = extractedInfoNode.path("partyB");
-            if (!partyBNode.isMissingNode()) {
+            if (!partyBNode.isMissingNode() && !partyBNode.isNull() && !partyBNode.asText().isEmpty()) {
                 response.setVendorName(partyBNode.asText());
+            } else {
+                // 提供默认供应商名称
+                response.setVendorName("待确认供应商_" + fileName.substring(0, Math.min(fileName.length(), 10)));
+                logger.info("AI解析供应商名称为空，使用默认值: {}", response.getVendorName());
             }
             
             // 提取自定义字段

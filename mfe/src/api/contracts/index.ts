@@ -152,29 +152,39 @@ export const createContract = async (
     endDate: string;
     vendorName: string;
     taxRate: number;
+    attachmentName?: string;
+    customFields?: Record<string, string>;
     operatorId?: string;
   }
-): Promise<AmortizationCalculateResponse> => {
+): Promise<{ id: number; totalAmount: number; startDate: string; endDate: string; vendorName: string; createdAt: string; }> => {
   if (USE_MOCK) {
     // 模拟网络延迟
     await new Promise((resolve) => setTimeout(resolve, 500));
     return Promise.resolve({
-      contractId: Date.now(),
+      id: Date.now(),
       totalAmount: request.totalAmount,
       startDate: request.startDate,
       endDate: request.endDate,
       vendorName: request.vendorName,
-      taxRate: request.taxRate,
-      entries: []
+      createdAt: new Date().toISOString()
     });
   }
 
   // 真实 API 调用
-  const response = await apiPost<AmortizationCalculateResponse>(
+  const response = await apiPost<{ contractId: number; totalAmount: number; startDate: string; endDate: string; vendorName: string; generatedAt: string; }>(
     '/contracts',
     request
   );
-  return response as unknown as AmortizationCalculateResponse;
+  
+  // 转换后端返回的字段名以匹配前端期望
+  return {
+    id: response.contractId,
+    totalAmount: response.totalAmount,
+    startDate: response.startDate,
+    endDate: response.endDate,
+    vendorName: response.vendorName,
+    createdAt: response.generatedAt
+  };
 };
 
 /**
